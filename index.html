@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thrivoy</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .navbar-brand { font-weight: bold; color: #007BFF !important; }
+        .section { padding: 4rem 1rem; }
+        .footer { background-color: #343a40; color: white; padding: 3rem 1rem; }
+        .footer a { color: #adb5bd; text-decoration: none; }
+        .footer a:hover { color: white; }
+        .page-content { display: none; } /* Hide all pages by default */
+        .hero { background-color: #f8f9fa; padding: 6rem 1rem; text-align: center; }
+        .practice-card { border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem; transition: all 0.2s ease-in-out; background-color: white; }
+        .practice-card:hover { transform: translateY(-5px); box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15); }
+        .pricing-card { border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 2rem; height: 100%; display: flex; flex-direction: column; }
+        .pricing-card ul { flex-grow: 1; }
+        .form-section { background-color: #f8f9fa; }
+        iframe { width: 100%; height: 100vh; border: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- Shared Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#home" onclick="showPage('home')">Thrivoy</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="#consulting" onclick="showPage('consulting')">Consulting</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#signal" onclick="showPage('signal')">Signal</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#synapse" onclick="showPage('synapse')">Synapse</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#consensus" onclick="showPage('consensus')">Consensus</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Content Containers -->
+    <div id="home" class="page-content">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="container">
+                <h1 class="display-4">The End of Reactive Strategy.</h1>
+                <p class="lead">Thrivoy deploys a private, 24/7 AI-powered analyst to monitor your market landscape, transforming competitive noise into strategic foresight.</p>
+                <a href="#consulting" onclick="showPage('consulting')" class="btn btn-primary btn-lg mt-3">Request a Complimentary Intelligence Audit</a>
+            </div>
+        </div>
+        <!-- Core Practices Section -->
+        <div class="section" id="practices">
+            <div class="container">
+                <h2 class="text-center mb-5">Our Core Practices</h2>
+                <div class="row">
+                    <div class="col-md-3 col-6"><div class="practice-card">Healthcare Delivery</div></div>
+                    <div class="col-md-3 col-6"><div class="practice-card">Pharma & Life Sciences</div></div>
+                    <div class="col-md-3 col-6"><div class="practice-card">Banking & Finance</div></div>
+                    <div class="col-md-3 col-6"><div class="practice-card">FinTech & Payments</div></div>
+                    <div class="col-md-3 col-6"><div class="practice-card">Manufacturing</div></div>
+                    <div class="col-md-3 col-6"><div class="practice-card">Infrastructure & Energy</div></div>
+                    <div class="col-md-3 col-6"><div class="practice-card">Technology & SaaS</div></div>
+                    <div class="col-md-3 col-6"><div class="practice-card">IT Services</div></div>
+                    <div class="col-md-3 col-6"><div class="practice-card">Consumer Goods</div></div>
+                    <div class="col-md-3 col-6"><div class="practice-card">E-commerce & Retail</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="consulting" class="page-content">
+        <div class="container">
+            <div class="section text-center">
+                <h1>Thrivoy Consulting</h1>
+                <p class="lead">We design and deploy bespoke, AI-powered intelligence engines for your most complex strategic challenges. This is a permanent, ownable asset for your organization.</p>
+            </div>
+            <!-- Pricing Tiers -->
+            <div class="section" id="pricing">
+                <h2 class="text-center mb-5">Engagement Models</h2>
+                <div class="row">
+                    <!-- Pricing Cards for Consulting -->
+                </div>
+            </div>
+            <!-- Audit Form Section -->
+            <div class="section form-section text-center" id="audit">
+                <h2>Request Your Complimentary Intelligence Audit</h2>
+                <!-- Google Form for Audit will be embedded here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="signal" class="page-content">
+        <div class="container">
+            <div class="section text-center">
+                <h1>Thrivoy Signal</h1>
+                <p class="lead">Your automated competitor watchtower. Simple, powerful, and delivered to your inbox.</p>
+            </div>
+            <!-- Pricing Cards for Signal with Razorpay links -->
+        </div>
+    </div>
+
+    <div id="synapse" class="page-content" style="height: 100vh; padding: 0;">
+        <iframe src="PASTE_YOUR_SYNAPSE_WEB_APP_URL_HERE"></iframe>
+    </div>
+
+    <div id="consensus" class="page-content" style="height: 100vh; padding: 0;">
+        <iframe src="PASTE_YOUR_CONSENSUS_WEB_APP_URL_HERE"></iframe>
+    </div>
+
+    <div id="partners" class="page-content">
+        <div class="container">
+            <div class="section text-center">
+                <h1>Become a Thrivoy Evangelist</h1>
+                <!-- Evangelist Program Content and Application Form -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Footer -->
+    <div class="footer">
+        <div class="container text-center">
+            <p class="mb-2">© 2025 The Thrivoy Group. All Rights Reserved.</p>
+            <a href="#partners" onclick="showPage('partners')">The Evangelist Program</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function showPage(pageId) {
+            // Hide all page content
+            document.querySelectorAll('.page-content').forEach(function(page) {
+                page.style.display = 'none';
+            });
+            // Show the selected page
+            document.getElementById(pageId).style.display = 'block';
+            // Collapse the navbar on mobile after a click
+            $('.navbar-collapse').collapse('hide');
+        }
+
+        // Handle URL hash to show the correct page on load
+        document.addEventListener("DOMContentLoaded", function() {
+            let page = window.location.hash.substr(1);
+            if (page === '') {
+                page = 'home';
+            }
+            showPage(page);
+        });
+
+        // Handle back/forward browser buttons
+        window.addEventListener('hashchange', function() {
+            let page = window.location.hash.substr(1);
+            if (page === '') {
+                page = 'home';
+            }
+            showPage(page);
+        });
+    </script>
+</body>
+</html>
