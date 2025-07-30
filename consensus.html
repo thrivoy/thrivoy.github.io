@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thrivoy Consensus | Confidently Decide.</title>
     <meta name="description" content="Consensus is a free tool by Thrivoy that uses AI to find the unbiased consensus on any topic, helping you make confident decisions.">
+    
+    <!-- Remove conflicting CSP and let iframe handle its own policies -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; frame-src https://script.google.com https://script.googleusercontent.com; child-src https://script.google.com https://script.googleusercontent.com;">
+    
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body { 
@@ -34,10 +38,33 @@
             padding: 6rem 1rem; 
             text-align: center; 
         } 
-        iframe { 
+        .iframe-container {
             width: 100%; 
             height: 100vh; 
-            border: 0; 
+            border: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        iframe { 
+            width: 100%; 
+            height: 100%; 
+            border: 0;
+            display: block;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        .loading-overlay.hidden {
+            display: none;
         }
     </style>
 </head>
@@ -72,12 +99,23 @@
             <a class="btn btn-primary btn-lg mt-4" href="#app">Try Consensus Now</a>
         </div>
     </div>
-    <div id="app" style="height: 100vh; width: 100%;">
+    <div id="app" class="iframe-container">
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p class="mt-2">Loading Consensus Tool...</p>
+            </div>
+        </div>
         <iframe 
+            id="consensusFrame"
             src="https://script.google.com/macros/s/AKfycbwMquzTZ0IXD5SquoOJiRAFhQpIjXZaSZ0bbVr__PFxxtxiwtN058whOL0jczTgWftvog/exec"
-            allow="autoplay; camera; encrypted-media; fullscreen; geolocation; microphone; payment; usb; accelerometer; gyroscope; magnetometer; screen-wake-lock"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation"
-            referrerpolicy="no-referrer-when-downgrade">
+            allow="clipboard-read; clipboard-write; web-share"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation allow-downloads"
+            loading="lazy"
+            onload="hideLoading()"
+            onerror="showError()">
         </iframe>
     </div>
     <div class="footer">
@@ -86,7 +124,34 @@
             <p><a href="contact.html">Apply for a Consultation</a></p>
         </div>
     </div>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+            }
+        }
+        
+        function showError() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.innerHTML = `
+                    <div class="text-center">
+                        <div class="alert alert-danger">
+                            <h5>Unable to load Consensus Tool</h5>
+                            <p>Please try refreshing the page or contact support if the issue persists.</p>
+                            <button class="btn btn-primary" onclick="location.reload()">Refresh Page</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Hide loading after 10 seconds as fallback
+        setTimeout(hideLoading, 10000);
+    </script>
 </body>
 </html>
