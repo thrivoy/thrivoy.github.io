@@ -30,8 +30,7 @@
             color: white; 
         }
         .hero-interior { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background-color: #f8f9fa;
             padding: 6rem 1rem; 
             text-align: center; 
         }
@@ -41,11 +40,11 @@
             display: flex; 
             flex-direction: column; 
             height: 100%; 
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .pricing-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
         .pricing-card .card-body { 
             padding: 2rem; 
@@ -56,933 +55,110 @@
         .pricing-card ul { 
             flex-grow: 1; 
         }
-        
-        /* App Interface Styles */
-        .app-container {
-            display: none;
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
-        .app-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .dashboard-card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-        .dashboard-card:hover {
-            transform: translateY(-2px);
-        }
-        .competitor-item {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        .status-active { background-color: #d4edda; color: #155724; }
-        .status-pending { background-color: #fff3cd; color: #856404; }
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 2rem;
-        }
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 25px;
-            padding: 0.75rem 2rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.4);
-        }
-        .alert-custom {
-            border: none;
-            border-radius: 10px;
-            padding: 1rem 1.5rem;
-        }
     </style>
 </head>
 <body>
-    <!-- Marketing Page -->
-    <div id="marketing-page">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="#" onclick="showPage('marketing')">Thrivoy Signal</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ml-auto align-items-center">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#features">Features</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#pricing-signal">Pricing</a>
-                        </li>
-                        <li class="nav-item ml-lg-3">
-                            <a class="btn btn-primary" href="#" onclick="showPage('signup')">Get Started Free</a>
-                        </li>
-                        <li class="nav-item ml-2">
-                            <a class="btn btn-outline-primary" href="#" onclick="showPage('login')">Login</a>
-                        </li>
-                    </ul>
+    <!-- Shared Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">Thrivoy</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="approach.html">Our Approach</a></li>
+                    <li class="nav-item"><a class="nav-link" href="platforms.html">Our Platforms</a></li>
+                    <li class="nav-item ml-lg-3"><a class="btn btn-primary" href="contact.html">Apply for a Consultation</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="hero-interior">
+        <div class="container">
+            <h1 class="display-4">Know What Your Competitors Will Do Next.</h1>
+            <p class="lead mt-4" style="max-width: 800px; margin: auto;">
+                Stop wasting hours on manual tracking. Get a daily AI-powered briefing on your competitors' moves, delivered to your inbox. The power of a Thrivoy engine, delivered as a simple subscription.
+            </p>
+        </div>
+    </div>
+
+    <div class="section" id="pricing-signal">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2>Simple, Transparent Pricing</h2>
+                <p class="lead text-muted">Start for free. Upgrade when you need more power.</p>
+            </div>
+            <div class="card-deck mb-3 text-center">
+                <div class="card mb-4 shadow-sm pricing-card">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">Starter</h4>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="card-title pricing-card-title">₹0 <small class="text-muted">/ mo</small></h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Track 1 Competitor</li>
+                            <li>Weekly Email Briefing</li>
+                            <li>AI-Powered Summaries</li>
+                        </ul>
+                        <a href="https://script.google.com/macros/s/AKfycbwsE_Or7Vql1mUL004YyPp48RzKXNK6RnnOSR1PvclwyJE1o4UeFajMdJVHEOHUrgzq/exec" target="_blank" class="btn btn-lg btn-block btn-outline-primary mt-auto">
+                            Get Started Free
+                        </a>
+                    </div>
+                </div>
+                <div class="card mb-4 shadow-sm border-primary pricing-card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="my-0 font-weight-normal">Professional</h4>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="card-title pricing-card-title">₹4,999 <small class="text-muted">/ mo</small></h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Track 5 Competitors</li>
+                            <li>Daily Email Briefings</li>
+                            <li>Subscriber Dashboard</li>
+                        </ul>
+                        <a href="PASTE_YOUR_SIGNAL_PRO_RAZORPAY_LINK_HERE" target="_blank" class="btn btn-lg btn-block btn-primary mt-auto">
+                            Upgrade to Professional
+                        </a>
+                    </div>
+                </div>
+                <div class="card mb-4 shadow-sm pricing-card">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">Enterprise</h4>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="card-title pricing-card-title">₹19,999 <small class="text-muted">/ mo</small></h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Track 25 Competitors</li>
+                            <li>Real-time Alerts</li>
+                            <li>Team Access (5 Users)</li>
+                        </ul>
+                        <a href="PASTE_YOUR_SIGNAL_ENTERPRISE_RAZORPAY_LINK_HERE" target="_blank" class="btn btn-lg btn-block btn-outline-primary mt-auto">
+                            Upgrade to Enterprise
+                        </a>
+                    </div>
                 </div>
             </div>
-        </nav>
-
-        <div class="hero-interior">
-            <div class="container">
-                <h1 class="display-4">Know What Your Competitors Will Do Next.</h1>
-                <p class="lead mt-4" style="max-width: 800px; margin: auto;">
-                    Stop wasting hours on manual tracking. Get a daily AI-powered briefing on your competitors' moves, delivered to your inbox. The power of a Thrivoy engine, delivered as a simple subscription.
+            <div class="text-center mt-4">
+                <p class="text-muted">
+                    Already a paid subscriber? 
+                    <a href="https://script.google.com/macros/s/AKfycbwsE_Or7Vql1mUL004YyPp48RzKXNK6RnnOSR1PvclwyJE1o4UeFajMdJVHEOHUrgzq/exec?page=login" target="_blank">Access your dashboard.</a>
                 </p>
-                <div class="mt-5">
-                    <button class="btn btn-light btn-lg mr-3" onclick="showPage('signup')">
-                        Start Free Trial
-                    </button>
-                    <button class="btn btn-outline-light btn-lg" onclick="showPage('demo')">
-                        See Demo
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="section" id="features">
-            <div class="container">
-                <div class="row text-center">
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body">
-                                <div class="text-primary mb-3">
-                                    <i class="fas fa-robot fa-3x"></i>
-                                </div>
-                                <h5 class="card-title">AI-Powered Analysis</h5>
-                                <p class="card-text">Advanced AI algorithms analyze competitor movements and predict future strategies.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body">
-                                <div class="text-primary mb-3">
-                                    <i class="fas fa-clock fa-3x"></i>
-                                </div>
-                                <h5 class="card-title">Real-Time Monitoring</h5>
-                                <p class="card-text">24/7 automated tracking of competitor websites, social media, and public announcements.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-body">
-                                <div class="text-primary mb-3">
-                                    <i class="fas fa-envelope fa-3x"></i>
-                                </div>
-                                <h5 class="card-title">Daily Briefings</h5>
-                                <p class="card-text">Concise, actionable insights delivered to your inbox every morning.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section" id="pricing-signal">
-            <div class="container">
-                <div class="text-center mb-5">
-                    <h2 class="display-5">Choose Your Plan</h2>
-                    <p class="lead">Start free, upgrade when you need more power</p>
-                </div>
-                <div class="card-deck mb-3 text-center">
-                    <div class="card mb-4 shadow-sm pricing-card">
-                        <div class="card-header">
-                            <h4 class="my-0 font-weight-normal">Starter</h4>
-                        </div>
-                        <div class="card-body">
-                            <h1 class="card-title pricing-card-title">₹0 <small class="text-muted">/ mo</small></h1>
-                            <ul class="list-unstyled mt-3 mb-4">
-                                <li>Track 1 Competitor</li>
-                                <li>Weekly Email Briefing</li>
-                                <li>AI-Powered Summaries</li>
-                                <li>Basic Dashboard</li>
-                            </ul>
-                            <button class="btn btn-lg btn-block btn-outline-primary mt-auto" onclick="showPage('signup')">
-                                Get Started Free
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card mb-4 shadow-sm border-primary pricing-card">
-                        <div class="card-header bg-primary text-white">
-                            <h4 class="my-0 font-weight-normal">Professional</h4>
-                        </div>
-                        <div class="card-body">
-                            <h1 class="card-title pricing-card-title">₹4,999 <small class="text-muted">/ mo</small></h1>
-                            <ul class="list-unstyled mt-3 mb-4">
-                                <li>Track 5 Competitors</li>
-                                <li>Daily Email Briefings</li>
-                                <li>Advanced Dashboard</li>
-                                <li>Trend Analysis</li>
-                            </ul>
-                            <button class="btn btn-lg btn-block btn-primary mt-auto" onclick="upgradeToPro()">
-                                Upgrade to Professional
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card mb-4 shadow-sm pricing-card">
-                        <div class="card-header">
-                            <h4 class="my-0 font-weight-normal">Enterprise</h4>
-                        </div>
-                        <div class="card-body">
-                            <h1 class="card-title pricing-card-title">₹19,999 <small class="text-muted">/ mo</small></h1>
-                            <ul class="list-unstyled mt-3 mb-4">
-                                <li>Track 25 Competitors</li>
-                                <li>Real-time Alerts</li>
-                                <li>Team Access (5 Users)</li>
-                                <li>Custom Reports</li>
-                            </ul>
-                            <button class="btn btn-lg btn-block btn-outline-primary mt-auto" onclick="upgradeToEnterprise()">
-                                Upgrade to Enterprise
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-
-    <!-- Signup Page -->
-    <div id="signup-page" class="app-container">
-        <div class="app-header">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h1 class="h3 mb-0">Create Your Thrivoy Signal Account</h1>
-                        <p class="mb-0">Start monitoring your competitors today</p>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-light" onclick="showPage('marketing')">
-                            ← Back to Home
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="card dashboard-card">
-                        <div class="card-body p-5">
-                            <form id="signupForm">
-                                <div class="mb-4">
-                                    <label for="companyName" class="form-label">Company Name</label>
-                                    <input type="text" class="form-control form-control-lg" id="companyName" required>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="email" class="form-label">Business Email</label>
-                                    <input type="email" class="form-control form-control-lg" id="email" required>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="firstCompetitor" class="form-label">First Competitor to Track</label>
-                                    <input type="text" class="form-control form-control-lg" id="firstCompetitor" placeholder="e.g., competitor.com" required>
-                                    <small class="form-text text-muted">Enter the website or company name</small>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="industry" class="form-label">Industry</label>
-                                    <select class="form-control form-control-lg" id="industry" required>
-                                        <option value="">Select your industry</option>
-                                        <option value="technology">Technology</option>
-                                        <option value="ecommerce">E-commerce</option>
-                                        <option value="fintech">Fintech</option>
-                                        <option value="healthcare">Healthcare</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">
-                                    Start Free Monitoring
-                                </button>
-                            </form>
-                            <div class="text-center mt-3">
-                                <small class="text-muted">
-                                    Already have an account? 
-                                    <a href="#" onclick="showPage('login')">Sign in here</a>
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Login Page -->
-    <div id="login-page" class="app-container">
-        <div class="app-header">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h1 class="h3 mb-0">Welcome Back</h1>
-                        <p class="mb-0">Access your competitor intelligence dashboard</p>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-light" onclick="showPage('marketing')">
-                            ← Back to Home
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-5">
-                    <div class="card dashboard-card">
-                        <div class="card-body p-5">
-                            <form id="loginForm">
-                                <div class="mb-4">
-                                    <label for="loginEmail" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control form-control-lg" id="loginEmail" required>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="loginCode" class="form-label">Access Code</label>
-                                    <input type="text" class="form-control form-control-lg" id="loginCode" placeholder="Check your email for the code" required>
-                                    <small class="form-text text-muted">
-                                        Don't have a code? 
-                                        <a href="#" onclick="sendAccessCode()">Send me one</a>
-                                    </small>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">
-                                    Access Dashboard
-                                </button>
-                            </form>
-                            <div class="text-center mt-3">
-                                <small class="text-muted">
-                                    New to Thrivoy Signal? 
-                                    <a href="#" onclick="showPage('signup')">Create account</a>
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard Page -->
-    <div id="dashboard-page" class="app-container">
-        <div class="app-header">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h1 class="h3 mb-0">Competitor Intelligence Dashboard</h1>
-                        <p class="mb-0">Welcome back, <span id="userCompany">your company</span></p>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-light mr-2" onclick="refreshDashboard()">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                        <button class="btn btn-light" onclick="logout()">
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="container mt-4">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card dashboard-card mb-4">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0">Competitors Being Monitored</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="competitorsList">
-                                <!-- Dynamic content will be loaded here -->
-                            </div>
-                            <button class="btn btn-outline-primary" onclick="addCompetitor()">
-                                <i class="fas fa-plus"></i> Add Competitor
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="card dashboard-card">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0">Recent Intelligence Briefings</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="briefingsList">
-                                <!-- Dynamic content will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="card dashboard-card mb-4">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0">Account Status</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <strong>Plan:</strong> <span id="currentPlan">Starter</span>
-                            </div>
-                            <div class="mb-3">
-                                <strong>Competitors:</strong> <span id="competitorCount">1</span> of <span id="competitorLimit">1</span>
-                            </div>
-                            <div class="mb-3">
-                                <strong>Next Briefing:</strong> Tomorrow 9:00 AM
-                            </div>
-                            <button class="btn btn-primary btn-sm" onclick="upgradePlan()">
-                                Upgrade Plan
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="card dashboard-card">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0">Quick Actions</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary btn-sm" onclick="downloadReport()">
-                                    <i class="fas fa-download"></i> Download Report
-                                </button>
-                                <button class="btn btn-outline-primary btn-sm" onclick="configureAlerts()">
-                                    <i class="fas fa-bell"></i> Configure Alerts
-                                </button>
-                                <button class="btn btn-outline-primary btn-sm" onclick="viewSettings()">
-                                    <i class="fas fa-cog"></i> Settings
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Spinner -->
-    <div id="loadingSpinner" class="loading-spinner">
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-        <p class="mt-2">Processing your request...</p>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer" id="footer">
+    
+    <!-- Shared Footer -->
+    <div class="footer">
         <div class="container text-center">
             <p class="mb-2">© 2025 The Thrivoy Group. All Rights Reserved.</p>
-            <p><a href="#" onclick="showPage('contact')">Contact Us</a> | <a href="#" onclick="showPage('privacy')">Privacy Policy</a></p>
+            <p><a href="contact.html">Apply for a Consultation</a></p>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
-    
-    <script>
-        // Configuration
-        const APP_CONFIG = {
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxXX9fbMXhFI2D_XIr7rR5Kq1gzatFP06xtDbAiceONs637aCTdWx5pit9CApMMV7Q/exec',
-            RAZORPAY_PRO_LINK: 'PASTE_YOUR_SIGNAL_PRO_RAZORPAY_LINK_HERE',
-            RAZORPAY_ENTERPRISE_LINK: 'PASTE_YOUR_SIGNAL_ENTERPRISE_RAZORPAY_LINK_HERE'
-        };
-
-        // Global state
-        let currentUser = null;
-        let currentPage = 'marketing';
-
-        // Page Management
-        function showPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.app-container, #marketing-page').forEach(page => {
-                page.style.display = 'none';
-            });
-            
-            // Hide footer for app pages
-            const footer = document.getElementById('footer');
-            if (pageId === 'marketing') {
-                document.getElementById('marketing-page').style.display = 'block';
-                footer.style.display = 'block';
-            } else {
-                document.getElementById(pageId + '-page').style.display = 'block';
-                footer.style.display = 'none';
-            }
-            
-            currentPage = pageId;
-            
-            // Load page-specific data
-            if (pageId === 'dashboard') {
-                loadDashboard();
-            }
-        }
-
-        // Authentication Functions
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            signup();
-        });
-
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            login();
-        });
-
-        async function signup() {
-            showLoading(true);
-            
-            const formData = {
-                action: 'signup',
-                companyName: document.getElementById('companyName').value,
-                email: document.getElementById('email').value,
-                firstCompetitor: document.getElementById('firstCompetitor').value,
-                industry: document.getElementById('industry').value
-            };
-            
-            try {
-                const response = await callAppsScript(formData);
-                
-                if (response.success) {
-                    showAlert('success', 'Account created successfully! Check your email for login instructions.');
-                    currentUser = response.user;
-                    showPage('dashboard');
-                } else {
-                    showAlert('error', response.message || 'Signup failed. Please try again.');
-                }
-            } catch (error) {
-                showAlert('error', 'Network error. Please check your connection and try again.');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        async function login() {
-            showLoading(true);
-            
-            const formData = {
-                action: 'login',
-                email: document.getElementById('loginEmail').value,
-                accessCode: document.getElementById('loginCode').value
-            };
-            
-            try {
-                const response = await callAppsScript(formData);
-                
-                if (response.success) {
-                    currentUser = response.user;
-                    showPage('dashboard');
-                } else {
-                    showAlert('error', response.message || 'Login failed. Please check your credentials.');
-                }
-            } catch (error) {
-                showAlert('error', 'Network error. Please check your connection and try again.');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        async function sendAccessCode() {
-            const email = document.getElementById('loginEmail').value;
-            if (!email) {
-                showAlert('error', 'Please enter your email address first.');
-                return;
-            }
-            
-            showLoading(true);
-            
-            try {
-                const response = await callAppsScript({
-                    action: 'sendAccessCode',
-                    email: email
-                });
-                
-                if (response.success) {
-                    showAlert('success', 'Access code sent to your email!');
-                } else {
-                    showAlert('error', response.message || 'Failed to send access code.');
-                }
-            } catch (error) {
-                showAlert('error', 'Network error. Please try again.');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // Dashboard Functions
-        async function loadDashboard() {
-            if (!currentUser) return;
-            
-            showLoading(true);
-            
-            try {
-                const response = await callAppsScript({
-                    action: 'getDashboard',
-                    userId: currentUser.id
-                });
-                
-                if (response.success) {
-                    populateDashboard(response.data);
-                } else {
-                    showAlert('error', 'Failed to load dashboard data.');
-                }
-            } catch (error) {
-                showAlert('error', 'Network error while loading dashboard.');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        function populateDashboard(data) {
-            // Update user info
-            document.getElementById('userCompany').textContent = data.companyName || 'your company';
-            document.getElementById('currentPlan').textContent = data.plan || 'Starter';
-            document.getElementById('competitorCount').textContent = data.competitors?.length || 0;
-            
-            // Populate competitors list
-            const competitorsList = document.getElementById('competitorsList');
-            if (data.competitors && data.competitors.length > 0) {
-                competitorsList.innerHTML = data.competitors.map(comp => `
-                    <div class="competitor-item">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1">${comp.name}</h6>
-                                <small class="text-muted">${comp.url}</small>
-                            </div>
-                            <div>
-                                <span class="status-badge ${comp.status === 'active' ? 'status-active' : 'status-pending'}">
-                                    ${comp.status}
-                                </span>
-                                <button class="btn btn-sm btn-outline-danger ml-2" onclick="removeCompetitor('${comp.id}')">
-                                    Remove
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                competitorsList.innerHTML = '<p class="text-muted">No competitors added yet.</p>';
-            }
-            
-            // Populate briefings
-            const briefingsList = document.getElementById('briefingsList');
-            if (data.briefings && data.briefings.length > 0) {
-                briefingsList.innerHTML = data.briefings.map(briefing => `
-                    <div class="mb-3 p-3 border-left border-primary">
-                        <h6>${briefing.title}</h6>
-                        <p class="mb-1">${briefing.summary}</p>
-                        <small class="text-muted">${briefing.date}</small>
-                    </div>
-                `).join('');
-            } else {
-                briefingsList.innerHTML = '<p class="text-muted">No briefings available yet. Your first briefing will arrive soon!</p>';
-            }
-        }
-
-        // Utility Functions
-        async function callAppsScript(data) {
-            const response = await fetch(APP_CONFIG.APPS_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            return await response.json();
-        }
-
-        function showLoading(show) {
-            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
-        }
-
-        function showAlert(type, message) {
-            // Remove existing alerts
-            document.querySelectorAll('.alert-custom').forEach(alert => alert.remove());
-            
-            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-            const alertHtml = `
-                <div class="alert ${alertClass} alert-custom alert-dismissible fade show" role="alert">
-                    <strong>${type === 'success' ? 'Success!' : 'Error!'}</strong> ${message}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            `;
-            
-            // Insert at the top of the current visible page
-            const currentContainer = document.querySelector('#' + currentPage + '-page .container') || 
-                                   document.querySelector('#marketing-page .container');
-            if (currentContainer) {
-                currentContainer.insertAdjacentHTML('afterbegin', alertHtml);
-            }
-        }
-
-        // Business Functions
-        function upgradeToPro() {
-            if (APP_CONFIG.RAZORPAY_PRO_LINK && APP_CONFIG.RAZORPAY_PRO_LINK !== 'PASTE_YOUR_SIGNAL_PRO_RAZORPAY_LINK_HERE') {
-                window.open(APP_CONFIG.RAZORPAY_PRO_LINK, '_blank');
-            } else {
-                showAlert('error', 'Payment integration not configured. Please contact support.');
-            }
-        }
-
-        function upgradeToEnterprise() {
-            if (APP_CONFIG.RAZORPAY_ENTERPRISE_LINK && APP_CONFIG.RAZORPAY_ENTERPRISE_LINK !== 'PASTE_YOUR_SIGNAL_ENTERPRISE_RAZORPAY_LINK_HERE') {
-                window.open(APP_CONFIG.RAZORPAY_ENTERPRISE_LINK, '_blank');
-            } else {
-                showAlert('error', 'Payment integration not configured. Please contact support.');
-            }
-        }
-
-        async function addCompetitor() {
-            const competitorName = prompt('Enter competitor name or website:');
-            if (!competitorName) return;
-            
-            showLoading(true);
-            
-            try {
-                const response = await callAppsScript({
-                    action: 'addCompetitor',
-                    userId: currentUser.id,
-                    competitorName: competitorName
-                });
-                
-                if (response.success) {
-                    showAlert('success', 'Competitor added successfully!');
-                    loadDashboard();
-                } else {
-                    showAlert('error', response.message || 'Failed to add competitor.');
-                }
-            } catch (error) {
-                showAlert('error', 'Network error. Please try again.');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        async function removeCompetitor(competitorId) {
-            if (!confirm('Are you sure you want to stop monitoring this competitor?')) return;
-            
-            showLoading(true);
-            
-            try {
-                const response = await callAppsScript({
-                    action: 'removeCompetitor',
-                    userId: currentUser.id,
-                    competitorId: competitorId
-                });
-                
-                if (response.success) {
-                    showAlert('success', 'Competitor removed successfully!');
-                    loadDashboard();
-                } else {
-                    showAlert('error', response.message || 'Failed to remove competitor.');
-                }
-            } catch (error) {
-                showAlert('error', 'Network error. Please try again.');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        function refreshDashboard() {
-            loadDashboard();
-        }
-
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                currentUser = null;
-                showPage('marketing');
-                showAlert('success', 'Logged out successfully!');
-            }
-        }
-
-        function upgradePlan() {
-            showAlert('info', 'Choose your upgrade plan from the pricing section.');
-            showPage('marketing');
-            document.getElementById('pricing-signal').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function downloadReport() {
-            showAlert('info', 'Report download feature coming soon!');
-        }
-
-        function configureAlerts() {
-            showAlert('info', 'Alert configuration feature coming soon!');
-        }
-
-        function viewSettings() {
-            showAlert('info', 'Settings page coming soon!');
-        }
-
-        // Demo Functions
-        function showPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.app-container, #marketing-page').forEach(page => {
-                page.style.display = 'none';
-            });
-            
-            // Hide footer for app pages
-            const footer = document.getElementById('footer');
-            if (pageId === 'marketing') {
-                document.getElementById('marketing-page').style.display = 'block';
-                footer.style.display = 'block';
-            } else if (pageId === 'demo') {
-                showDemoData();
-                document.getElementById('dashboard-page').style.display = 'block';
-                footer.style.display = 'none';
-            } else {
-                document.getElementById(pageId + '-page').style.display = 'block';
-                footer.style.display = 'none';
-            }
-            
-            currentPage = pageId;
-            
-            // Load page-specific data
-            if (pageId === 'dashboard' && currentUser) {
-                loadDashboard();
-            }
-        }
-
-        function showDemoData() {
-            // Populate demo dashboard
-            document.getElementById('userCompany').textContent = 'Demo Company';
-            document.getElementById('currentPlan').textContent = 'Professional';
-            document.getElementById('competitorCount').textContent = '3';
-            document.getElementById('competitorLimit').textContent = '5';
-            
-            // Demo competitors
-            document.getElementById('competitorsList').innerHTML = `
-                <div class="competitor-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">TechRival Corp</h6>
-                            <small class="text-muted">techrival.com</small>
-                        </div>
-                        <div>
-                            <span class="status-badge status-active">active</span>
-                            <button class="btn btn-sm btn-outline-danger ml-2" onclick="showAlert('info', 'This is a demo - no actual changes made')">Remove</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="competitor-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">InnovateCo</h6>
-                            <small class="text-muted">innovateco.com</small>
-                        </div>
-                        <div>
-                            <span class="status-badge status-active">active</span>
-                            <button class="btn btn-sm btn-outline-danger ml-2" onclick="showAlert('info', 'This is a demo - no actual changes made')">Remove</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="competitor-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-1">StartupX</h6>
-                            <small class="text-muted">startupx.io</small>
-                        </div>
-                        <div>
-                            <span class="status-badge status-pending">pending</span>
-                            <button class="btn btn-sm btn-outline-danger ml-2" onclick="showAlert('info', 'This is a demo - no actual changes made')">Remove</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Demo briefings
-            document.getElementById('briefingsList').innerHTML = `
-                <div class="mb-3 p-3 border-left border-primary">
-                    <h6>TechRival Corp launches new AI feature</h6>
-                    <p class="mb-1">Competitor has announced a new AI-powered feature in their latest product update. This could impact your market positioning in the enterprise segment.</p>
-                    <small class="text-muted">2 hours ago</small>
-                </div>
-                <div class="mb-3 p-3 border-left border-warning">
-                    <h6>InnovateCo reduces pricing by 15%</h6>
-                    <p class="mb-1">Significant price reduction detected across their core product line. This aggressive pricing strategy may affect your competitive advantage.</p>
-                    <small class="text-muted">1 day ago</small>
-                </div>
-                <div class="mb-3 p-3 border-left border-info">
-                    <h6>StartupX raises $50M Series B</h6>
-                    <p class="mb-1">Funding announcement suggests expansion plans. Monitor for increased marketing spend and product development acceleration.</p>
-                    <small class="text-muted">3 days ago</small>
-                </div>
-            `;
-            
-            // Add demo notice
-            setTimeout(() => {
-                showAlert('info', 'This is a demo dashboard. Sign up to start tracking your real competitors!');
-            }, 1000);
-        }
-
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set default page
-            showPage('marketing');
-            
-            // Add smooth scrolling for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-            
-            // Handle URL parameters for direct access
-            const urlParams = new URLSearchParams(window.location.search);
-            const page = urlParams.get('page');
-            if (page && ['login', 'signup', 'dashboard'].includes(page)) {
-                showPage(page);
-            }
-        });
-
-        // Handle browser back/forward buttons
-        window.addEventListener('popstate', function(event) {
-            if (event.state && event.state.page) {
-                showPage(event.state.page);
-            } else {
-                showPage('marketing');
-            }
-        });
-
-        // Update browser history when changing pages
-        const originalShowPage = showPage;
-        showPage = function(pageId) {
-            originalShowPage(pageId);
-            if (history.pushState) {
-                history.pushState({page: pageId}, '', `?page=${pageId}`);
-            }
-        };
-    </script>
 </body>
 </html>
