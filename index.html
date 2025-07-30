@@ -118,27 +118,47 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        function showPage(pageId){/* ... Same as previous final version ... */}
-        document.addEventListener("DOMContentLoaded",function(){/* ... Same as previous final version ... */});
-        window.addEventListener('hashchange',function(){/* ... Same as previous final version ... */});
-        const partnerForm = document.getElementById('partner-form');
-        partnerForm.addEventListener("submit", e => {
-            e.preventDefault();
-            const formActionURL = 'https://docs.google.com/forms/d/e/1FAIpQLSfLtD0QYpRzBTnQneDwCzyakGtQoeyQlZNUWb51TLmxoI1EWw/formResponse';
-            const formData = new FormData(partnerForm);
-            const submitButton = partnerForm.querySelector('button');
-            submitButton.disabled = true; submitButton.innerText = 'Submitting...';
-            fetch(formActionURL, { method: "POST", mode: "no-cors", body: formData })
-            .then(() => { 
-                document.getElementById('partner-form-container').style.display = 'none'; 
-                document.getElementById('partner-success-message').style.display = 'block'; 
-            })
-            .catch(error => { 
-                alert('An error occurred. Please try again.'); 
-                submitButton.disabled = false; 
-                submitButton.innerText = 'Submit Application'; 
+                function showPage(pageId) {
+            // Hide all page content sections first
+            document.querySelectorAll('.page-content').forEach(function(page) {
+                page.style.display = 'none';
             });
-        });
+            
+            // Find the target page to show
+            const targetPage = document.getElementById(pageId);
+            
+            // If the target page exists, show it. Otherwise, default to showing the 'home' page.
+            if (targetPage) {
+                targetPage.style.display = 'block';
+            } else {
+                document.getElementById('home').style.display = 'block';
+            }
+            
+            // Update the URL hash without causing the page to jump
+            if (window.location.hash !== '#' + pageId) {
+                window.location.hash = '#' + pageId;
+            }
+            
+            // Update the active class on the navigation link
+            document.querySelectorAll('.nav-item').forEach(function(navItem) {
+                navItem.classList.remove('active');
+            });
+            const activeNavItem = document.getElementById('nav-' + pageId);
+            if (activeNavItem) {
+                activeNavItem.classList.add('active');
+            } else if (pageId === 'home') {
+                // If we are on the homepage, no nav link should be active
+                 document.querySelectorAll('.nav-item').forEach(function(navItem) {
+                    navItem.classList.remove('active');
+                });
+            }
+            
+            // Scroll to the top of the new page content
+            window.scrollTo(0, 0);
+
+            // For mobile, collapse the navigation menu after a link is clicked
+            $('.navbar-collapse').collapse('hide');
+        }
     </script>
 </body>
 </html>
