@@ -675,4 +675,480 @@
             document.getElementById('footer').style.display = 'none';
             currentView = 'dashboard';
             updateBrowserHistory('dashboard');
-            loa
+            loadDashboard();
+        }
+
+        function showDemoPage() {
+            hideAllViews();
+            document.getElementById('demo-page').style.display = 'block';
+            document.getElementById('footer').style.display = 'none';
+            currentView = 'demo';
+            updateBrowserHistory('demo');
+        }
+
+        function hideAllViews() {
+            document.querySelectorAll('#main-content, .app-container').forEach(view => {
+                view.style.display = 'none';
+            });
+        }
+
+        function updateBrowserHistory(view) {
+            if (history.pushState) {
+                const url = view === 'main' ? 'signal.html' : `signal.html?view=${view}`;
+                history.pushState({view: view}, '', url);
+            }
+        }
+
+        // Authentication Functions
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            signup();
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            login();
+        });
+
+        async function signup() {
+            showLoading(true);
+            
+            const formData = {
+                action: 'signup',
+                companyName: document.getElementById('companyName').value,
+                email: document.getElementById('email').value,
+                firstCompetitor: document.getElementById('firstCompetitor').value,
+                industry: document.getElementById('industry').value,
+                source: 'signal_page'
+            };
+            
+            try {
+                const response = await callAppsScript(formData);
+                
+                if (response.success) {
+                    showAlert('success', 'Account created successfully! Check your email for login instructions.');
+                    currentUser = response.user;
+                    setTimeout(() => {
+                        showDashboardPage();
+                    }, 2000);
+                } else {
+                    showAlert('error', response.message || 'Signup failed. Please try again.');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error. Please check your connection and try again.');
+                console.error('Signup error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function login() {
+            showLoading(true);
+            
+            const formData = {
+                action: 'login',
+                email: document.getElementById('loginEmail').value,
+                accessCode: document.getElementById('loginCode').value,
+                source: 'signal_page'
+            };
+            
+            try {
+                const response = await callAppsScript(formData);
+                
+                if (response.success) {
+                    currentUser = response.user;
+                    showAlert('success', 'Login successful! Redirecting to dashboard...');
+                    setTimeout(() => {
+                        showDashboardPage();
+                    }, 1500);
+                } else {
+                    showAlert('error', response.message || 'Login failed. Please check your credentials.');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error. Please check your connection and try again.');
+                console.error('Login error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function sendAccessCode() {
+            const email = document.getElementById('loginEmail').value;
+            if (!email) {
+                showAlert('error', 'Please enter your email address first.');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await callAppsScript({
+                    action: 'sendAccessCode',
+                    email: email,
+                    source: 'signal_page'
+                });
+                
+                if (response.success) {
+                    showAlert('success', 'Access code sent to your email!');
+                } else {
+                    showAlert('error', response.message || 'Failed to send access code.');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error. Please try again.');
+                console.error('Send access code error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Dashboard Functions
+        async function loadDashboard() {
+            if (!currentUser) {
+                showAlert('error', 'Please log in to access the dashboard.');
+                showLoginPage();
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await callAppsScript({
+                    action: 'getDashboard',
+                    userId: currentUser.id,
+                    source: 'signal_page'
+                });
+                
+                if (response.success) {
+                    populateDashboard(response.data);
+                } else {
+                    showAlert('error', 'Failed to load dashboard data.');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error while loading dashboard.');
+                console.error('Dashboard load error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function populateDashboard(data) {
+            // Update user info
+            document.getElementById('userCompany').textContent = data.companyName || 'your company';
+            document.getElementById('currentPlan').textContent = data.plan || 'Starter';
+            document.getElementById('competitorCount').textContent = data.competitors?.length || 0;
+            document.getElementById('competitorLimit').textContent = data.competitorLimit || 1;
+            
+            // Populate competitors list
+            const competitorsList = document.getElementById('competitorsList');
+            if (data.competitors && data.competitors.length > 0) {
+                competitorsList.innerHTML = data.competitors.map(comp => `
+                    <div class="competitor-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${comp.name || 'Unknown'}</h6>
+                                <small class="text-muted">${comp.url || 'No URL'}</small>
+                            </div>
+                            <div>
+                                <span class="status-badge ${comp.status === 'active' ? 'status-active' : 'status-pending'}">
+                                    ${comp.status || 'pending'}
+                                </span>
+                                <button class="btn btn-sm btn-outline-danger ml-2" onclick="removeCompetitor('${comp.id}')">
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                competitorsList.innerHTML = '<p class="text-muted">No competitors added yet. Add your first competitor to start monitoring!</p>';
+            }
+            
+            // Populate briefings
+            const briefingsList = document.getElementById('briefingsList');
+            if (data.briefings && data.briefings.length > 0) {
+                briefingsList.innerHTML = data.briefings.map(briefing => `
+                    <div class="mb-3 p-3 border-left border-primary">
+                        <h6>${briefing.title || 'Intelligence Update'}</h6>
+                        <p class="mb-1">${briefing.summary || 'No summary available'}</p>
+                        <small class="text-muted">${briefing.date || 'No date'}</small>
+                    </div>
+                `).join('');
+            } else {
+                briefingsList.innerHTML = '<p class="text-muted">No briefings available yet. Your first briefing will arrive soon after adding competitors!</p>';
+            }
+        }
+
+        // Utility Functions
+        async function callAppsScript(data) {
+            try {
+                const response = await fetch(APP_CONFIG.APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...data,
+                        timestamp: new Date().toISOString(),
+                        userAgent: navigator.userAgent,
+                        referrer: document.referrer || APP_CONFIG.SITE_BASE_URL
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Apps Script call error:', error);
+                throw error;
+            }
+        }
+
+        function showLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = show ? 'block' : 'none';
+            
+            // Disable forms during loading
+            document.querySelectorAll('form, button').forEach(element => {
+                element.disabled = show;
+            });
+        }
+
+        function showAlert(type, message) {
+            // Remove existing alerts
+            document.querySelectorAll('.alert-custom').forEach(alert => alert.remove());
+            
+            const alertClass = type === 'success' ? 'alert-success' : 
+                              type === 'info' ? 'alert-info' : 'alert-danger';
+            const alertHtml = `
+                <div class="alert ${alertClass} alert-custom alert-dismissible fade show" role="alert">
+                    <strong>${type === 'success' ? 'Success!' : type === 'info' ? 'Info:' : 'Error!'}</strong> ${message}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            `;
+            
+            // Insert at the top of the current visible container
+            const currentContainer = document.querySelector(`#${currentView === 'main' ? 'main-content' : currentView + '-page'} .container`);
+            if (currentContainer) {
+                currentContainer.insertAdjacentHTML('afterbegin', alertHtml);
+                
+                // Auto-remove success alerts after 5 seconds
+                if (type === 'success') {
+                    setTimeout(() => {
+                        const alert = currentContainer.querySelector('.alert-success');
+                        if (alert) {
+                            $(alert).alert('close');
+                        }
+                    }, 5000);
+                }
+            }
+        }
+
+        // Business Functions
+        function upgradeToPro() {
+            if (APP_CONFIG.RAZORPAY_PRO_LINK && APP_CONFIG.RAZORPAY_PRO_LINK !== 'PASTE_YOUR_SIGNAL_PRO_RAZORPAY_LINK_HERE') {
+                window.open(APP_CONFIG.RAZORPAY_PRO_LINK, '_blank');
+            } else {
+                showAlert('info', 'Payment integration is being configured. Please contact us at contact.html for upgrade assistance.');
+            }
+        }
+
+        function upgradeToEnterprise() {
+            if (APP_CONFIG.RAZORPAY_ENTERPRISE_LINK && APP_CONFIG.RAZORPAY_ENTERPRISE_LINK !== 'PASTE_YOUR_SIGNAL_ENTERPRISE_RAZORPAY_LINK_HERE') {
+                window.open(APP_CONFIG.RAZORPAY_ENTERPRISE_LINK, '_blank');
+            } else {
+                showAlert('info', 'Payment integration is being configured. Please contact us at contact.html for upgrade assistance.');
+            }
+        }
+
+        async function addCompetitor() {
+            if (!currentUser) {
+                showAlert('error', 'Please log in to add competitors.');
+                return;
+            }
+            
+            const competitorName = prompt('Enter competitor name or website:');
+            if (!competitorName || competitorName.trim() === '') return;
+            
+            showLoading(true);
+            
+            try {
+                const response = await callAppsScript({
+                    action: 'addCompetitor',
+                    userId: currentUser.id,
+                    competitorName: competitorName.trim(),
+                    source: 'signal_dashboard'
+                });
+                
+                if (response.success) {
+                    showAlert('success', 'Competitor added successfully! Monitoring will begin shortly.');
+                    loadDashboard();
+                } else {
+                    showAlert('error', response.message || 'Failed to add competitor. Please try again.');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error. Please check your connection and try again.');
+                console.error('Add competitor error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function removeCompetitor(competitorId) {
+            if (!currentUser) {
+                showAlert('error', 'Please log in to remove competitors.');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to stop monitoring this competitor?')) return;
+            
+            showLoading(true);
+            
+            try {
+                const response = await callAppsScript({
+                    action: 'removeCompetitor',
+                    userId: currentUser.id,
+                    competitorId: competitorId,
+                    source: 'signal_dashboard'
+                });
+                
+                if (response.success) {
+                    showAlert('success', 'Competitor removed successfully!');
+                    loadDashboard();
+                } else {
+                    showAlert('error', response.message || 'Failed to remove competitor. Please try again.');
+                }
+            } catch (error) {
+                showAlert('error', 'Network error. Please check your connection and try again.');
+                console.error('Remove competitor error:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function refreshDashboard() {
+            if (currentUser) {
+                showAlert('info', 'Refreshing dashboard data...');
+                loadDashboard();
+            } else {
+                showAlert('error', 'Please log in to refresh dashboard.');
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                currentUser = null;
+                showAlert('success', 'Logged out successfully!');
+                setTimeout(() => {
+                    showMainPage();
+                }, 1000);
+            }
+        }
+
+        function upgradePlan() {
+            showAlert('info', 'Choose your upgrade plan from the pricing section below.');
+            showMainPage();
+            setTimeout(() => {
+                document.getElementById('pricing-signal').scrollIntoView({ behavior: 'smooth' });
+            }, 500);
+        }
+
+        function downloadReport() {
+            showAlert('info', 'Report download feature is coming soon! You\'ll receive notifications when it\'s available.');
+        }
+
+        function configureAlerts() {
+            showAlert('info', 'Alert configuration feature is coming soon! Currently, you receive daily email briefings.');
+        }
+
+        function viewSettings() {
+            showAlert('info', 'Settings page is coming soon! For now, contact us for account modifications.');
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parse URL parameters to determine initial view
+            const urlParams = new URLSearchParams(window.location.search);
+            const view = urlParams.get('view');
+            
+            if (view && ['signup', 'login', 'dashboard', 'demo'].includes(view)) {
+                switch(view) {
+                    case 'signup':
+                        showSignupPage();
+                        break;
+                    case 'login':
+                        showLoginPage();
+                        break;
+                    case 'dashboard':
+                        showDashboardPage();
+                        break;
+                    case 'demo':
+                        showDemoPage();
+                        break;
+                    default:
+                        showMainPage();
+                }
+            } else {
+                showMainPage();
+            }
+            
+            // Add smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Handle browser back/forward buttons
+            window.addEventListener('popstate', function(event) {
+                if (event.state && event.state.view) {
+                    switch(event.state.view) {
+                        case 'signup':
+                            showSignupPage();
+                            break;
+                        case 'login':
+                            showLoginPage();
+                            break;
+                        case 'dashboard':
+                            showDashboardPage();
+                            break;
+                        case 'demo':
+                            showDemoPage();
+                            break;
+                        default:
+                            showMainPage();
+                    }
+                } else {
+                    showMainPage();
+                }
+            });
+            
+            // Form validation enhancement
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('input', function(e) {
+                    const target = e.target;
+                    if (target.type === 'email') {
+                        const isValid = target.checkValidity();
+                        target.classList.toggle('is-invalid', !isValid);
+                        target.classList.toggle('is-valid', isValid);
+                    }
+                });
+            });
+            
+            console.log('Thrivoy Signal initialized successfully');
+        });
+    </script>
+</body>
+</html>
