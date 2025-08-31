@@ -494,6 +494,47 @@
             <h2>Submit Expert Knowledge</h2>
             <form id="expertForm" onsubmit="return false;">
                 <div class="form-group">
+                    <label for="expertId">Expert ID:</label>
+                    <input type="text" id="expertId" placeholder="Your unique expert identifier" required autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="secretKey">Expert Secret Key:</label>
+                    <input type="password" id="secretKey" placeholder="Your expert access key" required autocomplete="current-password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="domain">Domain/Field:</label>
+                    <select id="domain" required>
+                        <option value="">Select domain...</option>
+                        <option value="Leadership">Leadership</option>
+                        <option value="Management">Management</option>
+                        <option value="Communication">Communication</option>
+                        <option value="Conflict Resolution">Conflict Resolution</option>
+                        <option value="Career Development">Career Development</option>
+                        <option value="Team Building">Team Building</option>
+                        <option value="Strategy">Strategy</option>
+                        <option value="Innovation">Innovation</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="challengeType">Challenge Type:</label>
+                    <input type="text" id="challengeType" placeholder="e.g., Remote Team Management, Difficult Conversations" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="scenario">Scenario Description:</label>
+                    <textarea id="scenario" placeholder="Describe the specific situation or scenario this knowledge addresses..." rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="immediateGuidance">Immediate Guidance:</label>
+                    <textarea id="immediateGuidance" placeholder="What should someone do first when facing this situation?" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
                     <label for="logicalFramework">Logical Framework (Optional):</label>
                     <textarea id="logicalFramework" placeholder="Structured approach, methodology, or framework to apply..." rows="2"></textarea>
                 </div>
@@ -1475,45 +1516,4 @@
         }
     </script>
 </body>
-</html>group">
-                    <label for="expertId">Expert ID:</label>
-                    <input type="text" id="expertId" placeholder="Your unique expert identifier" required autocomplete="username">
-                </div>
-                
-                <div class="form-group">
-                    <label for="secretKey">Expert Secret Key:</label>
-                    <input type="password" id="secretKey" placeholder="Your expert access key" required autocomplete="current-password">
-                </div>
-                
-                <div class="form-group">
-                    <label for="domain">Domain/Field:</label>
-                    <select id="domain" required>
-                        <option value="">Select domain...</option>
-                        <option value="Leadership">Leadership</option>
-                        <option value="Management">Management</option>
-                        <option value="Communication">Communication</option>
-                        <option value="Conflict Resolution">Conflict Resolution</option>
-                        <option value="Career Development">Career Development</option>
-                        <option value="Team Building">Team Building</option>
-                        <option value="Strategy">Strategy</option>
-                        <option value="Innovation">Innovation</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="challengeType">Challenge Type:</label>
-                    <input type="text" id="challengeType" placeholder="e.g., Remote Team Management, Difficult Conversations" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="scenario">Scenario Description:</label>
-                    <textarea id="scenario" placeholder="Describe the specific situation or scenario this knowledge addresses..." rows="3" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="immediateGuidance">Immediate Guidance:</label>
-                    <textarea id="immediateGuidance" placeholder="What should someone do first when facing this situation?" rows="3" required></textarea>
-                </div>
-                
-                <div class="form-
+</html>
