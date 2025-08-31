@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thrivoy Centaur™ - Expert-AI Knowledge System</title>
+    <meta name="description" content="AI-powered guidance system backed by validated expert knowledge for strategic, interpersonal, and professional challenges.">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        .centaur-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .centaur-header {
+            background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .centaur-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+        
+        .centaur-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 0.5rem 2rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .breadcrumb a {
+            color: #1a365d;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .centaur-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
+            background: white;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #1a365d;
+            z-index: 10;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #1a365d;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .frame-container {
+            position: relative;
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .centaur-header {
+                padding: 1rem;
+            }
+            .centaur-header h1 {
+                font-size: 1.4rem;
+            }
+            .breadcrumb {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="centaur-wrapper">
+        <header class="centaur-header">
+            <h1>Thrivoy Centaur™</h1>
+            <p>Expert-AI Knowledge Validation System</p>
+        </header>
+        
+        <nav class="breadcrumb">
+            <a href="/">Thrivoy Home</a> / 
+            <a href="/#platforms">Platforms</a> / 
+            <span>Centaur</span>
+        </nav>
+        
+        <div class="frame-container">
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-spinner"></div>
+                Initializing Centaur System...
+            </div>
+            
+            <iframe src="https://script.google.com/macros/s/AKfycby3ifSpLmSy5VBhXF3rogz0JVuUzRxXR5RXjmoctyi4YbQ3zE4OyMrCFTnk0PRI0hPkqQ/exec" 
+                    class="centaur-frame"
+                    frameborder="0" 
+                    allowfullscreen
+                    title="Thrivoy Centaur Expert-AI System"
+                    onload="hideLoading()">
+            </iframe>
+        </div>
+    </div>
+    
+    <script>
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+        
+        // Fallback to hide loading after 10 seconds
+        setTimeout(hideLoading, 10000);
+    </script>
+</body>
+</html>
