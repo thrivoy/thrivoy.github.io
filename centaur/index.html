@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expert-AI Knowledge Validation System</title>
+    <title>Thrivoy Centaur | Expert-AI Knowledge Validation System</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     
     <style>
         * {
@@ -14,40 +16,48 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f8f9fa;
             min-height: 100vh;
             color: #333;
             line-height: 1.6;
         }
 
-        .container {
+        .navbar-brand { 
+            font-weight: bold; 
+            color: #007BFF !important; 
+        }
+
+        .container-main {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .section {
+            padding: 3rem 1rem;
+        }
+
+        .header-section {
+            background: white;
             border-radius: 15px;
-            padding: 30px;
+            padding: 40px;
             margin-bottom: 30px;
             text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .header h1 {
-            color: #4a5568;
+        .header-section h1 {
+            color: #007BFF;
             font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 300;
-            letter-spacing: -0.5px;
+            margin-bottom: 15px;
+            font-weight: 600;
         }
 
-        .header p {
-            color: #718096;
-            font-size: 1.1em;
+        .header-section p {
+            color: #6c757d;
+            font-size: 1.2em;
+            margin-bottom: 20px;
         }
 
         .system-status {
@@ -60,6 +70,7 @@
             color: #2f855a;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
@@ -79,10 +90,10 @@
             display: flex;
             justify-content: center;
             margin-bottom: 30px;
-            background: rgba(255, 255, 255, 0.9);
+            background: white;
             border-radius: 12px;
-            padding: 5px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             flex-wrap: wrap;
         }
 
@@ -95,33 +106,32 @@
             margin: 2px;
             border: none;
             background: transparent;
-            color: #4a5568;
+            color: #495057;
             font-size: 14px;
         }
 
         .nav-tab.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #007BFF;
             color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
         }
 
         .nav-tab:not(.active):hover {
-            background: rgba(102, 126, 234, 0.1);
+            background: rgba(0, 123, 255, 0.1);
             transform: translateY(-1px);
         }
 
         .nav-tab:focus {
-            outline: 2px solid #667eea;
+            outline: 2px solid #007BFF;
             outline-offset: 2px;
         }
 
         .tab-content {
             display: none;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: white;
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .tab-content.active {
@@ -138,44 +148,44 @@
             margin-bottom: 20px;
         }
 
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #4a5568;
+            color: #495057;
         }
 
-        input, textarea, select {
+        .form-control {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
             font-size: 14px;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
             font-family: inherit;
         }
 
-        input:focus, textarea:focus, select:focus {
+        .form-control:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #007BFF;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
 
-        textarea {
+        textarea.form-control {
             resize: vertical;
             min-height: 100px;
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #007BFF;
             color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            border: 1px solid #007BFF;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
             cursor: pointer;
             font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-weight: 400;
+            transition: all 0.15s ease-in-out;
             margin-right: 10px;
             margin-bottom: 10px;
             position: relative;
@@ -183,8 +193,9 @@
         }
 
         .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            background-color: #0056b3;
+            border-color: #0056b3;
+            transform: translateY(-1px);
         }
 
         .btn:active {
@@ -192,26 +203,55 @@
         }
 
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.65;
             cursor: not-allowed;
             transform: none;
         }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, #718096, #4a5568);
+        .btn-outline-primary {
+            background: transparent;
+            color: #007BFF;
+            border: 1px solid #007BFF;
         }
 
-        .btn-danger {
-            background: linear-gradient(135deg, #e53e3e, #c53030);
+        .btn-outline-primary:hover:not(:disabled) {
+            background: #007BFF;
+            color: white;
         }
 
         .btn-success {
-            background: linear-gradient(135deg, #38a169, #2f855a);
+            background: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #218838;
+            border-color: #1e7e34;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #c82333;
+            border-color: #bd2130;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #5a6268;
+            border-color: #545b62;
         }
 
         .status {
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 0.375rem;
             margin: 15px 0;
             font-weight: 500;
             animation: slideIn 0.3s ease;
@@ -223,27 +263,27 @@
         }
 
         .status.success {
-            background: rgba(56, 161, 105, 0.1);
-            border: 1px solid #38a169;
-            color: #2f855a;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
         }
 
         .status.error {
-            background: rgba(229, 62, 62, 0.1);
-            border: 1px solid #e53e3e;
-            color: #c53030;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
         }
 
         .status.info {
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid #667eea;
-            color: #5a67d8;
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
         }
 
         .queue-item {
-            background: rgba(247, 250, 252, 0.8);
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
             padding: 20px;
             margin-bottom: 15px;
             transition: all 0.3s ease;
@@ -251,22 +291,22 @@
 
         .queue-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .queue-item h3 {
-            color: #4a5568;
+            color: #495057;
             margin-bottom: 10px;
             font-size: 1.2em;
         }
 
         .queue-item p {
             margin-bottom: 8px;
-            color: #718096;
+            color: #6c757d;
         }
 
         .queue-item strong {
-            color: #4a5568;
+            color: #495057;
         }
 
         .stats-grid {
@@ -277,12 +317,13 @@
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
+            background: white;
+            border-radius: 0.5rem;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
+            border: 1px solid #dee2e6;
         }
 
         .stat-card:hover {
@@ -292,12 +333,12 @@
         .stat-number {
             font-size: 2.5em;
             font-weight: bold;
-            color: #667eea;
+            color: #007BFF;
             display: block;
         }
 
         .stat-label {
-            color: #718096;
+            color: #6c757d;
             font-size: 0.9em;
             margin-top: 5px;
         }
@@ -308,7 +349,7 @@
             height: 20px;
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top-color: #667eea;
+            border-top-color: #007BFF;
             animation: spin 1s ease-in-out infinite;
             vertical-align: middle;
         }
@@ -318,16 +359,16 @@
         }
 
         .response-section {
-            background: rgba(247, 250, 252, 0.8);
-            border-radius: 12px;
+            background: #f8f9fa;
+            border-radius: 0.5rem;
             padding: 20px;
             margin: 15px 0;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #007BFF;
             animation: slideIn 0.3s ease;
         }
 
         .response-section h3 {
-            color: #4a5568;
+            color: #495057;
             margin-bottom: 10px;
             font-size: 1.2em;
             display: flex;
@@ -336,15 +377,15 @@
         }
 
         .action-items {
-            background: rgba(56, 161, 105, 0.1);
-            border-radius: 12px;
+            background: #d4edda;
+            border-radius: 0.5rem;
             padding: 20px;
             margin-top: 15px;
-            border-left: 4px solid #38a169;
+            border-left: 4px solid #28a745;
         }
 
         .action-items h3 {
-            color: #2f855a;
+            color: #155724;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
@@ -357,7 +398,7 @@
 
         .action-items li {
             margin-bottom: 8px;
-            color: #4a5568;
+            color: #495057;
             line-height: 1.5;
         }
 
@@ -366,26 +407,42 @@
         }
 
         .offline-notice {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid #f59e0b;
-            color: #92400e;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 0.375rem;
             margin-bottom: 20px;
             display: none;
         }
 
+        .footer { 
+            background-color: #343a40; 
+            color: white; 
+            padding: 3rem 1rem; 
+            margin-top: 4rem;
+        } 
+
+        .footer a { 
+            color: #adb5bd; 
+            text-decoration: none; 
+        } 
+
+        .footer a:hover { 
+            color: white; 
+        }
+
         /* Enhanced mobile responsiveness */
         @media (max-width: 768px) {
-            .container {
+            .container-main {
                 padding: 10px;
             }
             
-            .header {
+            .header-section {
                 padding: 20px;
             }
             
-            .header h1 {
+            .header-section h1 {
                 font-size: 1.8em;
             }
             
@@ -424,7 +481,7 @@
         /* Accessibility improvements */
         .btn:focus,
         .nav-tab:focus {
-            outline: 2px solid #667eea;
+            outline: 2px solid #007BFF;
             outline-offset: 2px;
         }
 
@@ -436,176 +493,208 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: #38a169;
+            background: #28a745;
             z-index: 1000;
             transition: all 0.3s ease;
         }
 
         .connection-indicator.demo {
-            background: #f59e0b;
+            background: #ffc107;
         }
 
         .connection-indicator.error {
-            background: #e53e3e;
+            background: #dc3545;
         }
     </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">Thrivoy</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../approach.html">Our Approach</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="../platforms.html">Our Platforms</a>
+                    </li>
+                    <li class="nav-item ml-lg-3">
+                        <a class="btn btn-primary" href="../contact.html">Apply for a Consultation</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="connection-indicator" id="connectionIndicator" title="System Status"></div>
     
-    <div class="container">
-        <div class="header">
-            <h1>Expert-AI Knowledge System</h1>
-            <p>Curated expert knowledge meets advanced AI processing</p>
-            <div id="system-status" class="system-status">
-                <span id="status-icon">🟡</span>
-                <span id="status-text">Initializing system...</span>
+    <div class="section">
+        <div class="container-main">
+            <div class="header-section">
+                <h1>Thrivoy Centaur</h1>
+                <p>Expert-AI Knowledge Validation System</p>
+                <p class="text-muted">Curated expert knowledge meets advanced AI processing</p>
+                <div id="system-status" class="system-status">
+                    <span id="status-icon">🟡</span>
+                    <span id="status-text">Initializing system...</span>
+                </div>
             </div>
-        </div>
 
-        <div id="offline-notice" class="offline-notice">
-            <strong>Offline Mode:</strong> Some features may be limited. Please check your internet connection.
-        </div>
-
-        <div class="nav-tabs" role="tablist">
-            <button class="nav-tab active" role="tab" onclick="showTab('query')" aria-selected="true">AI Query</button>
-            <button class="nav-tab" role="tab" onclick="showTab('submit')" aria-selected="false">Submit Knowledge</button>
-            <button class="nav-tab" role="tab" onclick="showTab('validate')" aria-selected="false">Validation Queue</button>
-            <button class="nav-tab" role="tab" onclick="showTab('stats')" aria-selected="false">System Stats</button>
-        </div>
-
-        <div id="query-tab" class="tab-content active" role="tabpanel">
-            <h2>Ask the AI Expert System</h2>
-            <div class="form-group">
-                <label for="userQuery">Your Question or Challenge:</label>
-                <textarea id="userQuery" placeholder="Describe your situation, challenge, or question. The AI will provide strategic, interpersonal, and professional guidance based on validated expert knowledge..." rows="4" aria-describedby="query-help"></textarea>
-                <small id="query-help" style="color: #718096; margin-top: 5px; display: block;">Tip: Be specific about your situation for better guidance</small>
+            <div id="offline-notice" class="offline-notice">
+                <strong>Offline Mode:</strong> Some features may be limited. Please check your internet connection.
             </div>
-            <button class="btn" onclick="processQuery()" id="query-btn">
-                <span id="query-btn-text">Get Expert Guidance</span>
-                <span id="query-loading" class="loading hidden" aria-hidden="true"></span>
-            </button>
-            
-            <div id="query-status" role="status" aria-live="polite"></div>
-            <div id="ai-response" role="region" aria-label="AI Response"></div>
-        </div>
 
-        <div id="submit-tab" class="tab-content" role="tabpanel">
-            <h2>Submit Expert Knowledge</h2>
-            <form id="expertForm" onsubmit="return false;">
+            <div class="nav-tabs" role="tablist">
+                <button class="nav-tab active" role="tab" onclick="showTab('query')" aria-selected="true">AI Query</button>
+                <button class="nav-tab" role="tab" onclick="showTab('submit')" aria-selected="false">Submit Knowledge</button>
+                <button class="nav-tab" role="tab" onclick="showTab('validate')" aria-selected="false">Validation Queue</button>
+                <button class="nav-tab" role="tab" onclick="showTab('stats')" aria-selected="false">System Stats</button>
+            </div>
+
+            <div id="query-tab" class="tab-content active" role="tabpanel">
+                <h2>Ask the AI Expert System</h2>
                 <div class="form-group">
-                    <label for="expertId">Expert ID:</label>
-                    <input type="text" id="expertId" placeholder="Your unique expert identifier" required autocomplete="username">
+                    <label for="userQuery">Your Question or Challenge:</label>
+                    <textarea id="userQuery" class="form-control" placeholder="Describe your situation, challenge, or question. The AI will provide strategic, interpersonal, and professional guidance based on validated expert knowledge..." rows="4" aria-describedby="query-help"></textarea>
+                    <small id="query-help" class="form-text text-muted">Tip: Be specific about your situation for better guidance</small>
                 </div>
-                
-                <div class="form-group">
-                    <label for="secretKey">Expert Secret Key:</label>
-                    <input type="password" id="secretKey" placeholder="Your expert access key" required autocomplete="current-password">
-                </div>
-                
-                <div class="form-group">
-                    <label for="domain">Domain/Field:</label>
-                    <select id="domain" required>
-                        <option value="">Select domain...</option>
-                        <option value="Leadership">Leadership</option>
-                        <option value="Management">Management</option>
-                        <option value="Communication">Communication</option>
-                        <option value="Conflict Resolution">Conflict Resolution</option>
-                        <option value="Career Development">Career Development</option>
-                        <option value="Team Building">Team Building</option>
-                        <option value="Strategy">Strategy</option>
-                        <option value="Innovation">Innovation</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="challengeType">Challenge Type:</label>
-                    <input type="text" id="challengeType" placeholder="e.g., Remote Team Management, Difficult Conversations" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="scenario">Scenario Description:</label>
-                    <textarea id="scenario" placeholder="Describe the specific situation or scenario this knowledge addresses..." rows="3" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="immediateGuidance">Immediate Guidance:</label>
-                    <textarea id="immediateGuidance" placeholder="What should someone do first when facing this situation?" rows="3" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="logicalFramework">Logical Framework (Optional):</label>
-                    <textarea id="logicalFramework" placeholder="Structured approach, methodology, or framework to apply..." rows="2"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="emotionalIntelligence">Emotional Intelligence Considerations (Optional):</label>
-                    <textarea id="emotionalIntelligence" placeholder="Emotional aspects, empathy considerations, interpersonal dynamics..." rows="2"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="socialProof">Social Proof/Evidence (Optional):</label>
-                    <textarea id="socialProof" placeholder="Supporting evidence, case studies, research, or examples..." rows="2"></textarea>
-                </div>
-                
-                <button type="button" class="btn" onclick="submitExpertKnowledge()" id="submit-btn">
-                    <span id="submit-btn-text">Submit Knowledge</span>
-                    <span id="submit-loading" class="loading hidden" aria-hidden="true"></span>
+                <button class="btn" onclick="processQuery()" id="query-btn">
+                    <span id="query-btn-text">Get Expert Guidance</span>
+                    <span id="query-loading" class="loading hidden" aria-hidden="true"></span>
                 </button>
-            </form>
-            
-            <div id="submit-status" role="status" aria-live="polite"></div>
-        </div>
-
-        <div id="validate-tab" class="tab-content" role="tabpanel">
-            <h2>Knowledge Validation Queue</h2>
-            <div class="form-group">
-                <label for="validatorSecret">Validator Secret Key:</label>
-                <input type="password" id="validatorSecret" placeholder="Enter validator secret key" autocomplete="current-password">
+                
+                <div id="query-status" role="status" aria-live="polite"></div>
+                <div id="ai-response" role="region" aria-label="AI Response"></div>
             </div>
-            <div class="form-group">
-                <label for="validatorId">Validator ID:</label>
-                <input type="text" id="validatorId" placeholder="Your validator identifier" autocomplete="username">
-            </div>
-            <button class="btn" onclick="loadValidationQueue()" id="load-queue-btn">
-                <span id="load-queue-text">Load Validation Queue</span>
-                <span id="load-queue-loading" class="loading hidden" aria-hidden="true"></span>
-            </button>
-            
-            <div id="validation-status" role="status" aria-live="polite"></div>
-            <div id="validation-queue" role="region" aria-label="Validation Queue"></div>
-        </div>
 
-        <div id="stats-tab" class="tab-content" role="tabpanel">
-            <h2>System Statistics</h2>
-            <button class="btn" onclick="loadSystemStats()" id="stats-btn">
-                <span id="stats-btn-text">Refresh Stats</span>
-                <span id="stats-loading" class="loading hidden" aria-hidden="true"></span>
-            </button>
-            
-            <div id="stats-content">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <span id="total-queries" class="stat-number">-</span>
-                        <div class="stat-label">Total Queries</div>
+            <div id="submit-tab" class="tab-content" role="tabpanel">
+                <h2>Submit Expert Knowledge</h2>
+                <form id="expertForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="expertId">Expert ID:</label>
+                        <input type="text" id="expertId" class="form-control" placeholder="Your unique expert identifier" required autocomplete="username">
                     </div>
-                    <div class="stat-card">
-                        <span id="validated-knowledge" class="stat-number">-</span>
-                        <div class="stat-label">Validated Knowledge</div>
+                    
+                    <div class="form-group">
+                        <label for="secretKey">Expert Secret Key:</label>
+                        <input type="password" id="secretKey" class="form-control" placeholder="Your expert access key" required autocomplete="current-password">
                     </div>
-                    <div class="stat-card">
-                        <span id="pending-validation" class="stat-number">-</span>
-                        <div class="stat-label">Pending Validation</div>
+                    
+                    <div class="form-group">
+                        <label for="domain">Domain/Field:</label>
+                        <select id="domain" class="form-control" required>
+                            <option value="">Select domain...</option>
+                            <option value="Leadership">Leadership</option>
+                            <option value="Management">Management</option>
+                            <option value="Communication">Communication</option>
+                            <option value="Conflict Resolution">Conflict Resolution</option>
+                            <option value="Career Development">Career Development</option>
+                            <option value="Team Building">Team Building</option>
+                            <option value="Strategy">Strategy</option>
+                            <option value="Innovation">Innovation</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
-                    <div class="stat-card">
-                        <span id="avg-response-time" class="stat-number">-</span>
-                        <div class="stat-label">Avg Response Time (ms)</div>
+                    
+                    <div class="form-group">
+                        <label for="challengeType">Challenge Type:</label>
+                        <input type="text" id="challengeType" class="form-control" placeholder="e.g., Remote Team Management, Difficult Conversations" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="scenario">Scenario Description:</label>
+                        <textarea id="scenario" class="form-control" placeholder="Describe the specific situation or scenario this knowledge addresses..." rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="immediateGuidance">Immediate Guidance:</label>
+                        <textarea id="immediateGuidance" class="form-control" placeholder="What should someone do first when facing this situation?" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="logicalFramework">Logical Framework (Optional):</label>
+                        <textarea id="logicalFramework" class="form-control" placeholder="Structured approach, methodology, or framework to apply..." rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="emotionalIntelligence">Emotional Intelligence Considerations (Optional):</label>
+                        <textarea id="emotionalIntelligence" class="form-control" placeholder="Emotional aspects, empathy considerations, interpersonal dynamics..." rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="socialProof">Social Proof/Evidence (Optional):</label>
+                        <textarea id="socialProof" class="form-control" placeholder="Supporting evidence, case studies, research, or examples..." rows="2"></textarea>
+                    </div>
+                    
+                    <button type="button" class="btn" onclick="submitExpertKnowledge()" id="submit-btn">
+                        <span id="submit-btn-text">Submit Knowledge</span>
+                        <span id="submit-loading" class="loading hidden" aria-hidden="true"></span>
+                    </button>
+                </form>
+                
+                <div id="submit-status" role="status" aria-live="polite"></div>
+            </div>
+
+            <div id="validate-tab" class="tab-content" role="tabpanel">
+                <h2>Knowledge Validation Queue</h2>
+                <div class="form-group">
+                    <label for="validatorSecret">Validator Secret Key:</label>
+                    <input type="password" id="validatorSecret" class="form-control" placeholder="Enter validator secret key" autocomplete="current-password">
+                </div>
+                <div class="form-group">
+                    <label for="validatorId">Validator ID:</label>
+                    <input type="text" id="validatorId" class="form-control" placeholder="Your validator identifier" autocomplete="username">
+                </div>
+                <button class="btn" onclick="loadValidationQueue()" id="load-queue-btn">
+                    <span id="load-queue-text">Load Validation Queue</span>
+                    <span id="load-queue-loading" class="loading hidden" aria-hidden="true"></span>
+                </button>
+                
+                <div id="validation-status" role="status" aria-live="polite"></div>
+                <div id="validation-queue" role="region" aria-label="Validation Queue"></div>
+            </div>
+
+            <div id="stats-tab" class="tab-content" role="tabpanel">
+                <h2>System Statistics</h2>
+                <button class="btn" onclick="loadSystemStats()" id="stats-btn">
+                    <span id="stats-btn-text">Refresh Stats</span>
+                    <span id="stats-loading" class="loading hidden" aria-hidden="true"></span>
+                </button>
+                
+                <div id="stats-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span id="total-queries" class="stat-number">-</span>
+                            <div class="stat-label">Total Queries</div>
+                        </div>
+                        <div class="stat-card">
+                            <span id="validated-knowledge" class="stat-number">-</span>
+                            <div class="stat-label">Validated Knowledge</div>
+                        </div>
+                        <div class="stat-card">
+                            <span id="pending-validation" class="stat-number">-</span>
+                            <div class="stat-label">Pending Validation</div>
+                        </div>
+                        <div class="stat-card">
+                            <span id="avg-response-time" class="stat-number">-</span>
+                            <div class="stat-label">Avg Response Time (ms)</div>
+                        </div>
                     </div>
                 </div>
+                
+                <div id="stats-status" role="status" aria-live="polite"></div>
             </div>
-            
-            <div id="stats-status" role="status" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container text-center">
+            <p class="mb-2">© 2025 The Thrivoy Group. All Rights Reserved.</p>
+            <p><a href="../contact.html">Apply for a Consultation</a></p>
         </div>
     </div>
 
@@ -653,7 +742,14 @@
                     testAPIConnection();
                 }
                 
-                console.log('System initialized - Mode:', systemMode, 'API URL:', API_BASE_URL);
+                console.log('Development helpers available: window.expertAI');
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>log('System initialized - Mode:', systemMode, 'API URL:', API_BASE_URL);
                 
             } catch (error) {
                 console.error('Error initializing API URL:', error);
@@ -723,24 +819,6 @@
                     statusElement.className = 'system-status';
                     iconElement.textContent = '🟢';
                     connectionIndicator.className = 'connection-indicator';
-                    connectionIndicator.title = 'Production System Connected';
-                    break;
-                case 'demo':
-                    statusElement.className = 'system-status demo';
-                    iconElement.textContent = '🟡';
-                    connectionIndicator.className = 'connection-indicator demo';
-                    connectionIndicator.title = 'Demo Mode Active';
-                    break;
-                case 'error':
-                    statusElement.className = 'system-status error';
-                    iconElement.textContent = '🔴';
-                    connectionIndicator.className = 'connection-indicator error';
-                    connectionIndicator.title = 'System Error';
-                    break;
-                case 'connecting':
-                    statusElement.className = 'system-status';
-                    iconElement.textContent = '🟡';
-                    connectionIndicator.className = 'connection-indicator demo';
                     connectionIndicator.title = 'Connecting...';
                     break;
             }
@@ -1512,8 +1590,22 @@
                     };
                 }
             };
-            console.log('Development helpers available: window.expertAI');
-        }
-    </script>
-</body>
-</html>
+            console. 'Production System Connected';
+                    break;
+                case 'demo':
+                    statusElement.className = 'system-status demo';
+                    iconElement.textContent = '🟡';
+                    connectionIndicator.className = 'connection-indicator demo';
+                    connectionIndicator.title = 'Demo Mode Active';
+                    break;
+                case 'error':
+                    statusElement.className = 'system-status error';
+                    iconElement.textContent = '🔴';
+                    connectionIndicator.className = 'connection-indicator error';
+                    connectionIndicator.title = 'System Error';
+                    break;
+                case 'connecting':
+                    statusElement.className = 'system-status';
+                    iconElement.textContent = '🟡';
+                    connectionIndicator.className = 'connection-indicator demo';
+                    connectionIndicator.title =
