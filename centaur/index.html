@@ -742,14 +742,7 @@
                     testAPIConnection();
                 }
                 
-                console.log('Development helpers available: window.expertAI');
-        }
-    </script>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>log('System initialized - Mode:', systemMode, 'API URL:', API_BASE_URL);
+                console.log('System initialized - Mode:', systemMode, 'API URL:', API_BASE_URL);
                 
             } catch (error) {
                 console.error('Error initializing API URL:', error);
@@ -819,6 +812,24 @@
                     statusElement.className = 'system-status';
                     iconElement.textContent = '🟢';
                     connectionIndicator.className = 'connection-indicator';
+                    connectionIndicator.title = 'Production System Connected';
+                    break;
+                case 'demo':
+                    statusElement.className = 'system-status demo';
+                    iconElement.textContent = '🟡';
+                    connectionIndicator.className = 'connection-indicator demo';
+                    connectionIndicator.title = 'Demo Mode Active';
+                    break;
+                case 'error':
+                    statusElement.className = 'system-status error';
+                    iconElement.textContent = '🔴';
+                    connectionIndicator.className = 'connection-indicator error';
+                    connectionIndicator.title = 'System Error';
+                    break;
+                case 'connecting':
+                    statusElement.className = 'system-status';
+                    iconElement.textContent = '🟡';
+                    connectionIndicator.className = 'connection-indicator demo';
                     connectionIndicator.title = 'Connecting...';
                     break;
             }
@@ -1590,22 +1601,11 @@
                     };
                 }
             };
-            console. 'Production System Connected';
-                    break;
-                case 'demo':
-                    statusElement.className = 'system-status demo';
-                    iconElement.textContent = '🟡';
-                    connectionIndicator.className = 'connection-indicator demo';
-                    connectionIndicator.title = 'Demo Mode Active';
-                    break;
-                case 'error':
-                    statusElement.className = 'system-status error';
-                    iconElement.textContent = '🔴';
-                    connectionIndicator.className = 'connection-indicator error';
-                    connectionIndicator.title = 'System Error';
-                    break;
-                case 'connecting':
-                    statusElement.className = 'system-status';
-                    iconElement.textContent = '🟡';
-                    connectionIndicator.className = 'connection-indicator demo';
-                    connectionIndicator.title =
+            console.log('Development helpers available: window.expertAI');
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
