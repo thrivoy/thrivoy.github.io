@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Permissions-Policy" content="web-share=()">
     <title>Thrivoy Centaur™ - Expert-AI Knowledge System</title>
     <meta name="description" content="AI-powered guidance system backed by validated expert knowledge for strategic, interpersonal, and professional challenges.">
     
@@ -16,6 +17,7 @@
         body, html {
             height: 100%;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            overflow: hidden;
         }
         
         .centaur-wrapper {
@@ -30,6 +32,7 @@
             padding: 1rem 2rem;
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
         
         .centaur-header h1 {
@@ -50,6 +53,7 @@
             padding: 0.5rem 2rem;
             font-size: 0.85rem;
             border-bottom: 1px solid #e9ecef;
+            flex-shrink: 0;
         }
         
         .breadcrumb a {
@@ -61,10 +65,19 @@
             text-decoration: underline;
         }
         
-        .centaur-frame {
+        .frame-container {
+            position: relative;
             flex: 1;
-            border: none;
+            min-height: 0;
+        }
+        
+        .centaur-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            border: none;
             background: white;
         }
         
@@ -74,8 +87,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.95);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             font-size: 1.1rem;
@@ -87,10 +101,10 @@
             border: 3px solid #f3f4f6;
             border-top: 3px solid #1a365d;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin-right: 1rem;
+            margin-bottom: 1rem;
         }
         
         @keyframes spin {
@@ -98,9 +112,19 @@
             100% { transform: rotate(360deg); }
         }
         
-        .frame-container {
-            position: relative;
-            flex: 1;
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem;
+            text-align: center;
+        }
+        
+        .error-details {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            opacity: 0.8;
         }
         
         @media (max-width: 768px) {
@@ -132,26 +156,62 @@
         <div class="frame-container">
             <div class="loading-overlay" id="loadingOverlay">
                 <div class="loading-spinner"></div>
-                Initializing Centaur System...
+                <div>Initializing Centaur System...</div>
+                <div style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.7;">
+                    Connecting to expert knowledge base
+                </div>
             </div>
             
-            <iframe src="https://script.google.com/macros/s/AKfycby3ifSpLmSy5VBhXF3rogz0JVuUzRxXR5RXjmoctyi4YbQ3zE4OyMrCFTnk0PRI0hPkqQ/exec" 
+            <iframe src="YOUR_APPS_SCRIPT_WEBAPP_URL_HERE" 
                     class="centaur-frame"
                     frameborder="0" 
                     allowfullscreen
                     title="Thrivoy Centaur Expert-AI System"
-                    onload="hideLoading()">
+                    onload="handleIframeLoad()"
+                    onerror="handleIframeError()">
             </iframe>
         </div>
     </div>
     
     <script>
-        function hideLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
+        let loadingTimeout;
+        
+        function handleIframeLoad() {
+            // Hide loading after successful load
+            setTimeout(() => {
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => overlay.style.display = 'none', 300);
+                }
+            }, 1000);
         }
         
-        // Fallback to hide loading after 10 seconds
-        setTimeout(hideLoading, 10000);
+        function handleIframeError() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.innerHTML = `
+                <div class="error-message">
+                    <strong>Unable to Load Centaur System</strong>
+                    <div class="error-details">
+                        Please check that the Apps Script web app is properly deployed.<br>
+                        <a href="/" style="color: #1a365d;">Return to Thrivoy Home</a>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Fallback error handling
+        loadingTimeout = setTimeout(() => {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay && overlay.style.display !== 'none') {
+                handleIframeError();
+            }
+        }, 15000);
+        
+        // Additional debugging
+        window.addEventListener('message', function(event) {
+            console.log('Iframe message:', event);
+        });
     </script>
 </body>
 </html>
