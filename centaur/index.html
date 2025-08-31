@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Permissions-Policy" content="web-share=()">
     <title>Thrivoy Centaur™ - Expert-AI Knowledge System</title>
     <meta name="description" content="AI-powered guidance system backed by validated expert knowledge for strategic, interpersonal, and professional challenges.">
+    
+    <!-- Favicon to prevent 404 errors -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
     
     <style>
         * {
@@ -95,6 +97,7 @@
             font-size: 1.1rem;
             color: #1a365d;
             z-index: 10;
+            transition: opacity 0.3s ease;
         }
         
         .loading-spinner {
@@ -119,12 +122,29 @@
             border-radius: 8px;
             margin: 1rem;
             text-align: center;
+            max-width: 600px;
         }
         
         .error-details {
             font-size: 0.9rem;
             margin-top: 0.5rem;
             opacity: 0.8;
+        }
+        
+        .retry-button {
+            background: #1a365d;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            transition: background 0.2s ease;
+        }
+        
+        .retry-button:hover {
+            background: #2d3748;
         }
         
         @media (max-width: 768px) {
@@ -156,7 +176,7 @@
         <div class="frame-container">
             <div class="loading-overlay" id="loadingOverlay">
                 <div class="loading-spinner"></div>
-                <div>Initializing Centaur System...</div>
+                <div id="loadingText">Initializing Centaur System...</div>
                 <div style="font-size: 0.8rem; margin-top: 1rem; opacity: 0.7;">
                     Connecting to expert knowledge base
                 </div>
@@ -164,53 +184,134 @@
             
             <iframe src="https://script.google.com/macros/s/AKfycbyrjdAgx8gBgIaUiODmL-pMqqAFoIwdrDREbDzD80Nxm3RbVkqV7MZN5SdHxCdAg9KazQ/exec" 
                     class="centaur-frame"
-                    frameborder="0" 
-                    allowfullscreen
-                    title="Thrivoy Centaur Expert-AI System"
-                    onload="handleIframeLoad()"
-                    onerror="handleIframeError()">
+                    id="centaurFrame"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+                    loading="lazy"
+                    title="Thrivoy Centaur Expert-AI System">
             </iframe>
         </div>
     </div>
     
     <script>
         let loadingTimeout;
+        let retryCount = 0;
+        const maxRetries = 3;
         
-        function handleIframeLoad() {
-            // Hide loading after successful load
-            setTimeout(() => {
-                const overlay = document.getElementById('loadingOverlay');
-                if (overlay) {
-                    overlay.style.opacity = '0';
-                    setTimeout(() => overlay.style.display = 'none', 300);
-                }
-            }, 1000);
+        function updateLoadingText(text) {
+            const loadingText = document.getElementById('loadingText');
+            if (loadingText) {
+                loadingText.textContent = text;
+            }
         }
         
-        function handleIframeError() {
+        function hideLoading() {
             const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        function showError(message, details = '') {
+            const overlay = document.getElementById('loadingOverlay');
+            const retryButton = retryCount < maxRetries ? 
+                `<button class="retry-button" onclick="retryLoad()">Retry Connection (${retryCount + 1}/${maxRetries})</button>` : 
+                '';
+            
             overlay.innerHTML = `
                 <div class="error-message">
-                    <strong>Unable to Load Centaur System</strong>
+                    <strong>${message}</strong>
                     <div class="error-details">
-                        Please check that the Apps Script web app is properly deployed.<br>
+                        ${details}<br>
                         <a href="/" style="color: #1a365d;">Return to Thrivoy Home</a>
                     </div>
+                    ${retryButton}
                 </div>
             `;
         }
         
-        // Fallback error handling
+        function retryLoad() {
+            if (retryCount >= maxRetries) {
+                showError('Maximum retry attempts reached', 'Please try again later or contact support.');
+                return;
+            }
+            
+            retryCount++;
+            updateLoadingText(`Retrying connection... (${retryCount}/${maxRetries})`);
+            
+            const frame = document.getElementById('centaurFrame');
+            const currentSrc = frame.src;
+            frame.src = '';
+            
+            setTimeout(() => {
+                frame.src = currentSrc + (currentSrc.includes('?') ? '&' : '?') + 'retry=' + retryCount;
+                
+                // Reset loading timeout
+                clearTimeout(loadingTimeout);
+                loadingTimeout = setTimeout(() => {
+                    showError(
+                        'Connection Timeout', 
+                        'The Centaur system is taking longer than expected to load. This may be due to network issues or system maintenance.'
+                    );
+                }, 15000);
+            }, 1000);
+        }
+        
+        // Handle iframe load event
+        document.getElementById('centaurFrame').addEventListener('load', function() {
+            console.log('Centaur iframe loaded successfully');
+            clearTimeout(loadingTimeout);
+            
+            // Progressive loading feedback
+            updateLoadingText('System loaded successfully');
+            setTimeout(() => hideLoading(), 500);
+        });
+        
+        // Handle iframe error event
+        document.getElementById('centaurFrame').addEventListener('error', function() {
+            console.error('Centaur iframe failed to load');
+            clearTimeout(loadingTimeout);
+            showError(
+                'Failed to Load Centaur System',
+                'Please check that the Apps Script web app is properly deployed and accessible.'
+            );
+        });
+        
+        // Set initial loading timeout
         loadingTimeout = setTimeout(() => {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay && overlay.style.display !== 'none') {
-                handleIframeError();
+            if (document.getElementById('loadingOverlay').style.display !== 'none') {
+                showError(
+                    'Loading Timeout',
+                    'The system is taking longer than expected to load. This could be due to network connectivity or server issues.'
+                );
             }
         }, 15000);
         
-        // Additional debugging
+        // Handle communication with iframe
         window.addEventListener('message', function(event) {
-            console.log('Iframe message:', event);
+            // Handle messages from the iframe if needed
+            if (event.data && event.data.type === 'centaur_ready') {
+                console.log('Centaur system ready');
+                hideLoading();
+            }
+        });
+        
+        // Enhanced error detection
+        window.addEventListener('error', function(event) {
+            console.error('Global error:', event.error);
+            if (event.error && event.error.toString().includes('iframe')) {
+                showError('System Error', 'An error occurred while loading the system components.');
+            }
+        });
+        
+        // Detect if user is trying to interact before load completes
+        document.addEventListener('click', function() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay && overlay.style.display !== 'none' && retryCount === 0) {
+                updateLoadingText('System is still loading... Please wait');
+            }
         });
     </script>
 </body>
