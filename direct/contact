@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Thrivoy</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0b1220 0%, #1a2332 100%); color: #e6edf3; padding: 60px 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { background: rgba(230, 237, 243, 0.05); border: 1px solid rgba(230, 237, 243, 0.1); border-radius: 16px; padding: 40px; margin-bottom: 30px; }
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .contact-item { text-align: center; }
+        .contact-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 50px;">Contact Thrivoy</h1>
+        
+        <div class="contact-grid">
+            <div class="card">
+                <div class="contact-item">
+                    <span class="contact-icon">📧</span>
+                    <h3>Email Support</h3>
+                    <p>Get help with your automation</p>
+                    <a href="mailto:support@thrivoy.com" style="color: #00d4ff;">support@thrivoy.com</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="contact-item">
+                    <span class="contact-icon">💬</span>
+                    <h3>Live Chat</h3>
+                    <p>Instant assistance available</p>
+                    <a href="#" style="color: #00d4ff;">Start Chat</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="contact-item">
+                    <span class="contact-icon">📞</span>
+                    <h3>Phone</h3>
+                    <p>Speak with our team</p>
+                    <a href="tel:+918012345678" style="color: #00d4ff;">+91 801-234-5678</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Frequently Asked Questions</h2>
+            <div style="text-align: left;">
+                <h4>How long does setup take?</h4>
+                <p>Complete automation setup takes 3-5 minutes after form submission.</p>
+                
+                <h4>What if I need changes?</h4>
+                <p>Contact support and we'll update your website and content within 24 hours.</p>
+                
+                <h4>Is my data secure?</h4>
+                <p>Yes, we use enterprise-grade security and never share your information.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
