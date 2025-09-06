@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Thrivoy!</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0b1220 0%, #1a2332 100%); color: #e6edf3; text-align: center; padding: 60px 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .success-icon { font-size: 4rem; color: #4ade80; margin-bottom: 30px; }
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        .button { background: linear-gradient(135deg, #00d4ff, #8b5cf6); color: white; padding: 16px 32px; border: none; border-radius: 8px; text-decoration: none; display: inline-block; margin: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">🎉</div>
+        <h1>Welcome to Thrivoy!</h1>
+        <p>Your business automation is being set up. You'll receive an email with your website and dashboard links within the next few minutes.</p>
+        
+        <div style="margin-top: 40px;">
+            <a href="portal.html" class="button">Go to Client Portal</a>
+            <a href="index.html" class="button">Back to Home</a>
+        </div>
+
+        <div style="margin-top: 60px; padding: 20px; background: rgba(230, 237, 243, 0.05); border-radius: 12px;">
+            <h3>What happens next?</h3>
+            <ul style="text-align: left; max-width: 400px; margin: 0 auto;">
+                <li>✅ Professional website created</li>
+                <li>✅ Business dashboard deployed</li>
+                <li>✅ AI content library generated</li>
+                <li>✅ Welcome email sent</li>
+                <li>✅ Follow-up emails scheduled</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
