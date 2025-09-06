@@ -224,6 +224,11 @@
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #6b7280;
+        }
+
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
@@ -255,7 +260,7 @@
             width: 100%;
         }
 
-        .submit-button:hover {
+        .submit-button:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
         }
@@ -467,15 +472,183 @@
     </footer>
 
     <script>
-        // Replace with your actual Apps Script Web App URL
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzf4F2botY0BitNCac8XFsgPrcI9g_lIu0y8i5-RnINui8wJ9OyeR39BPbTPJ6X_d9mYA/exec';
+        // **IMPORTANT: Replace with your actual Apps Script Web App URL**
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwWwl3KRlaTa7fzoAaL4rkDS6j0Fr8fcTmIrYZy9JhvX7jXRD4sO_Kz3bBD8MAs8WH58A/exec';
 
+        // CORS-Compatible Submission Functions
+        function submitWithJSONP(formData) {
+            return new Promise((resolve, reject) => {
+                const callbackName = 'jsonp_callback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                const script = document.createElement('script');
+                
+                // Create global callback
+                window[callbackName] = function(data) {
+                    document.head.removeChild(script);
+                    delete window[callbackName];
+                    resolve(data);
+                };
+                
+                // Handle script load errors
+                script.onerror = function() {
+                    if (document.head.contains(script)) {
+                        document.head.removeChild(script);
+                    }
+                    if (window[callbackName]) {
+                        delete window[callbackName];
+                    }
+                    reject(new Error('JSONP script load failed'));
+                };
+                
+                // Build URL with query parameters
+                const params = new URLSearchParams();
+                for (const [key, value] of Object.entries(formData)) {
+                    if (value && value.trim) {
+                        params.append(key, value.trim());
+                    }
+                }
+                params.append('callback', callbackName);
+                
+                const url = APPS_SCRIPT_URL + '?' + params.toString();
+                console.log('JSONP URL:', url);
+                
+                script.src = url;
+                document.head.appendChild(script);
+                
+                // Timeout after 60 seconds
+                setTimeout(() => {
+                    if (window[callbackName]) {
+                        if (document.head.contains(script)) {
+                            document.head.removeChild(script);
+                        }
+                        delete window[callbackName];
+                        reject(new Error('JSONP request timeout'));
+                    }
+                }, 60000);
+            });
+        }
+
+        function submitWithIFrame(formData) {
+            return new Promise((resolve, reject) => {
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.name = 'hidden_frame_' + Date.now();
+                
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = APPS_SCRIPT_URL;
+                form.target = iframe.name;
+                form.style.display = 'none';
+                
+                // Add form fields
+                for (const [key, value] of Object.entries(formData)) {
+                    if (value && value.trim) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value.trim();
+                        form.appendChild(input);
+                    }
+                }
+                
+                // Listen for messages from iframe
+                function handleMessage(event) {
+                    console.log('Received message:', event.data);
+                    
+                    if (event.source === iframe.contentWindow || 
+                        (typeof event.data === 'object' && event.data !== null)) {
+                        
+                        window.removeEventListener('message', handleMessage);
+                        
+                        if (document.body.contains(iframe)) {
+                            document.body.removeChild(iframe);
+                        }
+                        if (document.body.contains(form)) {
+                            document.body.removeChild(form);
+                        }
+                        
+                        resolve(event.data);
+                    }
+                }
+                
+                window.addEventListener('message', handleMessage);
+                
+                // Handle iframe load event
+                iframe.onload = function() {
+                    console.log('iFrame loaded');
+                    setTimeout(() => {
+                        try {
+                            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                            const bodyText = iframeDoc.body ? iframeDoc.body.innerText : '';
+                            console.log('iFrame body text:', bodyText);
+                            
+                            if (bodyText.includes('Onboarding Complete') || 
+                                bodyText.includes('Dashboard:') || 
+                                bodyText.includes('Website:')) {
+                                
+                                window.removeEventListener('message', handleMessage);
+                                
+                                if (document.body.contains(iframe)) {
+                                    document.body.removeChild(iframe);
+                                }
+                                if (document.body.contains(form)) {
+                                    document.body.removeChild(form);
+                                }
+                                
+                                resolve({
+                                    success: true,
+                                    message: 'Onboarding completed successfully'
+                                });
+                            }
+                        } catch (e) {
+                            console.log('Could not read iframe content (cross-origin)');
+                        }
+                    }, 2000);
+                };
+                
+                // Handle errors
+                iframe.onerror = function() {
+                    window.removeEventListener('message', handleMessage);
+                    
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                    if (document.body.contains(form)) {
+                        document.body.removeChild(form);
+                    }
+                    
+                    reject(new Error('iFrame submission failed'));
+                };
+                
+                document.body.appendChild(iframe);
+                document.body.appendChild(form);
+                
+                console.log('Submitting form via iFrame');
+                form.submit();
+                
+                // Timeout after 90 seconds
+                setTimeout(() => {
+                    window.removeEventListener('message', handleMessage);
+                    
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                    if (document.body.contains(form)) {
+                        document.body.removeChild(form);
+                    }
+                    
+                    reject(new Error('iFrame request timeout'));
+                }, 90000);
+            });
+        }
+
+        // Form submission handler
         document.getElementById('onboardingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const submitButton = document.getElementById('submitButton');
             const successMessage = document.getElementById('successMessage');
             const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
             
             // Hide messages
             successMessage.style.display = 'none';
@@ -485,49 +658,64 @@
             submitButton.disabled = true;
             submitButton.innerHTML = '<span class="spinner"></span>Setting up your automation...';
             
+            // Collect form data
+            const formData = {};
+            const inputs = this.querySelectorAll('input, textarea');
+            
+            inputs.forEach(input => {
+                if (input.value && input.value.trim) {
+                    formData[input.name] = input.value.trim();
+                }
+            });
+            
+            console.log('Form data:', formData);
+            
             try {
-                // Collect form data
-                const formData = new FormData();
-                const inputs = this.querySelectorAll('input, textarea');
+                let result;
+                let method = 'unknown';
                 
-                inputs.forEach(input => {
-                    if (input.value.trim()) {
-                        formData.append(input.name, input.value.trim());
-                    }
-                });
-                
-                // Submit to Apps Script
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (response.ok) {
-                    const result = await response.text();
+                // Try JSONP first
+                try {
+                    console.log('Attempting JSONP submission...');
+                    result = await submitWithJSONP(formData);
+                    method = 'JSONP';
+                    console.log('JSONP success:', result);
+                } catch (jsonpError) {
+                    console.log('JSONP failed:', jsonpError.message);
                     
-                    // Check if result contains success indicators
-                    if (result.includes('Onboarding Complete') || result.includes('Dashboard:')) {
-                        successMessage.style.display = 'block';
-                        this.reset(); // Clear form
-                        
-                        // Scroll to success message
-                        successMessage.scrollIntoView({ behavior: 'smooth' });
-                    } else {
-                        throw new Error('Unexpected response format');
-                    }
+                    // Try iFrame method as fallback
+                    console.log('Attempting iFrame submission...');
+                    result = await submitWithIFrame(formData);
+                    method = 'iFrame';
+                    console.log('iFrame success:', result);
+                }
+                
+                // Handle successful response
+                if (result && (result.success || result.success === undefined)) {
+                    successMessage.innerHTML = 
+                        '<strong>Success!</strong> Your business automation is being set up. ' +
+                        'Check your email for details and next steps.';
+                    successMessage.style.display = 'block';
+                    
+                    // Clear form
+                    this.reset();
+                    
+                    // Scroll to success message
+                    successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    console.log('Submission successful via', method);
                 } else {
-                    throw new Error('Network error: ' + response.status);
+                    throw new Error(result.error || 'Submission failed');
                 }
                 
             } catch (error) {
-                console.error('Submission error:', error);
+                console.error('All submission methods failed:', error);
                 
-                document.getElementById('errorText').textContent = 
-                    error.message || 'Please check your connection and try again.';
+                errorText.textContent = error.message || 'Please check your connection and try again.';
                 errorMessage.style.display = 'block';
                 
                 // Scroll to error message
-                errorMessage.scrollIntoView({ behavior: 'smooth' });
+                errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } finally {
                 // Reset button
                 submitButton.disabled = false;
@@ -547,6 +735,44 @@
                     });
                 }
             });
+        });
+
+        // Test connection on page load
+        window.addEventListener('load', function() {
+            console.log('Testing connection to Apps Script...');
+            
+            const testCallback = 'test_' + Date.now();
+            const testScript = document.createElement('script');
+            
+            window[testCallback] = function(data) {
+                console.log('Connection test successful:', data);
+                document.head.removeChild(testScript);
+                delete window[testCallback];
+            };
+            
+            testScript.onerror = function() {
+                console.log('Connection test failed - this is normal for CORS restrictions');
+                if (document.head.contains(testScript)) {
+                    document.head.removeChild(testScript);
+                }
+                if (window[testCallback]) {
+                    delete window[testCallback];
+                }
+            };
+            
+            testScript.src = APPS_SCRIPT_URL + '?callback=' + testCallback + '&test=1';
+            document.head.appendChild(testScript);
+            
+            // Cleanup after 10 seconds
+            setTimeout(() => {
+                if (window[testCallback]) {
+                    console.log('Connection test timeout');
+                    if (document.head.contains(testScript)) {
+                        document.head.removeChild(testScript);
+                    }
+                    delete window[testCallback];
+                }
+            }, 10000);
         });
     </script>
 </body>
