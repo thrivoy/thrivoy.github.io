@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Portal - Thrivoy</title>
+    <style>
+        /* Same base styles as landing page */
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0b1220 0%, #1a2332 100%); color: #e6edf3; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background: rgba(230, 237, 243, 0.05); border: 1px solid rgba(230, 237, 243, 0.1); border-radius: 16px; padding: 40px; margin-bottom: 30px; }
+        .button { background: linear-gradient(135deg, #00d4ff, #8b5cf6); color: white; padding: 12px 24px; border: none; border-radius: 8px; text-decoration: none; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Your Business Portal</h1>
+        
+        <div class="card">
+            <h2>🚀 Your Assets</h2>
+            <div id="businessAssets">
+                <p>Enter your Business ID to view your assets:</p>
+                <input type="text" id="businessId" placeholder="biz-1234567890">
+                <button onclick="loadAssets()" class="button">Load My Assets</button>
+            </div>
+            <div id="assetsList" style="display:none;">
+                <h3>Your Business URLs:</h3>
+                <ul>
+                    <li><a href="#" id="websiteLink" target="_blank">Your Website</a></li>
+                    <li><a href="#" id="dashboardLink" target="_blank">Your Dashboard</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Content Library</h2>
+            <div id="contentLibrary">
+                <p>Your AI-generated content will appear here...</p>
+                <button onclick="loadContent()" class="button">Load My Content</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📧 Support</h2>
+            <p>Need help? Contact our support team:</p>
+            <a href="mailto:support@thrivoy.com" class="button">Contact Support</a>
+        </div>
+    </div>
+
+    <script>
+        function loadAssets() {
+            const businessId = document.getElementById('businessId').value;
+            if (businessId) {
+                // Update links with business ID
+                document.getElementById('websiteLink').href = `https://thrivoy-direct.github.io/website-${businessId}`;
+                document.getElementById('dashboardLink').href = `https://thrivoy-direct.github.io/dashboard-${businessId}`;
+                document.getElementById('assetsList').style.display = 'block';
+            }
+        }
+
+        function loadContent() {
+            // Could integrate with Google Sheets API to show content
+            alert('Content loading feature coming soon!');
+        }
+    </script>
+</body>
+</html>
