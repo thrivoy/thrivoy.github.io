@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Thrivoy Onboarding</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;max-width:760px;margin:0 auto}
+    h1{color:#1166EE}
+    label{display:block;margin-top:10px;font-weight:600}
+    input,select,textarea{width:100%;padding:8px;margin-top:6px;border:1px solid #ddd;border-radius:4px}
+    .inline{display:flex;gap:8px}
+    .small{width:48%}
+    .btn{background:#1166EE;color:#fff;padding:10px 12px;border:none;border-radius:6px;margin-top:12px;cursor:pointer}
+    .note{color:#666;font-size:13px}
+  </style>
+</head>
+<body>
+  <h1>Get your Thrivoy site live</h1>
+  <p class="note">Enter business details. Setup fee waived for Founders — ₹499/month thereafter. You can pay by UPI or be billed.</p>
+
+  <form id="onboardForm" method="post" action="https://script.google.com/macros/s/AKfycbymmM4ZkzZ-g2QbhjNozXGP9-_0wpvrNAevi0TLeRsZ4ZWDgXTQfZlU81Cr1fZxjmLxww/exec">
+    <input type="hidden" name="action" value="onboard"/>
+    <label>Business name <input name="businessName" required /></label>
+    <label>Owner name <input name="ownerName" required /></label>
+    <label>Email <input name="email" type="email" required /></label>
+    <label>Phone (include country code) <input name="phone" placeholder="919876543210" required /></label>
+    <label>Category <input name="category" required /></label>
+    <label>Location <input name="location" required /></label>
+    <label>Description <textarea name="description"></textarea></label>
+
+    <h3>Branding & Marketing</h3>
+    <label>Tagline <input name="tagline" /></label>
+    <label>Brand primary (hex) <input name="brandPrimary" placeholder="#1166EE" /></label>
+    <label>Brand secondary (hex) <input name="brandSecondary" placeholder="#FF8800" /></label>
+
+    <label>Platforms (comma separated) <input name="platforms" value="linkedin,facebook,instagram,whatsapp" /></label>
+    <label>Frequency <select name="frequency"><option value="weekly">Weekly</option><option value="daily">Daily</option><option value="monthly">Monthly</option></select></label>
+    <label>Tone <select name="tone"><option value="friendly">Friendly</option><option value="professional">Professional</option></select></label>
+
+    <h3>WhatsApp & Payment</h3>
+    <label>WhatsApp number (for site) <input name="whatsappNumber" placeholder="919876543210" /></label>
+    <label><input type="checkbox" name="showWhatsApp" value="true" checked /> Display WhatsApp on my website</label>
+
+    <h3>Billing</h3>
+    <div class="inline">
+      <div class="small"><label>Plan: <input name="plan" value="starter" readonly /></label></div>
+      <div class="small"><label>Price: <input name="price" value="499" readonly /></label></div>
+    </div>
+    <p class="note">You will receive a UPI payment link after onboarding if you choose to pay now. Admin can verify payments manually.</p>
+
+    <button class="btn" type="submit">Create my site</button>
+  </form>
+
+  <script>
+    // Listen for postMessage responses from Apps Script iframe response
+    window.addEventListener('message', function(ev) {
+      try {
+        var data = ev.data;
+        if (!data) return;
+        if (data.success) {
+          alert("Success! Your business id: " + (data.businessId || 'created'));
+          // Optionally redirect to a thank you page or show payment UI
+          if (data.websiteUrl) {
+            if (confirm("Open your new website now?\n" + data.websiteUrl)) {
+              window.open(data.websiteUrl, "_blank");
+            }
+          }
+        } else {
+          alert("Error: " + (data.error || 'unknown'));
+        }
+      } catch(e) { console.log(e); }
+    }, false);
+
+    // Form will submit normally to the Apps Script web app endpoint (doPost) which returns an HTML that posts message to parent
+  </script>
+</body>
+</html>
