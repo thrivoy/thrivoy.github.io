@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Thrivoy Dashboard</title></head>
+<body>
+  <h1>Thrivoy Dashboard</h1>
+  <div id="status">Loading...</div>
+  <button id="payNow">Pay ₹499 now</button>
+
+  <script>
+    var WEBAPP = "https://script.google.com/macros/s/YOUR_DEPLOY_ID/exec";
+    var businessId = "BIZ-PLACEHOLDER"; // set dynamically after login / onboarding
+
+    document.getElementById('payNow').addEventListener('click', function(){
+      var form = document.createElement('form');
+      form.method = "post";
+      form.action = WEBAPP;
+      form.style.display = "none";
+      var a1 = document.createElement('input'); a1.name = "action"; a1.value = "createInvoice"; form.appendChild(a1);
+      var a2 = document.createElement('input'); a2.name = "businessId"; a2.value = businessId; form.appendChild(a2);
+      var a3 = document.createElement('input'); a3.name = "amount"; a3.value = "499"; form.appendChild(a3);
+      document.body.appendChild(form);
+      form.submit();
+    }, false);
+
+    window.addEventListener('message', function(e){
+      if (e.data && e.data.invoice) {
+        var invoice = e.data.invoice;
+        if (invoice.upiQrImage) {
+          document.getElementById('status').innerHTML = 'Invoice created: ' + invoice.invoiceId + '<br/><img src="' + invoice.upiQrImage + '" alt="UPI QR"/>';
+        } else {
+          document.getElementById('status').innerText = 'Invoice created: ' + JSON.stringify(invoice);
+        }
+      }
+    }, false);
+  </script>
+</body>
+</html>
