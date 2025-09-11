@@ -93,7 +93,7 @@
       resultDiv.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Listen for postMessage responses from Apps Script
+    // Listen for postMessage responses
     window.addEventListener('message', function(ev) {
       addDebugLog('Received postMessage from origin: ' + ev.origin);
       addDebugLog('Message data: ' + JSON.stringify(ev.data));
@@ -105,7 +105,6 @@
           return;
         }
         
-        // Check if this looks like a Thrivoy response
         if (typeof data === 'object' && ('success' in data || 'action' in data)) {
           addDebugLog('Processing Thrivoy response: success=' + data.success);
           
@@ -120,57 +119,81 @@
             }
             
             showResult('success', 'Success! Your site is being created', successContent);
-            
-            // Re-enable submit button
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create my site';
-            
-            // Optional: Show browser alert as well
             alert("Success! Your business ID: " + (data.businessId || 'created'));
             
           } else {
             var errorContent = '<p>' + (data.error || 'Unknown error occurred') + '</p>';
-            if (data.businessId) {
-              errorContent += '<p><strong>Business ID:</strong> ' + data.businessId + '</p>';
-            }
-            
             showResult('error', 'Error occurred', errorContent);
-            
-            // Re-enable submit button
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create my site';
-            
             alert("Error: " + (data.error || 'unknown'));
           }
+          
+          // Re-enable submit button
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create my site';
         } else {
-          addDebugLog('Ignoring non-Thrivoy message (no success/action properties)');
+          addDebugLog('Ignoring non-Thrivoy message');
         }
       } catch(e) { 
         addDebugLog('Error processing message: ' + e.toString());
-        showResult('error', 'Processing Error', '<p>Failed to process response from server</p>');
-        
-        // Re-enable submit button
         submitBtn.disabled = false;
         submitBtn.textContent = 'Create my site';
       }
     }, false);
 
-    // Form submit handling
+    // Custom form submission using iframe
     document.getElementById('onboardForm').addEventListener('submit', function(e) {
-      addDebugLog('Form submitting to: ' + this.action);
+      e.preventDefault(); // Prevent normal form submission
+      
+      addDebugLog('Form submitted, creating iframe...');
       
       // Show loading state
       showResult('loading', 'Creating your site...', '<p>Please wait while we set up your business website and automation.</p>');
-      
-      // Disable submit button to prevent double submission
       submitBtn.disabled = true;
       submitBtn.textContent = 'Creating...';
       
-      // Add timeout fallback
+      // Create form data
+      var formData = new FormData(this);
+      var params = new URLSearchParams(formData).toString();
+      
+      addDebugLog('Form data: ' + params);
+      
+      // Create hidden iframe for submission
+      var iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.name = 'thrivoyFrame';
+      document.body.appendChild(iframe);
+      
+      // Create a temporary form that targets the iframe
+      var tempForm = document.createElement('form');
+      tempForm.method = 'POST';
+      tempForm.action = this.getAttribute('action');
+      tempForm.target = 'thrivoyFrame';
+      tempForm.style.display = 'none';
+      
+      // Copy all form data to temp form
+      for (var pair of formData.entries()) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = pair[0];
+        input.value = pair[1];
+        tempForm.appendChild(input);
+      }
+      
+      document.body.appendChild(tempForm);
+      addDebugLog('Submitting via iframe...');
+      tempForm.submit();
+      
+      // Cleanup
+      setTimeout(function() {
+        if (tempForm.parentNode) tempForm.parentNode.removeChild(tempForm);
+        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+      }, 1000);
+      
+      // Timeout fallback
       setTimeout(function() {
         if (submitBtn.disabled) {
           addDebugLog('Timeout: No response received after 30 seconds');
-          showResult('error', 'Timeout', '<p>No response received. Please check your internet connection and try again.</p>');
+          showResult('error', 'Timeout', '<p>No response received. Please try again.</p>');
           submitBtn.disabled = false;
           submitBtn.textContent = 'Create my site';
         }
@@ -178,8 +201,7 @@
     });
 
     // Initial debug info
-    addDebugLog('Page loaded, waiting for form submission...');
-    addDebugLog('Apps Script URL: https://script.google.com/macros/s/AKfycbyIBcgXjaSeNPYTY0RQ59bmAyUDLMqOgR8VINnfO0RjLMpjzxUULffgqeqOgaeHIdP3/exec');
-  </script>
+    addDebugLog('Page loaded, ready for form submission...');
+</script>
 </body>
 </html>
