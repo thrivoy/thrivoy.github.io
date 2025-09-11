@@ -1,207 +1,642 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Thrivoy Onboarding</title>
-  <style>
-    body{font-family:Arial,Helvetica,sans-serif;padding:20px;max-width:760px;margin:0 auto}
-    h1{color:#1166EE}
-    label{display:block;margin-top:10px;font-weight:600}
-    input,select,textarea{width:100%;padding:8px;margin-top:6px;border:1px solid #ddd;border-radius:4px}
-    .inline{display:flex;gap:8px}
-    .small{width:48%}
-    .btn{background:#1166EE;color:#fff;padding:10px 12px;border:none;border-radius:6px;margin-top:12px;cursor:pointer}
-    .btn:disabled{background:#ccc;cursor:not-allowed}
-    .note{color:#666;font-size:13px}
-    .result{margin-top:20px;padding:15px;border:1px solid #ddd;border-radius:6px;display:none}
-    .success{border-color:#28a745;background-color:#d4edda}
-    .error{border-color:#dc3545;background-color:#f8d7da}
-    .loading{border-color:#007bff;background-color:#d1ecf1}
-    .debug{margin-top:10px;padding:10px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-family:monospace;font-size:12px;max-height:200px;overflow-y:auto}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thrivoy - AI-Powered Business Websites & Social Media</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 20px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .hero {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 40px 0;
+            text-align: center;
+            color: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, #f1c40f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #e74c3c, #f39c12);
+            color: white;
+            padding: 18px 40px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .onboard-form {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+            display: block;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+            display: block;
+        }
+
+        .website-link {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .debug-log {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            max-height: 200px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .debug-controls {
+            position: fixed;
+            bottom: 230px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .debug-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .debug-log, .debug-controls {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Get your Thrivoy site live</h1>
-  <p class="note">Enter business details. Setup fee waived for Founders — ₹499/month thereafter. You can pay by UPI or be billed.</p>
-  
-  <form id="onboardForm" method="post" action="https://script.google.com/macros/s/AKfycbwV8qUBA62C27x-xn4Z5Oij6ckMFgn3JIKCelof3HE9PbsDyT6LAhTqO4jPBFdlcl2aog/exec">
-    <input type="hidden" name="action" value="onboard"/>
-    <label>Business name <input name="businessName" required /></label>
-    <label>Owner name <input name="ownerName" required /></label>
-    <label>Email <input name="email" type="email" required /></label>
-    <label>Phone (include country code) <input name="phone" placeholder="919876543210" required /></label>
-    <label>Category <input name="category" required /></label>
-    <label>Location <input name="location" required /></label>
-    <label>Description <textarea name="description"></textarea></label>
-    
-    <h3>Branding & Marketing</h3>
-    <label>Tagline <input name="tagline" /></label>
-    <label>Brand primary (hex) <input name="brandPrimary" placeholder="#1166EE" /></label>
-    <label>Brand secondary (hex) <input name="brandSecondary" placeholder="#FF8800" /></label>
-    <label>Platforms (comma separated) <input name="platforms" value="linkedin,facebook,instagram,whatsapp" /></label>
-    <label>Frequency <select name="frequency"><option value="weekly">Weekly</option><option value="daily">Daily</option><option value="monthly">Monthly</option></select></label>
-    <label>Tone <select name="tone"><option value="friendly">Friendly</option><option value="professional">Professional</option></select></label>
-    
-    <h3>WhatsApp & Payment</h3>
-    <label>WhatsApp number (for site) <input name="whatsappNumber" placeholder="919876543210" /></label>
-    <label><input type="checkbox" name="showWhatsApp" value="true" checked /> Display WhatsApp on my website</label>
-    
-    <h3>Billing</h3>
-    <div class="inline">
-      <div class="small"><label>Plan: <input name="plan" value="starter" readonly /></label></div>
-      <div class="small"><label>Price: <input name="price" value="499" readonly /></label></div>
+    <div class="container">
+        <header>
+            <h2>🚀 Thrivoy</h2>
+            <p>AI-Powered Business Websites & Social Media Management</p>
+        </header>
+
+        <div class="hero">
+            <h1>Launch Your Business Online in Minutes</h1>
+            <p>Get a professional website + automated social media posts powered by AI</p>
+            <button class="cta-button" onclick="showOnboardingForm()">
+                🎯 Start Your Free Trial
+            </button>
+        </div>
+
+        <form class="onboard-form" id="onboardForm">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #333;">
+                🏢 Tell Us About Your Business
+            </h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="businessName">Business Name *</label>
+                    <input type="text" id="businessName" name="businessName" required>
+                </div>
+                <div class="form-group">
+                    <label for="ownerName">Owner Name *</label>
+                    <input type="text" id="ownerName" name="ownerName" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone *</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category">Business Category *</label>
+                    <select id="category" name="category" required>
+                        <option value="">Choose category...</option>
+                        <option value="Restaurant">Restaurant</option>
+                        <option value="Retail">Retail Store</option>
+                        <option value="Services">Professional Services</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Education">Education</option>
+                        <option value="Real Estate">Real Estate</option>
+                        <option value="Fitness">Fitness & Wellness</option>
+                        <option value="Beauty">Beauty & Personal Care</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location *</label>
+                    <input type="text" id="location" name="location" placeholder="City, State" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Business Description *</label>
+                <textarea id="description" name="description" placeholder="Briefly describe your business..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="tagline">Tagline</label>
+                <input type="text" id="tagline" name="tagline" placeholder="Your business motto or catchphrase">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="brandPrimary">Primary Brand Color</label>
+                    <input type="color" id="brandPrimary" name="brandPrimary" value="#1166EE">
+                </div>
+                <div class="form-group">
+                    <label for="brandSecondary">Secondary Brand Color</label>
+                    <input type="color" id="brandSecondary" name="brandSecondary" value="#FF8800">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Social Media Platforms</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform_linkedin" name="platforms" value="linkedin" checked>
+                        <label for="platform_linkedin">LinkedIn</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform_facebook" name="platforms" value="facebook">
+                        <label for="platform_facebook">Facebook</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform_instagram" name="platforms" value="instagram">
+                        <label for="platform_instagram">Instagram</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform_whatsapp" name="platforms" value="whatsapp">
+                        <label for="platform_whatsapp">WhatsApp</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="frequency">Posting Frequency</label>
+                    <select id="frequency" name="frequency">
+                        <option value="daily">Daily</option>
+                        <option value="weekly" selected>Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tone">Content Tone</label>
+                    <select id="tone" name="tone">
+                        <option value="friendly" selected>Friendly</option>
+                        <option value="professional">Professional</option>
+                        <option value="casual">Casual</option>
+                        <option value="authoritative">Authoritative</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="whatsappNumber">WhatsApp Business Number</label>
+                <input type="tel" id="whatsappNumber" name="whatsappNumber" placeholder="Include country code (e.g., 917892159170)">
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showWhatsApp" name="showWhatsApp" value="true" checked>
+                    <label for="showWhatsApp">Show WhatsApp widget on website</label>
+                </div>
+            </div>
+
+            <input type="hidden" name="action" value="onboard">
+            <input type="hidden" name="plan" value="starter">
+            <input type="hidden" name="price" value="499">
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                🚀 Create My Business Website
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Creating your website and setting up your business profile...</p>
+            </div>
+
+            <div class="result" id="result"></div>
+        </form>
     </div>
-    <p class="note">You will receive a UPI payment link after onboarding if you choose to pay now. Admin can verify payments manually.</p>
-    
-    <button class="btn" type="submit" id="submitBtn">Create my site</button>
-  </form>
 
-  <!-- Result display area -->
-  <div id="result" class="result">
-    <div id="resultContent"></div>
-  </div>
+    <!-- Debug Panel -->
+    <div class="debug-controls">
+        <button class="debug-btn" onclick="toggleDebug()">Toggle Debug</button>
+        <button class="debug-btn" onclick="clearLog()">Clear Log</button>
+    </div>
+    <div class="debug-log" id="debugLog"></div>
 
-  <!-- Debug area (remove in production) -->
-  <div id="debugArea" style="margin-top:20px;">
-    <h4>Debug Info:</h4>
-    <div id="debugLog" class="debug"></div>
-    <button type="button" onclick="clearDebugLog()">Clear Log</button>
-  </div>
+    <script>
+        // Configuration
+        const CONFIG = {
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwV8qUBA62C27x-xn4Z5Oij6ckMFgn3JIKCelof3HE9PbsDyT6LAhTqO4jPBFdlcl2aog/exec',
+            TIMEOUT_MS: 30000
+        };
 
-  <script>
-    var debugLog = document.getElementById('debugLog');
-    var resultDiv = document.getElementById('result');
-    var resultContent = document.getElementById('resultContent');
-    var submitBtn = document.getElementById('submitBtn');
+        // Debug functionality
+        let debugVisible = true;
+        let debugLog = [];
 
-    function addDebugLog(message) {
-      var timestamp = new Date().toLocaleTimeString();
-      debugLog.innerHTML += '<div>[' + timestamp + '] ' + message + '</div>';
-      debugLog.scrollTop = debugLog.scrollHeight;
-      console.log('[Thrivoy Debug]', message);
-    }
-
-    function clearDebugLog() {
-      debugLog.innerHTML = '';
-    }
-
-    function showResult(type, title, content) {
-      resultDiv.className = 'result ' + type;
-      resultDiv.style.display = 'block';
-      resultContent.innerHTML = '<h3>' + title + '</h3>' + content;
-      resultDiv.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Listen for postMessage responses
-    window.addEventListener('message', function(ev) {
-      addDebugLog('Received postMessage from origin: ' + ev.origin);
-      addDebugLog('Message data: ' + JSON.stringify(ev.data));
-      
-      try {
-        var data = ev.data;
-        if (!data) {
-          addDebugLog('No data in message, ignoring');
-          return;
-        }
-        
-        if (typeof data === 'object' && ('success' in data || 'action' in data)) {
-          addDebugLog('Processing Thrivoy response: success=' + data.success);
-          
-          if (data.success) {
-            var successContent = '<p><strong>Business ID:</strong> ' + (data.businessId || 'created') + '</p>';
-            if (data.websiteUrl) {
-              successContent += '<p><strong>Website:</strong> <a href="' + data.websiteUrl + '" target="_blank">' + data.websiteUrl + '</a></p>';
-              successContent += '<button onclick="window.open(\'' + data.websiteUrl + '\', \'_blank\')" class="btn">View My Website</button>';
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            debugLog.push(logEntry);
+            console.log('[Thrivoy Debug]', message);
+            
+            const debugEl = document.getElementById('debugLog');
+            if (debugEl) {
+                debugEl.innerHTML = debugLog.slice(-10).join('<br>');
+                debugEl.scrollTop = debugEl.scrollHeight;
             }
-            if (data.message) {
-              successContent += '<p><strong>Status:</strong> ' + data.message + '</p>';
+        }
+
+        function toggleDebug() {
+            const debugEl = document.getElementById('debugLog');
+            debugVisible = !debugVisible;
+            debugEl.style.display = debugVisible ? 'block' : 'none';
+        }
+
+        function clearLog() {
+            debugLog = [];
+            document.getElementById('debugLog').innerHTML = '';
+        }
+
+        function showOnboardingForm() {
+            document.querySelector('.hero').style.display = 'none';
+            document.getElementById('onboardForm').style.display = 'block';
+            log('Onboarding form displayed');
+        }
+
+        function showResult(message, isSuccess = false, data = null) {
+            const resultEl = document.getElementById('result');
+            const loadingEl = document.getElementById('loading');
+            
+            loadingEl.classList.remove('show');
+            resultEl.className = `result ${isSuccess ? 'success' : 'error'}`;
+            
+            if (isSuccess && data && data.websiteUrl) {
+                resultEl.innerHTML = `
+                    <h3>🎉 Success! Your business is now online!</h3>
+                    <p>${message}</p>
+                    <p><strong>Business ID:</strong> ${data.businessId}</p>
+                    <a href="${data.websiteUrl}" target="_blank" class="website-link">
+                        🌐 View Your Website
+                    </a>
+                    <p style="margin-top: 15px; font-size: 14px; color: #666;">
+                        <strong>Next Steps:</strong><br>
+                        • Your website will be live in 1-3 minutes<br>
+                        • Check your email for login details<br>
+                        • Start customizing your content and social media posts
+                    </p>
+                `;
+            } else {
+                resultEl.innerHTML = `<h3>${isSuccess ? '✅' : '❌'} ${message}</h3>`;
             }
             
-            showResult('success', 'Success! Your site is being created', successContent);
-            alert("Success! Your business ID: " + (data.businessId || 'created'));
+            resultEl.style.display = 'block';
+        }
+
+        // CORS-compatible form submission using iframe technique
+        function submitViaIframe(formData) {
+            return new Promise((resolve, reject) => {
+                log('Creating submission iframe...');
+                
+                // Create form and iframe
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.name = 'thrivoy-submit-frame';
+                document.body.appendChild(iframe);
+
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = CONFIG.APPS_SCRIPT_URL;
+                form.target = 'thrivoy-submit-frame';
+                form.style.display = 'none';
+
+                // Add form fields
+                for (const [key, value] of formData.entries()) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
+                }
+
+                document.body.appendChild(form);
+
+                // Set up response handler
+                let responseReceived = false;
+                let timeoutId;
+
+                const handleResponse = (event) => {
+                    if (responseReceived) return;
+                    
+                    try {
+                        log('Received response from iframe');
+                        responseReceived = true;
+                        clearTimeout(timeoutId);
+                        
+                        // Clean up
+                        window.removeEventListener('message', handleResponse);
+                        document.body.removeChild(iframe);
+                        document.body.removeChild(form);
+                        
+                        // Parse response
+                        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+                        log(`Response data: ${JSON.stringify(data)}`);
+                        
+                        if (data.success) {
+                            resolve(data);
+                        } else {
+                            reject(new Error(data.error || 'Unknown error'));
+                        }
+                    } catch (error) {
+                        log(`Response parsing error: ${error.message}`);
+                        reject(error);
+                    }
+                };
+
+                // Set up timeout
+                timeoutId = setTimeout(() => {
+                    if (!responseReceived) {
+                        responseReceived = true;
+                        log('Request timeout - no response received');
+                        window.removeEventListener('message', handleResponse);
+                        document.body.removeChild(iframe);
+                        document.body.removeChild(form);
+                        reject(new Error('Request timeout - please try again'));
+                    }
+                }, CONFIG.TIMEOUT_MS);
+
+                // Listen for response
+                window.addEventListener('message', handleResponse);
+
+                // Submit form
+                log('Submitting form via iframe...');
+                form.submit();
+            });
+        }
+
+        // Form submission handler
+        document.getElementById('onboardForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-          } else {
-            var errorContent = '<p>' + (data.error || 'Unknown error occurred') + '</p>';
-            showResult('error', 'Error occurred', errorContent);
-            alert("Error: " + (data.error || 'unknown'));
-          }
-          
-          // Re-enable submit button
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Create my site';
-        } else {
-          addDebugLog('Ignoring non-Thrivoy message');
-        }
-      } catch(e) { 
-        addDebugLog('Error processing message: ' + e.toString());
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Create my site';
-      }
-    }, false);
+            log('Form submission started');
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingEl = document.getElementById('loading');
+            const resultEl = document.getElementById('result');
+            
+            // Reset UI
+            submitBtn.disabled = true;
+            loadingEl.classList.add('show');
+            resultEl.style.display = 'none';
+            
+            try {
+                // Collect form data
+                const formData = new FormData(this);
+                
+                // Handle checkboxes for platforms
+                const platforms = Array.from(document.querySelectorAll('input[name="platforms"]:checked'))
+                    .map(cb => cb.value);
+                formData.set('platforms', platforms.join(','));
+                
+                // Log form data for debugging
+                const debugData = {};
+                for (const [key, value] of formData.entries()) {
+                    debugData[key] = value;
+                }
+                log(`Form data: ${JSON.stringify(debugData)}`);
+                
+                // Submit via iframe
+                const response = await submitViaIframe(formData);
+                
+                log('Submission successful');
+                showResult('Your business website has been created!', true, response);
+                
+            } catch (error) {
+                log(`Submission error: ${error.message}`);
+                showResult(`Error: ${error.message}`, false);
+            } finally {
+                submitBtn.disabled = false;
+                loadingEl.classList.remove('show');
+            }
+        });
 
-    // Custom form submission using iframe
-    document.getElementById('onboardForm').addEventListener('submit', function(e) {
-      e.preventDefault(); // Prevent normal form submission
-      
-      addDebugLog('Form submitted, creating iframe...');
-      
-      // Show loading state
-      showResult('loading', 'Creating your site...', '<p>Please wait while we set up your business website and automation.</p>');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Creating...';
-      
-      // Create form data
-      var formData = new FormData(this);
-      var params = new URLSearchParams(formData).toString();
-      
-      addDebugLog('Form data: ' + params);
-      
-      // Create hidden iframe for submission
-      var iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.name = 'thrivoyFrame';
-      document.body.appendChild(iframe);
-      
-      // Create a temporary form that targets the iframe
-      var tempForm = document.createElement('form');
-      tempForm.method = 'POST';
-      tempForm.action = this.getAttribute('action');
-      tempForm.target = 'thrivoyFrame';
-      tempForm.style.display = 'none';
-      
-      // Copy all form data to temp form
-      for (var pair of formData.entries()) {
-        var input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = pair[0];
-        input.value = pair[1];
-        tempForm.appendChild(input);
-      }
-      
-      document.body.appendChild(tempForm);
-      addDebugLog('Submitting via iframe...');
-      tempForm.submit();
-      
-      // Cleanup
-      setTimeout(function() {
-        if (tempForm.parentNode) tempForm.parentNode.removeChild(tempForm);
-        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-      }, 1000);
-      
-      // Timeout fallback
-      setTimeout(function() {
-        if (submitBtn.disabled) {
-          addDebugLog('Timeout: No response received after 30 seconds');
-          showResult('error', 'Timeout', '<p>No response received. Please try again.</p>');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Create my site';
-        }
-      }, 30000);
-    });
-
-    // Initial debug info
-    addDebugLog('Page loaded, ready for form submission...');
-</script>
+        // Initialize
+        log('Page loaded, ready for form submission...');
+    </script>
 </body>
 </html>
