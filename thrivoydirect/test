@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Thrivoy Apps Script Web App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        input[type="url"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .test-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-btn:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        
+        .deployment-steps {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .step {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        .step::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #e17055;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Thrivoy Apps Script Web App Tester</h1>
+        
+        <div class="deployment-steps">
+            <h3>📋 Before Testing - Deployment Checklist:</h3>
+            <div class="step">Go to Apps Script → Deploy → Manage deployments</div>
+            <div class="step">If no deployment exists: Deploy → New deployment → Web app</div>
+            <div class="step">Set "Execute as" to "Me" and "Who has access" to "Anyone"</div>
+            <div class="step">Copy the new web app URL and paste it below</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Web App URL Configuration</h3>
+            <p>Enter your Apps Script web app URL:</p>
+            <input type="url" id="webAppUrl" placeholder="https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec" value="https://script.google.com/macros/s/AKfycbyIBcgXjaSeNPYTY0RQ59bmAyUDLMqOgR8VINnfO0RjLMpjzxUUULffgqeqOgaeHIdP3/exec">
+            <button class="test-btn" onclick="saveUrl()">💾 Save URL</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🏥 Health Check Tests</h3>
+            <p>Test basic connectivity and JSONP support:</p>
+            
+            <button class="test-btn" onclick="testBasicGet()">🔍 Test Basic GET</button>
+            <button class="test-btn" onclick="testJsonp()">📡 Test JSONP</button>
+            <button class="test-btn" onclick="testWhatsAppRedirect()">💬 Test WhatsApp Redirect</button>
+            
+            <div id="healthResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🏢 Business Onboarding Test</h3>
+            <p>Test the complete onboarding flow:</p>
+            
+            <button class="test-btn" onclick="testOnboarding()">🎯 Test Onboarding</button>
+            
+            <div id="onboardResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Configuration Check</h3>
+            <p>These functions help debug your Apps Script setup:</p>
+            
+            <button class="test-btn" onclick="showConfigInstructions()">⚙️ Show Config Instructions</button>
+            
+            <div id="configInstructions" style="display:none;">
+                <div class="info result">
+                    <h4>Required Script Properties:</h4>
+                    <p>Go to Apps Script → Project Settings → Script Properties and add:</p>
+                    <ul>
+                        <li><strong>GITHUB_OWNER</strong>: Your GitHub username</li>
+                        <li><strong>GITHUB_REPO</strong>: Your repository name</li>
+                        <li><strong>GITHUB_TOKEN</strong>: GitHub personal access token</li>
+                        <li><strong>UPI_ID</strong>: Your UPI ID (for payments)</li>
+                        <li><strong>THRIVOY_SUPPORT_NUMBER</strong>: Support WhatsApp number</li>
+                    </ul>
+                    
+                    <h4>Test Functions in Apps Script:</h4>
+                    <p>Run these functions directly in Apps Script editor to debug:</p>
+                    <ul>
+                        <li><code>checkScriptProperties()</code> - Check if all properties are set</li>
+                        <li><code>testGitHubConnection()</code> - Test GitHub API connection</li>
+                        <li><code>demoCreateSite()</code> - Create a demo site</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let webAppUrl = localStorage.getItem('thrivoyWebAppUrl') || 'https://script.google.com/macros/s/AKfycbyIBcgXjaSeNPYTY0RQ59bmAyUDLMqOgR8VINnfO0RjLMpjzxUUULffgqeqOgaeHIdP3/exec';
+        
+        function saveUrl() {
+            const url = document.getElementById('webAppUrl').value.trim();
+            if (!url) {
+                showResult('healthResults', 'Please enter a valid URL', 'error');
+                return;
+            }
+            webAppUrl = url;
+            localStorage.setItem('thrivoyWebAppUrl', url);
+            showResult('healthResults', 'URL saved: ' + url, 'success');
+        }
+
+        function showResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const timestamp = new Date().toLocaleTimeString();
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = `<strong>[${timestamp}]</strong><br>${message}`;
+            container.appendChild(resultDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function testBasicGet() {
+            showResult('healthResults', 'Testing basic GET request...', 'info');
+            
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    showResult('healthResults', `✅ Basic GET successful!\nResponse: ${text.substring(0, 200)}...`, 'success');
+                } else {
+                    showResult('healthResults', `❌ GET failed: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                showResult('healthResults', `❌ GET error: ${error.message}`, 'error');
+            }
+        }
+
+        function testJsonp() {
+            showResult('healthResults', 'Testing JSONP callback...', 'info');
+            
+            // Create JSONP callback
+            window.thrivoyTestCallback = function(data) {
+                showResult('healthResults', `✅ JSONP successful!\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                // Cleanup
+                delete window.thrivoyTestCallback;
+                document.head.removeChild(document.querySelector('script[src*="callback=thrivoyTestCallback"]'));
+            };
+            
+            // Create script tag for JSONP
+            const script = document.createElement('script');
+            script.src = `${webAppUrl}?action=health&callback=thrivoyTestCallback&_t=${Date.now()}`;
+            script.onerror = function() {
+                showResult('healthResults', '❌ JSONP failed - script could not load', 'error');
+                delete window.thrivoyTestCallback;
+            };
+            
+            document.head.appendChild(script);
+            
+            // Timeout after 10 seconds
+            setTimeout(() => {
+                if (window.thrivoyTestCallback) {
+                    showResult('healthResults', '❌ JSONP timeout - no callback received', 'error');
+                    delete window.thrivoyTestCallback;
+                    document.head.removeChild(script);
+                }
+            }, 10000);
+        }
+
+        async function testWhatsAppRedirect() {
+            showResult('healthResults', 'Testing WhatsApp redirect...', 'info');
+            
+            try {
+                const testUrl = `${webAppUrl}?action=wa_redirect&biz=TEST&phone=1234567890&msg=Hello`;
+                const response = await fetch(testUrl);
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    if (html.includes('wa.me')) {
+                        showResult('healthResults', '✅ WhatsApp redirect working!\nHTML contains wa.me link', 'success');
+                    } else {
+                        showResult('healthResults', `⚠️ Unexpected redirect response:\n${html.substring(0, 300)}...`, 'info');
+                    }
+                } else {
+                    showResult('healthResults', `❌ WhatsApp redirect failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('healthResults', `❌ WhatsApp test error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testOnboarding() {
+            showResult('onboardResults', 'Testing business onboarding...', 'info');
+            
+            const testData = {
+                action: 'onboard',
+                businessName: 'Test Business ' + Date.now(),
+                ownerName: 'Test Owner',
+                email: 'test@example.com',
+                phone: '9876543210',
+                category: 'Technology',
+                location: 'Test City',
+                description: 'A test business for Thrivoy',
+                brandPrimary: '#1166EE',
+                tagline: 'Testing Thrivoy'
+            };
+            
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    showResult('onboardResults', `📨 Onboarding response received:\n${html.substring(0, 500)}...`, 'success');
+                    
+                    // Try to extract postMessage data
+                    const match = html.match(/window\.parent\.postMessage\((.+?), "\*"\)/);
+                    if (match) {
+                        try {
+                            const data = JSON.parse(match[1]);
+                            showResult('onboardResults', `📊 Parsed response data:\n${JSON.stringify(data, null, 2)}`, data.success ? 'success' : 'error');
+                        } catch (e) {
+                            showResult('onboardResults', '⚠️ Could not parse postMessage data', 'info');
+                        }
+                    }
+                } else {
+                    showResult('onboardResults', `❌ Onboarding failed: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                showResult('onboardResults', `❌ Onboarding error: ${error.message}`, 'error');
+            }
+        }
+
+        function showConfigInstructions() {
+            const div = document.getElementById('configInstructions');
+            div.style.display = div.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Initialize
+        document.getElementById('webAppUrl').value = webAppUrl;
+    </script>
+</body>
+</html>
