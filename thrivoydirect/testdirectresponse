@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Apps Script Direct Response</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Apps Script Direct Test</h1>
+    <p>This will open your Apps Script URL directly in a new window to see the actual response.</p>
+    
+    <button onclick="testDirect()">📋 Test with Sample Data</button>
+    <button onclick="testHealthCheck()">🏥 Test Health Check</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwV8qUBA62C27x-xn4Z5Oij6ckMFgn3JIKCelof3HE9PbsDyT6LAhTqO4jPBFdlcl2aog/exec';
+        
+        function testDirect() {
+            // Create a form with test data and submit it to a new window
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = APPS_SCRIPT_URL;
+            form.target = '_blank';
+            
+            const testData = {
+                action: 'onboard',
+                businessName: 'Test Restaurant',
+                ownerName: 'Test Owner',
+                email: 'test@example.com',
+                phone: '9876543210',
+                category: 'Restaurant',
+                location: 'Test City',
+                description: 'A test restaurant',
+                tagline: 'Testing Thrivoy',
+                brandPrimary: '#1166EE',
+                brandSecondary: '#FF8800',
+                platforms: 'linkedin',
+                frequency: 'weekly',
+                tone: 'friendly',
+                whatsappNumber: '919092008720',
+                showWhatsApp: 'true',
+                plan: 'starter',
+                price: '499'
+            };
+            
+            for (const [key, value] of Object.entries(testData)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+            
+            document.getElementById('results').innerHTML = 
+                '<div class="result success">✅ Test form submitted! Check the new window/tab for the direct response from your Apps Script.</div>';
+        }
+        
+        function testHealthCheck() {
+            const url = APPS_SCRIPT_URL + '?action=health&t=' + Date.now();
+            window.open(url, '_blank');
+            
+            document.getElementById('results').innerHTML = 
+                '<div class="result success">✅ Health check opened! Check the new window/tab for the response.</div>';
+        }
+    </script>
+</body>
+</html>
