@@ -508,21 +508,22 @@
             resultEl.style.display = 'block';
         }
 
-        // CORS-compatible form submission using iframe technique
+        // CORS-compatible form submission using iframe technique with enhanced response handling
         function submitViaIframe(formData) {
             return new Promise((resolve, reject) => {
                 log('Creating submission iframe...');
                 
-                // Create form and iframe
+                // Create iframe with better settings
                 const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.name = 'thrivoy-submit-frame';
+                iframe.style.cssText = 'display:none;width:0;height:0;border:none;';
+                iframe.name = 'thrivoy-submit-frame-' + Date.now();
+                iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
                 document.body.appendChild(iframe);
 
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = CONFIG.APPS_SCRIPT_URL;
-                form.target = 'thrivoy-submit-frame';
+                form.target = iframe.name;
                 form.style.display = 'none';
 
                 // Add form fields
@@ -539,22 +540,33 @@
                 // Set up response handler
                 let responseReceived = false;
                 let timeoutId;
+                let pollInterval;
 
-                const handleResponse = (event) => {
+                const cleanup = () => {
+                    if (timeoutId) clearTimeout(timeoutId);
+                    if (pollInterval) clearInterval(pollInterval);
+                    window.removeEventListener('message', handlePostMessage);
+                    try {
+                        if (iframe.parentNode) document.body.removeChild(iframe);
+                        if (form.parentNode) document.body.removeChild(form);
+                    } catch (e) {
+                        log('Cleanup error (non-critical): ' + e.message);
+                    }
+                };
+
+                const handlePostMessage = (event) => {
                     if (responseReceived) return;
                     
+                    // Filter out unrelated messages
+                    if (!event.data || typeof event.data !== 'object') return;
+                    if (!event.data.hasOwnProperty('success') && !event.data.hasOwnProperty('action')) return;
+                    
                     try {
-                        log('Received response from iframe');
+                        log('Received postMessage response');
                         responseReceived = true;
-                        clearTimeout(timeoutId);
+                        cleanup();
                         
-                        // Clean up
-                        window.removeEventListener('message', handleResponse);
-                        document.body.removeChild(iframe);
-                        document.body.removeChild(form);
-                        
-                        // Parse response
-                        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+                        const data = event.data;
                         log(`Response data: ${JSON.stringify(data)}`);
                         
                         if (data.success) {
@@ -568,24 +580,69 @@
                     }
                 };
 
+                // Enhanced iframe content polling as backup
+                const pollIframeContent = () => {
+                    if (responseReceived) return;
+                    
+                    try {
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+                        if (iframeDoc && iframeDoc.body) {
+                            const bodyText = iframeDoc.body.textContent || '';
+                            const bodyHtml = iframeDoc.body.innerHTML || '';
+                            
+                            // Look for success/error indicators in the content
+                            if (bodyHtml.includes('"success":true') || bodyText.includes('Success')) {
+                                log('Detected success from iframe content');
+                                responseReceived = true;
+                                cleanup();
+                                
+                                // Try to extract data from HTML
+                                const match = bodyHtml.match(/"businessId":"([^"]+)"/);
+                                const businessId = match ? match[1] : 'BIZ-' + Date.now();
+                                
+                                resolve({
+                                    success: true,
+                                    businessId: businessId,
+                                    websiteUrl: `https://thrivoydirect.github.io/site/sites/${businessId}/`,
+                                    message: 'Business onboarded successfully'
+                                });
+                            } else if (bodyHtml.includes('"success":false') || bodyText.includes('Error')) {
+                                log('Detected error from iframe content');
+                                responseReceived = true;
+                                cleanup();
+                                
+                                const errorMatch = bodyHtml.match(/"error":"([^"]+)"/);
+                                const error = errorMatch ? errorMatch[1] : 'Unknown error occurred';
+                                reject(new Error(error));
+                            }
+                        }
+                    } catch (e) {
+                        // Cross-origin restrictions might prevent access - this is normal
+                    }
+                };
+
                 // Set up timeout
                 timeoutId = setTimeout(() => {
                     if (!responseReceived) {
                         responseReceived = true;
                         log('Request timeout - no response received');
-                        window.removeEventListener('message', handleResponse);
-                        document.body.removeChild(iframe);
-                        document.body.removeChild(form);
-                        reject(new Error('Request timeout - please try again'));
+                        cleanup();
+                        reject(new Error('Request timeout. Your submission may have been processed - please check your email or try refreshing the page.'));
                     }
                 }, CONFIG.TIMEOUT_MS);
 
-                // Listen for response
-                window.addEventListener('message', handleResponse);
+                // Listen for postMessage
+                window.addEventListener('message', handlePostMessage);
+                
+                // Start polling iframe content as backup
+                pollInterval = setInterval(pollIframeContent, 2000);
 
                 // Submit form
                 log('Submitting form via iframe...');
                 form.submit();
+                
+                // Initial content check after a short delay
+                setTimeout(pollIframeContent, 3000);
             });
         }
 
