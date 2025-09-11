@@ -12,13 +12,19 @@
     .inline{display:flex;gap:8px}
     .small{width:48%}
     .btn{background:#1166EE;color:#fff;padding:10px 12px;border:none;border-radius:6px;margin-top:12px;cursor:pointer}
+    .btn:disabled{background:#ccc;cursor:not-allowed}
     .note{color:#666;font-size:13px}
+    .result{margin-top:20px;padding:15px;border:1px solid #ddd;border-radius:6px;display:none}
+    .success{border-color:#28a745;background-color:#d4edda}
+    .error{border-color:#dc3545;background-color:#f8d7da}
+    .loading{border-color:#007bff;background-color:#d1ecf1}
+    .debug{margin-top:10px;padding:10px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;font-family:monospace;font-size:12px;max-height:200px;overflow-y:auto}
   </style>
 </head>
 <body>
   <h1>Get your Thrivoy site live</h1>
   <p class="note">Enter business details. Setup fee waived for Founders — ₹499/month thereafter. You can pay by UPI or be billed.</p>
-
+  
   <form id="onboardForm" method="post" action="https://script.google.com/macros/s/AKfycbyIBcgXjaSeNPYTY0RQ59bmAyUDLMqOgR8VINnfO0RjLMpjzxUULffgqeqOgaeHIdP3/exec">
     <input type="hidden" name="action" value="onboard"/>
     <label>Business name <input name="businessName" required /></label>
@@ -28,51 +34,152 @@
     <label>Category <input name="category" required /></label>
     <label>Location <input name="location" required /></label>
     <label>Description <textarea name="description"></textarea></label>
-
+    
     <h3>Branding & Marketing</h3>
     <label>Tagline <input name="tagline" /></label>
     <label>Brand primary (hex) <input name="brandPrimary" placeholder="#1166EE" /></label>
     <label>Brand secondary (hex) <input name="brandSecondary" placeholder="#FF8800" /></label>
-
     <label>Platforms (comma separated) <input name="platforms" value="linkedin,facebook,instagram,whatsapp" /></label>
     <label>Frequency <select name="frequency"><option value="weekly">Weekly</option><option value="daily">Daily</option><option value="monthly">Monthly</option></select></label>
     <label>Tone <select name="tone"><option value="friendly">Friendly</option><option value="professional">Professional</option></select></label>
-
+    
     <h3>WhatsApp & Payment</h3>
     <label>WhatsApp number (for site) <input name="whatsappNumber" placeholder="919876543210" /></label>
     <label><input type="checkbox" name="showWhatsApp" value="true" checked /> Display WhatsApp on my website</label>
-
+    
     <h3>Billing</h3>
     <div class="inline">
       <div class="small"><label>Plan: <input name="plan" value="starter" readonly /></label></div>
       <div class="small"><label>Price: <input name="price" value="499" readonly /></label></div>
     </div>
     <p class="note">You will receive a UPI payment link after onboarding if you choose to pay now. Admin can verify payments manually.</p>
-
-    <button class="btn" type="submit">Create my site</button>
+    
+    <button class="btn" type="submit" id="submitBtn">Create my site</button>
   </form>
 
+  <!-- Result display area -->
+  <div id="result" class="result">
+    <div id="resultContent"></div>
+  </div>
+
+  <!-- Debug area (remove in production) -->
+  <div id="debugArea" style="margin-top:20px;">
+    <h4>Debug Info:</h4>
+    <div id="debugLog" class="debug"></div>
+    <button type="button" onclick="clearDebugLog()">Clear Log</button>
+  </div>
+
   <script>
-    // Listen for postMessage responses from Apps Script iframe response
+    var debugLog = document.getElementById('debugLog');
+    var resultDiv = document.getElementById('result');
+    var resultContent = document.getElementById('resultContent');
+    var submitBtn = document.getElementById('submitBtn');
+
+    function addDebugLog(message) {
+      var timestamp = new Date().toLocaleTimeString();
+      debugLog.innerHTML += '<div>[' + timestamp + '] ' + message + '</div>';
+      debugLog.scrollTop = debugLog.scrollHeight;
+      console.log('[Thrivoy Debug]', message);
+    }
+
+    function clearDebugLog() {
+      debugLog.innerHTML = '';
+    }
+
+    function showResult(type, title, content) {
+      resultDiv.className = 'result ' + type;
+      resultDiv.style.display = 'block';
+      resultContent.innerHTML = '<h3>' + title + '</h3>' + content;
+      resultDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Listen for postMessage responses from Apps Script
     window.addEventListener('message', function(ev) {
+      addDebugLog('Received postMessage from origin: ' + ev.origin);
+      addDebugLog('Message data: ' + JSON.stringify(ev.data));
+      
       try {
         var data = ev.data;
-        if (!data) return;
-        if (data.success) {
-          alert("Success! Your business id: " + (data.businessId || 'created'));
-          // Optionally redirect to a thank you page or show payment UI
-          if (data.websiteUrl) {
-            if (confirm("Open your new website now?\n" + data.websiteUrl)) {
-              window.open(data.websiteUrl, "_blank");
+        if (!data) {
+          addDebugLog('No data in message, ignoring');
+          return;
+        }
+        
+        // Check if this looks like a Thrivoy response
+        if (typeof data === 'object' && ('success' in data || 'action' in data)) {
+          addDebugLog('Processing Thrivoy response: success=' + data.success);
+          
+          if (data.success) {
+            var successContent = '<p><strong>Business ID:</strong> ' + (data.businessId || 'created') + '</p>';
+            if (data.websiteUrl) {
+              successContent += '<p><strong>Website:</strong> <a href="' + data.websiteUrl + '" target="_blank">' + data.websiteUrl + '</a></p>';
+              successContent += '<button onclick="window.open(\'' + data.websiteUrl + '\', \'_blank\')" class="btn">View My Website</button>';
             }
+            if (data.message) {
+              successContent += '<p><strong>Status:</strong> ' + data.message + '</p>';
+            }
+            
+            showResult('success', 'Success! Your site is being created', successContent);
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create my site';
+            
+            // Optional: Show browser alert as well
+            alert("Success! Your business ID: " + (data.businessId || 'created'));
+            
+          } else {
+            var errorContent = '<p>' + (data.error || 'Unknown error occurred') + '</p>';
+            if (data.businessId) {
+              errorContent += '<p><strong>Business ID:</strong> ' + data.businessId + '</p>';
+            }
+            
+            showResult('error', 'Error occurred', errorContent);
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create my site';
+            
+            alert("Error: " + (data.error || 'unknown'));
           }
         } else {
-          alert("Error: " + (data.error || 'unknown'));
+          addDebugLog('Ignoring non-Thrivoy message (no success/action properties)');
         }
-      } catch(e) { console.log(e); }
+      } catch(e) { 
+        addDebugLog('Error processing message: ' + e.toString());
+        showResult('error', 'Processing Error', '<p>Failed to process response from server</p>');
+        
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create my site';
+      }
     }, false);
 
-    // Form will submit normally to the Apps Script web app endpoint (doPost) which returns an HTML that posts message to parent
+    // Form submit handling
+    document.getElementById('onboardForm').addEventListener('submit', function(e) {
+      addDebugLog('Form submitting to: ' + this.action);
+      
+      // Show loading state
+      showResult('loading', 'Creating your site...', '<p>Please wait while we set up your business website and automation.</p>');
+      
+      // Disable submit button to prevent double submission
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
+      
+      // Add timeout fallback
+      setTimeout(function() {
+        if (submitBtn.disabled) {
+          addDebugLog('Timeout: No response received after 30 seconds');
+          showResult('error', 'Timeout', '<p>No response received. Please check your internet connection and try again.</p>');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create my site';
+        }
+      }, 30000);
+    });
+
+    // Initial debug info
+    addDebugLog('Page loaded, waiting for form submission...');
+    addDebugLog('Apps Script URL: https://script.google.com/macros/s/AKfycbyIBcgXjaSeNPYTY0RQ59bmAyUDLMqOgR8VINnfO0RjLMpjzxUULffgqeqOgaeHIdP3/exec');
   </script>
 </body>
 </html>
