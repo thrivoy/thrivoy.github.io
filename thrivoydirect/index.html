@@ -499,262 +499,81 @@
     </div>
     <div class="debug-log" id="debugLog"></div>
 
-    <script>
-        // Configuration
-        const CONFIG = {
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzOgG71cEPm6cMQq33ADq7FBgmiXOjkjo6Gr9uVlLG24rO-dVE4yuG39oLFt7zW3_TyIg/exec',
-            TIMEOUT_MS: 30000
-        };
+<script>
+  // Handle showing result messages
+  function showResult(message, success, data = {}) {
+    const resultDiv = document.getElementById("result");
+    resultDiv.className = "result " + (success ? "success" : "error");
+    resultDiv.innerHTML = `
+      <p>${message}</p>
+      ${data.businessId ? `<p><strong>Business ID:</strong> ${data.businessId}</p>` : ""}
+      ${data.websiteUrl ? `<p><a href="${data.websiteUrl}" target="_blank">🌐 View Your Website</a></p>` : ""}
+    `;
+    resultDiv.style.display = "block";
+  }
 
-        // Debug functionality
-        let debugVisible = true;
-        let debugLog = [];
+  // Submit form via iframe
+  async function submitForm(event) {
+    event.preventDefault();
+    console.log("[Thrivoy Debug] Form submission started");
 
-        function log(message) {
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = `[${timestamp}] ${message}`;
-            debugLog.push(logEntry);
-            console.log('[Thrivoy Debug]', message);
-            
-            const debugEl = document.getElementById('debugLog');
-            if (debugEl) {
-                debugEl.innerHTML = debugLog.slice(-10).join('<br>');
-                debugEl.scrollTop = debugEl.scrollHeight;
-            }
-        }
+    const form = event.target;
+    const formData = Object.fromEntries(new FormData(form).entries());
+    console.log("[Thrivoy Debug] Form data:", JSON.stringify(formData));
 
-        function toggleDebug() {
-            const debugEl = document.getElementById('debugLog');
-            debugVisible = !debugVisible;
-            debugEl.style.display = debugVisible ? 'block' : 'none';
-        }
+    // Create hidden iframe
+    console.log("[Thrivoy Debug] Creating submission iframe...");
+    const iframe = document.createElement("iframe");
+    iframe.name = "hidden_iframe";
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
 
-        function clearLog() {
-            debugLog = [];
-            document.getElementById('debugLog').innerHTML = '';
-        }
+    // Build hidden form for iframe submission
+    const tempForm = document.createElement("form");
+    tempForm.method = "POST";
+    tempForm.action = "YOUR_GOOGLE_APPS_SCRIPT_URL"; // 🔄 replace with your Apps Script URL
+    tempForm.target = "hidden_iframe";
 
-        function showOnboardingForm() {
-            document.querySelector('.hero').style.display = 'none';
-            document.getElementById('onboardForm').style.display = 'block';
-            log('Onboarding form displayed');
-        }
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "payload";
+    input.value = JSON.stringify(formData);
+    tempForm.appendChild(input);
 
-        function showResult(message, isSuccess = false, data = null) {
-            const resultEl = document.getElementById('result');
-            const loadingEl = document.getElementById('loading');
-            
-            loadingEl.classList.remove('show');
-            resultEl.className = `result ${isSuccess ? 'success' : 'error'}`;
-            
-            if (isSuccess && data && data.websiteUrl) {
-                resultEl.innerHTML = `
-                    <h3>🎉 Success! Your business is now online!</h3>
-                    <p>${message}</p>
-                    <p><strong>Business ID:</strong> ${data.businessId}</p>
-                    <a href="${data.websiteUrl}" target="_blank" class="website-link">
-                        🌐 View Your Website
-                    </a>
-                    <p style="margin-top: 15px; font-size: 14px; color: #666;">
-                        <strong>Next Steps:</strong><br>
-                        • Your website will be live in 1-3 minutes<br>
-                        • Check your email for login details<br>
-                        • Start customizing your content and social media posts
-                    </p>
-                `;
-            } else {
-                resultEl.innerHTML = `<h3>${isSuccess ? '✅' : '❌'} ${message}</h3>`;
-            }
-            
-            resultEl.style.display = 'block';
-        }
+    document.body.appendChild(tempForm);
+    tempForm.submit();
 
-        // CORS-compatible form submission using iframe technique with enhanced response handling
-        function submitViaIframe(formData) {
-            return new Promise((resolve, reject) => {
-                log('Creating submission iframe...');
-                
-                // Create iframe with better settings
-                const iframe = document.createElement('iframe');
-                iframe.style.cssText = 'display:none;width:0;height:0;border:none;';
-                iframe.name = 'thrivoy-submit-frame-' + Date.now();
-                iframe.sandbox = 'allow-scripts allow-same-origin allow-forms';
-                document.body.appendChild(iframe);
+    console.log("[Thrivoy Debug] Submitting form via iframe...");
+  }
 
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = CONFIG.APPS_SCRIPT_URL;
-                form.target = iframe.name;
-                form.style.display = 'none';
+  // ✅ Listen for backend responses
+  window.addEventListener("message", (event) => {
+    try {
+      let data = event.data;
+      if (typeof data === "string") {
+        try { data = JSON.parse(data); } catch(e) { return; }
+      }
+      console.log("[Thrivoy Debug] Received postMessage response", data);
 
-                // Add form fields
-                for (const [key, value] of formData.entries()) {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = value;
-                    form.appendChild(input);
-                }
+      if (data.success) {
+        showResult("Your business website was created successfully!", true, data);
+      } else {
+        showResult("Error: " + (data.error || "Unknown error"), false, data);
+      }
+    } catch (err) {
+      console.error("[Thrivoy Debug] Listener error:", err);
+    }
+  });
 
-                document.body.appendChild(form);
+  // Attach form submit handler
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("onboarding-form");
+    if (form) {
+      console.log("[Thrivoy Debug] Onboarding form displayed");
+      form.addEventListener("submit", submitForm);
+    }
+  });
+</script>
 
-                // Set up response handler
-                let responseReceived = false;
-                let timeoutId;
-                let pollInterval;
-
-                const cleanup = () => {
-                    if (timeoutId) clearTimeout(timeoutId);
-                    if (pollInterval) clearInterval(pollInterval);
-                    window.removeEventListener('message', handlePostMessage);
-                    try {
-                        if (iframe.parentNode) document.body.removeChild(iframe);
-                        if (form.parentNode) document.body.removeChild(form);
-                    } catch (e) {
-                        log('Cleanup error (non-critical): ' + e.message);
-                    }
-                };
-
-                const handlePostMessage = (event) => {
-                    if (responseReceived) return;
-                    
-                    // Filter out unrelated messages
-                    if (!event.data || typeof event.data !== 'object') return;
-                    if (!event.data.hasOwnProperty('success') && !event.data.hasOwnProperty('action')) return;
-                    
-                    try {
-                        log('Received postMessage response');
-                        responseReceived = true;
-                        cleanup();
-                        
-                        const data = event.data;
-                        log(`Response data: ${JSON.stringify(data)}`);
-                        
-                        if (data.success) {
-                            resolve(data);
-                        } else {
-                            reject(new Error(data.error || 'Unknown error'));
-                        }
-                    } catch (error) {
-                        log(`Response parsing error: ${error.message}`);
-                        reject(error);
-                    }
-                };
-
-                // Enhanced iframe content polling as backup
-                const pollIframeContent = () => {
-                    if (responseReceived) return;
-                    
-                    try {
-                        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-                        if (iframeDoc && iframeDoc.body) {
-                            const bodyText = iframeDoc.body.textContent || '';
-                            const bodyHtml = iframeDoc.body.innerHTML || '';
-                            
-                            // Look for success/error indicators in the content
-                            if (bodyHtml.includes('"success":true') || bodyText.includes('Success')) {
-                                log('Detected success from iframe content');
-                                responseReceived = true;
-                                cleanup();
-                                
-                                // Try to extract data from HTML
-                                const match = bodyHtml.match(/"businessId":"([^"]+)"/);
-                                const businessId = match ? match[1] : 'BIZ-' + Date.now();
-                                
-                                resolve({
-                                    success: true,
-                                    businessId: businessId,
-                                    websiteUrl: `https://thrivoydirect.github.io/site/sites/${businessId}/`,
-                                    message: 'Business onboarded successfully'
-                                });
-                            } else if (bodyHtml.includes('"success":false') || bodyText.includes('Error')) {
-                                log('Detected error from iframe content');
-                                responseReceived = true;
-                                cleanup();
-                                
-                                const errorMatch = bodyHtml.match(/"error":"([^"]+)"/);
-                                const error = errorMatch ? errorMatch[1] : 'Unknown error occurred';
-                                reject(new Error(error));
-                            }
-                        }
-                    } catch (e) {
-                        // Cross-origin restrictions might prevent access - this is normal
-                    }
-                };
-
-                // Set up timeout
-                timeoutId = setTimeout(() => {
-                    if (!responseReceived) {
-                        responseReceived = true;
-                        log('Request timeout - no response received');
-                        cleanup();
-                        reject(new Error('Request timeout. Your submission may have been processed - please check your email or try refreshing the page.'));
-                    }
-                }, CONFIG.TIMEOUT_MS);
-
-                // Listen for postMessage
-                window.addEventListener('message', handlePostMessage);
-                
-                // Start polling iframe content as backup
-                pollInterval = setInterval(pollIframeContent, 2000);
-
-                // Submit form
-                log('Submitting form via iframe...');
-                form.submit();
-                
-                // Initial content check after a short delay
-                setTimeout(pollIframeContent, 3000);
-            });
-        }
-
-        // Form submission handler
-        document.getElementById('onboardForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            log('Form submission started');
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const loadingEl = document.getElementById('loading');
-            const resultEl = document.getElementById('result');
-            
-            // Reset UI
-            submitBtn.disabled = true;
-            loadingEl.classList.add('show');
-            resultEl.style.display = 'none';
-            
-            try {
-                // Collect form data
-                const formData = new FormData(this);
-                
-                // Handle checkboxes for platforms
-                const platforms = Array.from(document.querySelectorAll('input[name="platforms"]:checked'))
-                    .map(cb => cb.value);
-                formData.set('platforms', platforms.join(','));
-                
-                // Log form data for debugging
-                const debugData = {};
-                for (const [key, value] of formData.entries()) {
-                    debugData[key] = value;
-                }
-                log(`Form data: ${JSON.stringify(debugData)}`);
-                
-                // Submit via iframe
-                const response = await submitViaIframe(formData);
-                
-                log('Submission successful');
-                showResult('Your business website has been created!', true, response);
-                
-            } catch (error) {
-                log(`Submission error: ${error.message}`);
-                showResult(`Error: ${error.message}`, false);
-            } finally {
-                submitBtn.disabled = false;
-                loadingEl.classList.remove('show');
-            }
-        });
-
-        // Initialize
-        log('Page loaded, ready for form submission...');
-    </script>
 </body>
 </html>
