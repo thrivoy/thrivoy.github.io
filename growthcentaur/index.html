@@ -329,6 +329,16 @@
             margin: 0 auto 10px;
         }
 
+        .iframe-container {
+            display: none;
+            position: absolute;
+            top: -1000px;
+            left: -1000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
         @media (max-width: 768px) {
             .hero h1 {
                 font-size: 2.5em;
@@ -398,16 +408,12 @@
                     <label for="category">Business Category *</label>
                     <select id="category" name="category" required>
                         <option value="">Choose category...</option>
-                        <option value="Restaurant">Restaurant</option>
-                        <option value="Retail">Retail Store</option>
-                        <option value="Services">Professional Services</option>
-                        <option value="Healthcare">Healthcare</option>
-                        <option value="Technology">Technology</option>
-                        <option value="Education">Education</option>
-                        <option value="Real Estate">Real Estate</option>
-                        <option value="Fitness">Fitness & Wellness</option>
-                        <option value="Beauty">Beauty & Personal Care</option>
-                        <option value="Other">Other</option>
+                        <option value="healthcare">Healthcare</option>
+                        <option value="insurance">Insurance</option>
+                        <option value="technology">Technology</option>
+                        <option value="education">Education</option>
+                        <option value="consulting">Consulting</option>
+                        <option value="services">Services</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -575,6 +581,11 @@
         </form>
     </div>
 
+    <!-- Hidden iframe for Apps Script communication -->
+    <div class="iframe-container">
+        <iframe id="submissionIframe" name="submissionIframe"></iframe>
+    </div>
+
     <!-- Debug Panel -->
     <div class="debug-controls">
         <button class="debug-btn" onclick="toggleDebug()">Toggle Debug</button>
@@ -583,7 +594,7 @@
     <div class="debug-log" id="debugLog"></div>
 
     <script>
-        // Configuration - Update this URL with your Google Apps Script deployment URL
+        // 🔥 CRITICAL: Replace this URL with your actual Google Apps Script deployment URL
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzqCxs2unfdRAW-pkQ9BbG2n2KOoKTSd6FrP0dYV1kqSofR2JOi-j_CKWNP7pmdAiB/exec";
         
         let debugVisible = false;
@@ -613,14 +624,15 @@
             debugLog("Onboarding form displayed");
         }
 
-        // Generate AI tagline function
+        // Generate AI tagline function (calls real backend)
         async function generateTagline() {
             const businessName = document.getElementById('businessName').value.trim();
             const category = document.getElementById('category').value;
             const description = document.getElementById('description').value.trim();
+            const uniqueValue = document.getElementById('uniqueValue').value.trim();
             
-            if (!businessName || !category || !description) {
-                alert('Please fill in Business Name, Category, and Description first to generate a tagline.');
+            if (!businessName || !category) {
+                alert('Please fill in Business Name and Category first to generate a tagline.');
                 return;
             }
 
@@ -638,17 +650,19 @@
             `;
             suggestionsDiv.classList.add('show');
             
-            debugLog('Generating tagline for: ' + businessName);
+            debugLog('Generating tagline for: ' + businessName + ' (' + category + ')');
 
             try {
-                // Simulate API call - in real implementation, this would call your backend
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                // Generate sample taglines based on business info
-                const taglines = generateSampleTaglines(businessName, category, description);
-                
-                // Display tagline options
-                displayTaglineOptions(taglines);
+                const taglineData = {
+                    action: 'generateTagline',
+                    businessName: businessName,
+                    category: category,
+                    description: description,
+                    uniqueValue: uniqueValue
+                };
+
+                // Submit to Apps Script via iframe
+                await submitToAppsScript(taglineData, 'tagline');
                 
             } catch (error) {
                 debugLog('Tagline generation error: ' + error.message);
@@ -664,57 +678,13 @@
             }
         }
 
-        // Generate sample taglines (placeholder for AI generation)
-        function generateSampleTaglines(businessName, category, description) {
-            const templates = {
-                'Restaurant': [
-                    'Where flavor meets tradition',
-                    'Taste the difference',
-                    'Your neighborhood dining destination',
-                    'Authentic flavors, fresh ingredients',
-                    'Creating memorable dining experiences'
-                ],
-                'Services': [
-                    'Excellence in every service',
-                    'Your trusted partner',
-                    'Quality service, guaranteed results',
-                    'Professional solutions for your needs',
-                    'Exceeding expectations, every time'
-                ],
-                'Technology': [
-                    'Innovation that works',
-                    'Technology simplified',
-                    'Powering your digital future',
-                    'Smart solutions, real results',
-                    'Where technology meets excellence'
-                ],
-                'Healthcare': [
-                    'Your health, our priority',
-                    'Caring for you and your family',
-                    'Excellence in healthcare',
-                    'Compassionate care, professional service',
-                    'Your wellness journey starts here'
-                ],
-                'default': [
-                    'Quality you can trust',
-                    'Excellence in every detail',
-                    'Your success is our mission',
-                    'Professional service, personal touch',
-                    'Making the difference that matters'
-                ]
-            };
-
-            const categoryTemplates = templates[category] || templates['default'];
-            return categoryTemplates.slice(0, 3); // Return top 3 suggestions
-        }
-
         // Display tagline options
         function displayTaglineOptions(taglines) {
             const suggestionsDiv = document.getElementById('taglineSuggestions');
             let html = '<p style="font-weight: 600; margin-bottom: 10px;">Choose a tagline or use as inspiration:</p>';
             
             taglines.forEach(tagline => {
-                html += `<div class="tagline-option" onclick="selectTagline('${tagline}')">${tagline}</div>`;
+                html += `<div class="tagline-option" onclick="selectTagline('${tagline.replace(/'/g, '\\\'')}')">${tagline}</div>`;
             });
             
             suggestionsDiv.innerHTML = html;
@@ -727,158 +697,97 @@
             debugLog('Selected tagline: ' + tagline);
         }
 
+        // Submit data to Apps Script via iframe
+        async function submitToAppsScript(data, context = 'main') {
+            return new Promise((resolve, reject) => {
+                if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE") {
+                    reject(new Error('Apps Script URL not configured. Please update APPS_SCRIPT_URL in the code.'));
+                    return;
+                }
+
+                debugLog(`Submitting to Apps Script (${context}): ${JSON.stringify(data).substring(0, 100)}...`);
+
+                // Create a unique callback name
+                const callbackName = 'callback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                
+                // Set up response handler
+                const timeout = setTimeout(() => {
+                    cleanup();
+                    reject(new Error('Request timeout after 30 seconds'));
+                }, 30000);
+
+                function cleanup() {
+                    clearTimeout(timeout);
+                    if (window[callbackName]) {
+                        delete window[callbackName];
+                    }
+                    if (script && script.parentNode) {
+                        script.parentNode.removeChild(script);
+                    }
+                }
+
+                // Set up global callback function
+                window[callbackName] = function(response) {
+                    cleanup();
+                    debugLog(`Response received (${context}): ${JSON.stringify(response).substring(0, 200)}...`);
+                    resolve(response);
+                };
+
+                // Create script element for JSONP
+                const script = document.createElement('script');
+                const params = new URLSearchParams(data);
+                params.append('callback', callbackName);
+                script.src = APPS_SCRIPT_URL + '?' + params.toString();
+                
+                script.onerror = function() {
+                    cleanup();
+                    reject(new Error('Network error or Apps Script unavailable'));
+                };
+
+                document.head.appendChild(script);
+            });
+        }
+
         // Show result message (success or error)
         function showResult(message, success, data = {}) {
             const resultDiv = document.getElementById("result");
             resultDiv.className = "result " + (success ? "success" : "error");
-            resultDiv.innerHTML = `
-                <p>${message}</p>
-                ${data.businessId ? `<p><strong>Business ID:</strong> ${data.businessId}</p>` : ""}
-                ${data.websiteUrl ? `<p><a href="${data.websiteUrl}" target="_blank" class="website-link">🌐 View Your Website</a></p>` : ""}
-            `;
+            
+            let html = `<p>${message}</p>`;
+            
+            if (data.businessId) {
+                html += `<p><strong>Business ID:</strong> ${data.businessId}</p>`;
+            }
+            
+            if (data.websiteUrl) {
+                html += `<p><a href="${data.websiteUrl}" target="_blank" class="website-link">🌐 View Your Website</a></p>`;
+            }
+            
+            if (data.invoice && data.invoice.upiDeepLink) {
+                html += `
+                    <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
+                        <h4>💳 Payment Information</h4>
+                        <p><strong>Amount:</strong> ₹${data.invoice.amount}</p>
+                        <p><strong>Invoice ID:</strong> ${data.invoice.invoiceId}</p>
+                        <a href="${data.invoice.upiDeepLink}" target="_blank" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; display: inline-block; margin-top: 10px;">
+                            💳 Pay Now via UPI
+                        </a>
+                    </div>
+                `;
+            }
+            
+            resultDiv.innerHTML = html;
             resultDiv.style.display = "block";
             
             // Reset loading state
             document.getElementById("submitBtn").disabled = false;
             document.getElementById("loading").classList.remove("show");
+            
+            // Scroll to result
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Submit main form
-        async function submitForm(event) {
-            event.preventDefault();
-            debugLog("Form submission started");
-
-            const form = event.target;
-            const formData = new FormData(form);
-            
-            // Convert FormData to object for processing
-            const formDataObj = Object.fromEntries(formData.entries());
-            debugLog("Form data collected: " + Object.keys(formDataObj).length + " fields");
-
-            // Handle checkboxes (platforms) - convert to comma-separated string
-            const platforms = Array.from(document.querySelectorAll('input[name="platforms"]:checked'))
-                                   .map(cb => cb.value);
-            formDataObj.platforms = platforms.join(",");
-
-            // Show loading state
-            document.getElementById("submitBtn").disabled = true;
-            document.getElementById("loading").classList.add("show");
-
-            try {
-                // Simulate form submission - replace with actual API call
-                debugLog("Submitting form data...");
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                
-                // Simulate successful response
-                const mockResponse = {
-                    success: true,
-                    businessId: "THR_" + Date.now(),
-                    websiteUrl: `https://thrivoy.com/site/${formDataObj.businessName.toLowerCase().replace(/\s+/g, '-')}`
-                };
-
-                debugLog("Form submitted successfully");
-                showResult(
-                    "🎉 Your business website has been created successfully! You'll receive an email with your login details and social media posting schedule.",
-                    true,
-                    mockResponse
-                );
-
-            } catch (error) {
-                debugLog("Form submission error: " + error.message);
-                showResult(
-                    "❌ There was an error creating your website. Please try again or contact support.",
-                    false
-                );
-            }
-        }
-
-        // Listen for backend responses via postMessage
-        window.addEventListener("message", (event) => {
-            try {
-                let data = event.data;
-                debugLog("Received postMessage from: " + event.origin);
-                
-                if (typeof data === "string") {
-                    try { 
-                        data = JSON.parse(data); 
-                        debugLog("Parsed JSON response");
-                    } catch(e) { 
-                        debugLog("Failed to parse JSON: " + e.message);
-                        return; 
-                    }
-                }
-                
-                debugLog("Response data: " + JSON.stringify(data).substring(0, 200));
-
-                // Handle tagline generation responses
-                if (data.action === 'generateTagline') {
-                    if (data.success && data.taglines) {
-                        displayTaglineOptions(data.taglines);
-                        debugLog("Taglines received and displayed");
-                    } else {
-                        document.getElementById('taglineSuggestions').innerHTML = `
-                            <div style="text-align: center; color: #dc3545; padding: 15px;">
-                                ❌ Failed to generate taglines. Please try again.
-                            </div>
-                        `;
-                    }
-                }
-
-                // Handle main form submission responses
-                if (data.action === 'onboard') {
-                    if (data.success) {
-                        debugLog("Form submission successful");
-                        showResult(
-                            data.message || "🎉 Your business website has been created successfully!",
-                            true,
-                            data
-                        );
-                    } else {
-                        debugLog("Form submission failed: " + (data.message || "Unknown error"));
-                        showResult(
-                            data.message || "❌ There was an error creating your website. Please try again.",
-                            false
-                        );
-                    }
-                }
-
-            } catch (error) {
-                debugLog("Error processing postMessage: " + error.message);
-            }
-        });
-
-        // Initialize form event listener
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('onboardForm');
-            form.addEventListener('submit', submitForm);
-            debugLog("Form event listeners initialized");
-
-            // Initialize debug panel (hidden by default)
-            toggleDebug(); // This will hide it initially since debugVisible starts as false
-        });
-
-        // Auto-fill WhatsApp number from phone field
-        document.addEventListener('DOMContentLoaded', function() {
-            const phoneField = document.getElementById('phone');
-            const whatsappField = document.getElementById('whatsappNumber');
-            
-            phoneField.addEventListener('blur', function() {
-                if (this.value && !whatsappField.value) {
-                    // Remove any non-digits and try to format for WhatsApp
-                    let phoneNumber = this.value.replace(/\D/g, '');
-                    
-                    // If it doesn't start with country code, assume India (+91)
-                    if (phoneNumber.length === 10 && !phoneNumber.startsWith('91')) {
-                        phoneNumber = '91' + phoneNumber;
-                    }
-                    
-                    whatsappField.value = phoneNumber;
-                    debugLog("Auto-filled WhatsApp number: " + phoneNumber);
-                }
-            });
-        });
-
-        // Form validation helpers
+        // Validate form before submission
         function validateForm() {
             const requiredFields = ['businessName', 'ownerName', 'email', 'phone', 'category', 'location', 'description'];
             let isValid = true;
@@ -918,199 +827,62 @@
             }
 
             if (!isValid) {
-                debugLog("Form validation failed: " + missingFields.join(', '));
-                alert('Please correct the following fields:\n• ' + missingFields.join('\n• '));
+                debugLog("Form validation failed: " + missingFields.join(', '));                
+                alert("Please correct the following fields:\n- " + missingFields.join("\n- "));
             }
 
             return isValid;
         }
 
-        // Update form submission to include validation
-        async function submitForm(event) {
-            event.preventDefault();
-            
-            // Validate form first
+        // Handle form submission
+        document.getElementById("onboardForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
             if (!validateForm()) {
                 return;
             }
 
-            debugLog("Form submission started");
-
-            const form = event.target;
-            const formData = new FormData(form);
-            
-            // Convert FormData to object for processing
-            const formDataObj = Object.fromEntries(formData.entries());
-            debugLog("Form data collected: " + Object.keys(formDataObj).length + " fields");
-
-            // Handle checkboxes (platforms) - convert to comma-separated string
-            const platforms = Array.from(document.querySelectorAll('input[name="platforms"]:checked'))
-                                   .map(cb => cb.value);
-            formDataObj.platforms = platforms.join(",");
+            const form = e.target;
+            const submitBtn = document.getElementById("submitBtn");
+            const loadingDiv = document.getElementById("loading");
+            const resultDiv = document.getElementById("result");
 
             // Show loading state
-            document.getElementById("submitBtn").disabled = true;
-            document.getElementById("loading").classList.add("show");
+            submitBtn.disabled = true;
+            loadingDiv.classList.add("show");
+            resultDiv.style.display = "none";
+
+            // Gather form data
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                if (data[key]) {
+                    if (!Array.isArray(data[key])) {
+                        data[key] = [data[key]];
+                    }
+                    data[key].push(value);
+                } else {
+                    data[key] = value;
+                }
+            });
+
+            debugLog("Submitting form data...");
 
             try {
-                // In a real implementation, you would submit to your backend API
-                // For demo purposes, we're simulating the submission
-                debugLog("Submitting form data...");
-                
-                // Simulate network delay
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                
-                // Simulate successful response
-                const mockResponse = {
-                    success: true,
-                    businessId: "THR_" + Date.now(),
-                    websiteUrl: `https://thrivoy.com/site/${formDataObj.businessName.toLowerCase().replace(/\s+/g, '-')}`,
-                    message: "Your business website has been created successfully! You'll receive an email with login details and your social media posting schedule."
-                };
-
-                debugLog("Form submitted successfully");
-                showResult(
-                    "🎉 " + mockResponse.message,
-                    true,
-                    mockResponse
-                );
-
-                // Scroll to result
-                document.getElementById("result").scrollIntoView({ behavior: 'smooth' });
-
+                const response = await submitToAppsScript(data, 'form');
+                if (response.success) {
+                    showResult("✅ Website successfully created!", true, response.data || {});
+                } else {
+                    showResult("❌ Submission failed: " + (response.message || "Unknown error"), false);
+                }
             } catch (error) {
                 debugLog("Form submission error: " + error.message);
-                showResult(
-                    "❌ There was an error creating your website. Please try again or contact support.",
-                    false
-                );
+                showResult("❌ Submission error: " + error.message, false);
             }
-        }
-
-        // Enhanced tagline generation with better samples
-        function generateSampleTaglines(businessName, category, description) {
-            const businessKeywords = description.toLowerCase().split(/\s+/).filter(word => word.length > 3);
-            
-            const templates = {
-                'Restaurant': [
-                    'Where flavor meets tradition',
-                    'Taste the difference, feel at home',
-                    'Authentic cuisine, unforgettable experience',
-                    'Fresh ingredients, passionate cooking',
-                    'Your culinary journey starts here'
-                ],
-                'Services': [
-                    'Excellence in every service',
-                    'Your trusted service partner',
-                    'Professional solutions, personal care',
-                    'Quality service, guaranteed satisfaction',
-                    'Exceeding expectations, delivering results'
-                ],
-                'Technology': [
-                    'Innovation that transforms',
-                    'Technology simplified for you',
-                    'Powering your digital transformation',
-                    'Smart solutions, seamless experience',
-                    'Where innovation meets reliability'
-                ],
-                'Healthcare': [
-                    'Your health, our commitment',
-                    'Compassionate care, professional excellence',
-                    'Healthcare that puts you first',
-                    'Healing with heart and expertise',
-                    'Your wellness journey, our priority'
-                ],
-                'Retail': [
-                    'Quality products, exceptional service',
-                    'Your shopping destination',
-                    'Where quality meets affordability',
-                    'Curated collections, personal touch',
-                    'Shopping made simple and enjoyable'
-                ],
-                'Education': [
-                    'Empowering minds, shaping futures',
-                    'Learning that makes a difference',
-                    'Knowledge for tomorrow\'s leaders',
-                    'Where education meets inspiration',
-                    'Unlocking potential, creating success'
-                ],
-                'Real Estate': [
-                    'Your dream home awaits',
-                    'Properties that match your lifestyle',
-                    'Building communities, creating homes',
-                    'Real estate solutions you can trust',
-                    'Finding the perfect place to call home'
-                ],
-                'Fitness': [
-                    'Your fitness transformation starts here',
-                    'Stronger body, healthier you',
-                    'Fitness tailored to your goals',
-                    'Where wellness meets results',
-                    'Empowering your fitness journey'
-                ],
-                'Beauty': [
-                    'Beauty that radiates confidence',
-                    'Where beauty meets expertise',
-                    'Enhancing your natural beauty',
-                    'Professional care, beautiful results',
-                    'Your beauty journey, our passion'
-                ],
-                'default': [
-                    'Quality you can trust',
-                    'Excellence in every detail',
-                    'Your success is our mission',
-                    'Professional service, personal touch',
-                    'Making the difference that matters'
-                ]
-            };
-
-            let selectedTaglines = templates[category] || templates['default'];
-            
-            // Try to personalize one tagline with business name if it's short enough
-            if (businessName.length < 20) {
-                selectedTaglines = [...selectedTaglines];
-                selectedTaglines[0] = `${businessName} - where excellence begins`;
-            }
-
-            return selectedTaglines.slice(0, 4); // Return top 4 suggestions
-        }
-
-        // Add some visual feedback for form interactions
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add focus/blur animations to form fields
-            const formFields = document.querySelectorAll('input, select, textarea');
-            
-            formFields.forEach(field => {
-                field.addEventListener('focus', function() {
-                    this.style.transform = 'translateY(-1px)';
-                    this.style.boxShadow = '0 5px 15px rgba(102, 126, 234, 0.2)';
-                });
-                
-                field.addEventListener('blur', function() {
-                    this.style.transform = 'translateY(0)';
-                    if (this.style.borderColor !== 'rgb(220, 53, 69)') { // Don't override error styling
-                        this.style.boxShadow = '';
-                    }
-                });
-            });
-
-            // Add hover effects to checkboxes
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                const label = cb.nextElementSibling;
-                cb.addEventListener('change', function() {
-                    if (this.checked) {
-                        label.style.color = '#667eea';
-                        label.style.fontWeight = '600';
-                    } else {
-                        label.style.color = '';
-                        label.style.fontWeight = '';
-                    }
-                });
-            });
         });
 
-        debugLog("Thrivoy application initialized");
+        // Initialize
+        debugLog("Script loaded. Ready.");
     </script>
 </body>
 </html>
