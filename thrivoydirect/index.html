@@ -500,11 +500,31 @@
     <div class="debug-log" id="debugLog"></div>
 
 <script>
+  let debugVisible = false;
+
+  // Debug functions
+  function toggleDebug() {
+    debugVisible = !debugVisible;
+    document.getElementById('debugLog').style.display = debugVisible ? 'block' : 'none';
+  }
+
+  function clearLog() {
+    document.getElementById('debugLog').innerHTML = '';
+  }
+
+  function debugLog(message) {
+    const debugEl = document.getElementById('debugLog');
+    const timestamp = new Date().toLocaleTimeString();
+    debugEl.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+    debugEl.scrollTop = debugEl.scrollHeight;
+    console.log(`[Thrivoy Debug] ${message}`);
+  }
+
   // Show onboarding form when CTA button is clicked
   function showOnboardingForm() {
-    document.querySelector(".hero").style.display = "none"; // hide hero section
-    document.getElementById("onboardForm").style.display = "block"; // show form
-    console.log("[Thrivoy Debug] Onboarding form displayed");
+    document.querySelector(".hero").style.display = "none";
+    document.getElementById("onboardForm").style.display = "block";
+    debugLog("Onboarding form displayed");
   }
 
   // Show result message (success or error)
@@ -517,68 +537,137 @@
       ${data.websiteUrl ? `<p><a href="${data.websiteUrl}" target="_blank">🌐 View Your Website</a></p>` : ""}
     `;
     resultDiv.style.display = "block";
+    
+    // Reset loading state
+    document.getElementById("submitBtn").disabled = false;
+    document.getElementById("loading").classList.remove("show");
   }
 
-  // Submit form via hidden iframe
+  // FIXED: Submit form via hidden iframe - sends individual fields instead of wrapped JSON
   async function submitForm(event) {
     event.preventDefault();
-    console.log("[Thrivoy Debug] Form submission started");
+    debugLog("Form submission started");
 
     const form = event.target;
-    const formData = Object.fromEntries(new FormData(form).entries());
-    console.log("[Thrivoy Debug] Form data:", JSON.stringify(formData));
+    const formData = new FormData(form);
+    
+    // Convert FormData to object for logging
+    const formDataObj = Object.fromEntries(formData.entries());
+    debugLog("Form data collected: " + Object.keys(formDataObj).length + " fields");
+
+    // Show loading state
+    document.getElementById("submitBtn").disabled = true;
+    document.getElementById("loading").classList.add("show");
 
     // Create hidden iframe
-    console.log("[Thrivoy Debug] Creating submission iframe...");
+    debugLog("Creating submission iframe...");
     const iframe = document.createElement("iframe");
     iframe.name = "hidden_iframe_" + Date.now();
     iframe.style.display = "none";
     document.body.appendChild(iframe);
 
-    // Build hidden form for iframe submission
+    // Build hidden form for iframe submission - SEND INDIVIDUAL FIELDS
     const tempForm = document.createElement("form");
     tempForm.method = "POST";
-    tempForm.action = "https://script.google.com/macros/s/AKfycbzCwYX6qwr93RIuVVZbkY7FP7NQoXnux58ghfAKdATpTHxxh2VCOkclb6U9WsoMjhaseQ/exec"; // 🔄 replace with your deployed Apps Script web app URL
+    tempForm.action = "https://script.google.com/macros/s/AKfycbxit4aUUTTAheOiNrK00nCB0nYJdCOQFLX5_pxzgG7opFfoNXfJ1v5F3ZPUiuEq7mpFJA/exec";
     tempForm.target = iframe.name;
 
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = "payload";
-    input.value = JSON.stringify(formData);
-    tempForm.appendChild(input);
+    // ADD EACH FORM FIELD INDIVIDUALLY (not wrapped in "payload")
+    for (const [key, value] of formData.entries()) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;  // Use the actual field name
+      input.value = value; // Use the actual field value
+      tempForm.appendChild(input);
+      debugLog(`Added field: ${key} = ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}`);
+    }
+
+    // Handle checkboxes (platforms) - convert to comma-separated string
+    const platforms = Array.from(document.querySelectorAll('input[name="platforms"]:checked'))
+                           .map(cb => cb.value);
+    if (platforms.length > 0) {
+      // Remove individual platform entries and add combined
+      const platformInputs = tempForm.querySelectorAll('input[name="platforms"]');
+      platformInputs.forEach(input => tempForm.removeChild(input));
+      
+      const platformInput = document.createElement("input");
+      platformInput.type = "hidden";
+      platformInput.name = "platforms";
+      platformInput.value = platforms.join(",");
+      tempForm.appendChild(platformInput);
+      debugLog(`Combined platforms: ${platforms.join(",")}`);
+    }
 
     document.body.appendChild(tempForm);
+    debugLog("Submitting form via iframe...");
+    
     tempForm.submit();
 
-    console.log("[Thrivoy Debug] Submitting form via iframe...");
+    // Set timeout to show error if no response received
+    setTimeout(() => {
+      if (document.getElementById("loading").classList.contains("show")) {
+        debugLog("Timeout reached - no response received");
+        showResult("Request timed out. Please try again.", false);
+      }
+    }, 30000); // 30 second timeout
+
+    // Clean up after delay
+    setTimeout(() => {
+      try {
+        if (document.body.contains(tempForm)) {
+          document.body.removeChild(tempForm);
+        }
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+        debugLog("Cleaned up temporary elements");
+      } catch (e) {
+        debugLog("Cleanup error: " + e.message);
+      }
+    }, 60000); // Clean up after 1 minute
   }
 
   // Listen for backend responses via postMessage
   window.addEventListener("message", (event) => {
     try {
       let data = event.data;
+      debugLog("Received postMessage from: " + event.origin);
+      
       if (typeof data === "string") {
-        try { data = JSON.parse(data); } catch(e) { return; }
+        try { 
+          data = JSON.parse(data); 
+          debugLog("Parsed JSON response");
+        } catch(e) { 
+          debugLog("Failed to parse JSON: " + e.message);
+          return; 
+        }
       }
-      console.log("[Thrivoy Debug] Received postMessage response", data);
+      
+      debugLog("Response data: " + JSON.stringify(data).substring(0, 200));
 
       if (data.success) {
         showResult("Your business website was created successfully!", true, data);
+        debugLog("Success response processed");
       } else {
         showResult("Error: " + (data.error || "Unknown error"), false, data);
+        debugLog("Error response: " + (data.error || "Unknown error"));
       }
     } catch (err) {
+      debugLog("PostMessage listener error: " + err.message);
       console.error("[Thrivoy Debug] Listener error:", err);
     }
   });
 
   // Attach form submit handler
   document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("onboardForm"); // ✅ corrected ID
+    const form = document.getElementById("onboardForm");
     if (form) {
       form.addEventListener("submit", submitForm);
+      debugLog("Form submit handler attached");
+    } else {
+      debugLog("ERROR: Form not found!");
     }
-    console.log("[Thrivoy Debug] Page loaded, ready for form submission...");
+    debugLog("Page loaded, ready for form submission...");
   });
 </script>
 </body>
