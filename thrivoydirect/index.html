@@ -500,7 +500,14 @@
     <div class="debug-log" id="debugLog"></div>
 
 <script>
-  // Handle showing result messages
+  // Show onboarding form when CTA button is clicked
+  function showOnboardingForm() {
+    document.querySelector(".hero").style.display = "none"; // hide hero section
+    document.getElementById("onboardForm").style.display = "block"; // show form
+    console.log("[Thrivoy Debug] Onboarding form displayed");
+  }
+
+  // Show result message (success or error)
   function showResult(message, success, data = {}) {
     const resultDiv = document.getElementById("result");
     resultDiv.className = "result " + (success ? "success" : "error");
@@ -512,7 +519,7 @@
     resultDiv.style.display = "block";
   }
 
-  // Submit form via iframe
+  // Submit form via hidden iframe
   async function submitForm(event) {
     event.preventDefault();
     console.log("[Thrivoy Debug] Form submission started");
@@ -524,15 +531,15 @@
     // Create hidden iframe
     console.log("[Thrivoy Debug] Creating submission iframe...");
     const iframe = document.createElement("iframe");
-    iframe.name = "hidden_iframe";
+    iframe.name = "hidden_iframe_" + Date.now();
     iframe.style.display = "none";
     document.body.appendChild(iframe);
 
     // Build hidden form for iframe submission
     const tempForm = document.createElement("form");
     tempForm.method = "POST";
-    tempForm.action = "https://script.google.com/macros/s/AKfycbwu9uMUiZX1sAJQ7ygUumw3tXwaegk8v9iBkCrSpFdIF8Ua5eICTr6Otq0MJhc6I12smg/exec"; // 🔄 replace with your Apps Script URL
-    tempForm.target = "hidden_iframe";
+    tempForm.action = "https://script.google.com/macros/s/AKfycbwu9uMUiZX1sAJQ7ygUumw3tXwaegk8v9iBkCrSpFdIF8Ua5eICTr6Otq0MJhc6I12smg/exec"; // 🔄 replace with your deployed Apps Script web app URL
+    tempForm.target = iframe.name;
 
     const input = document.createElement("input");
     input.type = "hidden";
@@ -546,7 +553,7 @@
     console.log("[Thrivoy Debug] Submitting form via iframe...");
   }
 
-  // ✅ Listen for backend responses
+  // Listen for backend responses via postMessage
   window.addEventListener("message", (event) => {
     try {
       let data = event.data;
@@ -567,13 +574,12 @@
 
   // Attach form submit handler
   document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("onboarding-form");
+    const form = document.getElementById("onboardForm"); // ✅ corrected ID
     if (form) {
-      console.log("[Thrivoy Debug] Onboarding form displayed");
       form.addEventListener("submit", submitForm);
     }
+    console.log("[Thrivoy Debug] Page loaded, ready for form submission...");
   });
 </script>
-
 </body>
 </html>
