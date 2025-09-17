@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thrivoy - AI-Powered Business Websites & Social Media</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 20px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .hero {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 40px 0;
+            text-align: center;
+            color: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, #f1c40f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #e74c3c, #f39c12);
+            color: white;
+            padding: 18px 40px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .onboard-form {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+            display: block;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+            display: block;
+        }
+
+        .website-link {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .debug-log {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            max-height: 200px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .debug-controls {
+            position: fixed;
+            bottom: 230px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .debug-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        .tagline-generator {
+            position: relative;
+        }
+
+        .generate-tagline-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .generate-tagline-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .generate-tagline-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .tagline-suggestions {
+            margin-top: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            display: none;
+        }
+
+        .tagline-suggestions.show {
+            display: block;
+        }
+
+        .tagline-option {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tagline-option:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .tagline-loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .tagline-spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .debug-log, .debug-controls {
+                display: none;
+            }
+
+            .generate-tagline-btn {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h2>🚀 Thrivoy</h2>
+            <p>AI-Powered Business Websites & Social Media Management</p>
+        </header>
+
+        <div class="hero">
+            <h1>Launch Your Business Online in Minutes</h1>
+            <p>Get a professional website + automated social media posts powered by AI</p>
+            <button class="cta-button" onclick="showOnboardingForm()">
+                🎯 Start Your Free Trial
+            </button>
+        </div>
+
+        <form class="onboard-form" id="onboardForm">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #333;">
+                🏢 Tell Us About Your Business
+            </h2>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="businessName">Business Name *</label>
+                    <input type="text" id="businessName" name="businessName" required>
+                </div>
+                <div class="form-group">
+                    <label for="ownerName">Owner Name *</label>
+                    <input type="text" id="ownerName" name="ownerName" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone *</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category">Business Category *</label>
+                    <select id="category" name="category" required>
+                        <option value="">Choose category...</option>
+                        <option value="Restaurant">Restaurant</option>
+                        <option value="Retail">Retail Store</option>
+                        <option value="Services">Professional Services</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Education">Education</option>
+                        <option value="Real Estate">Real Estate</option>
+                        <option value="Fitness">Fitness & Wellness</option>
+                        <option value="Beauty">Beauty & Personal Care</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location *</label>
+                    <input type="text" id="location" name="location" placeholder="City, State" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Business Description *</label>
+                <textarea id="description" name="description" placeholder="Briefly describe your business..." required></textarea>
+            </div>
+
+            <div class="form-group tagline-generator">
+                <label for="tagline">Tagline</label>
+                <div style="display: flex; align-items: center; flex-wrap: wrap;">
+                    <input type="text" id="tagline" name="tagline" placeholder="Your business motto or catchphrase" style="flex: 1; min-width: 200px;">
+                    <button type="button" class="generate-tagline-btn" onclick="generateTagline()" id="generateTaglineBtn">
+                        ✨ Generate AI Tagline
+                    </button>
+                </div>
+                <div class="tagline-suggestions" id="taglineSuggestions"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="brandPrimary">Primary Brand Color</label>
+                    <input type="color" id="brandPrimary" name="brandPrimary" value="#1166EE">
+                </div>
+                <div class="form-group">
+                    <label for="brandSecondary">Secondary Brand Color</label>
+                    <input type="color" id="brandSecondary" name="brandSecondary" value="#FF8800">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Social Media Platforms</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform_linkedin" name="platforms" value="linkedin" checked>
+                        <label for="platform_linkedin">LinkedIn</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform_facebook" name="platforms" value="facebook">
+                        <label for="platform_facebook">Facebook</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform_instagram" name="platforms" value="instagram">
+                        <label for="platform_instagram">Instagram</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="platform_whatsapp" name="platforms" value="whatsapp">
+                        <label for="platform_whatsapp">WhatsApp</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="frequency">Posting Frequency</label>
+                    <select id="frequency" name="frequency">
+                        <option value="daily">Daily</option>
+                        <option value="weekly" selected>Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tone">Content Tone</label>
+                    <select id="tone" name="tone">
+                        <option value="friendly" selected>Friendly</option>
+                        <option value="professional">Professional</option>
+                        <option value="casual">Casual</option>
+                        <option value="authoritative">Authoritative</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="whatsappNumber">WhatsApp Business Number</label>
+                <input type="tel" id="whatsappNumber" name="whatsappNumber" placeholder="Include country code (e.g., 917892159170)">
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showWhatsApp" name="showWhatsApp" value="true" checked>
+                    <label for="showWhatsApp">Show WhatsApp widget on website</label>
+                </div>
+            </div>
+
+            <h3 style="color: #667eea; margin: 40px 0 20px 0; text-align: center;">
+                🎯 Business Intelligence (Optional)
+            </h3>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Help us create more targeted content and compelling messaging for your website
+            </p>
+
+            <div class="form-group">
+                <label for="targetAudience">Who are your ideal customers?</label>
+                <input type="text" id="targetAudience" name="targetAudience" 
+                       placeholder="e.g., Small business owners, young professionals, families">
+                <small style="color: #666; font-size: 13px;">This helps create content that speaks directly to your customers</small>
+            </div>
+
+            <div class="form-group">
+                <label for="uniqueValue">What makes you different from competitors?</label>
+                <input type="text" id="uniqueValue" name="uniqueValue" 
+                       placeholder="e.g., 20+ years experience, same-day service, personalized approach">
+                <small style="color: #666; font-size: 13px;">Your unique selling points will be highlighted throughout your website</small>
+            </div>
+
+            <div class="form-group">
+                <label for="keyBenefits">What are the top 3 benefits customers get?</label>
+                <input type="text" id="keyBenefits" name="keyBenefits" 
+                       placeholder="e.g., Save time, Reduce costs, Peace of mind">
+                <small style="color: #666; font-size: 13px;">Separate multiple benefits with commas</small>
+            </div>
+
+            <div class="form-group">
+                <label for="problemSolved">What main problem do you solve for customers?</label>
+                <input type="text" id="problemSolved" name="problemSolved" 
+                       placeholder="e.g., Complex paperwork, Finding reliable insurance">
+                <small style="color: #666; font-size: 13px;">Understanding the problem helps create compelling messaging</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="yearsExperience">Years of experience?</label>
+                    <input type="text" id="yearsExperience" name="yearsExperience" placeholder="e.g., 5, 10, 15+">
+                </div>
+                <div class="form-group">
+                    <label for="serviceArea">Geographic area you serve?</label>
+                    <input type="text" id="serviceArea" name="serviceArea" 
+                           placeholder="e.g., All of Karnataka, Pan-India">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="certifications">Certifications, awards, or credentials?</label>
+                <input type="text" id="certifications" name="certifications" 
+                       placeholder="e.g., Licensed Agent, MBA, Industry Awards">
+            </div>
+
+            <div class="form-group">
+                <label for="successStories">Brief example of how you've helped a customer?</label>
+                <textarea id="successStories" name="successStories" 
+                          placeholder="e.g., Helped family save 30% on insurance premiums"
+                          style="min-height: 80px;"></textarea>
+                <small style="color: #666; font-size: 13px;">This can be used as a testimonial or case study on your website</small>
+            </div>
+
+            <input type="hidden" name="action" value="onboard">
+            <input type="hidden" name="plan" value="starter">
+            <input type="hidden" name="price" value="499">
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                🚀 Create My Business Website
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Creating your website and setting up your business profile...</p>
+            </div>
+
+            <div class="result" id="result"></div>
+        </form>
+    </div>
+
+    <!-- Debug Panel -->
+    <div class="debug-controls">
+        <button class="debug-btn" onclick="toggleDebug()">Toggle Debug</button>
+        <button class="debug-btn" onclick="clearLog()">Clear Log</button>
+    </div>
+    <div class="debug-log" id="debugLog"></div>
+
+    <script>
+        // Configuration - Update this URL with your Google Apps Script deployment URL
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzzqCxs2unfdRAW-pkQ9BbG2n2KOoKTSd6FrP0dYV1kqSofR2JOi-j_CKWNP7pmdAiB/exec";
+        
+        let debugVisible = false;
+
+        // Debug functions
+        function toggleDebug() {
+            debugVisible = !debugVisible;
+            document.getElementById('debugLog').style.display = debugVisible ? 'block' : 'none';
+        }
+
+        function clearLog() {
+            document.getElementById('debugLog').innerHTML = '';
+        }
+
+        function debugLog(message) {
+            const debugEl = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            debugEl.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            debugEl.scrollTop = debugEl.scrollHeight;
+            console.log(`[Thrivoy Debug] ${message}`);
+        }
+
+        // Show onboarding form when CTA button is clicked
+        function showOnboardingForm() {
+            document.querySelector(".hero").style.display = "none";
+            document.getElementById("onboardForm").style.display = "block";
+            debugLog("Onboarding form displayed");
+        }
+
+        // Generate AI tagline function
+        async function generateTagline() {
+            const businessName = document.getElementById('businessName').value.trim();
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('description').value.trim();
+            
+            if (!businessName || !category || !description) {
+                alert('Please fill in Business Name, Category, and Description first to generate a tagline.');
+                return;
+            }
+
+            const btn = document.getElementById('generateTaglineBtn');
+            const suggestionsDiv = document.getElementById('taglineSuggestions');
+            
+            // Show loading state
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating...';
+            suggestionsDiv.innerHTML = `
+                <div class="tagline-loading">
+                    <div class="tagline-spinner"></div>
+                    <p>Creating AI-powered taglines for your business...</p>
+                </div>
+            `;
+            suggestionsDiv.classList.add('show');
+            
+            debugLog('Generating tagline for: ' + businessName);
+
+            try {
+                // Simulate API call - in real implementation, this would call your backend
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Generate sample taglines based on business info
+                const taglines = generateSampleTaglines(businessName, category, description);
+                
+                // Display tagline options
+                displayTaglineOptions(taglines);
+                
+            } catch (error) {
+                debugLog('Tagline generation error: ' + error.message);
+                suggestionsDiv.innerHTML = `
+                    <div style="text-align: center; color: #dc3545; padding: 15px;">
+                        ❌ Failed to generate taglines. Please try again.
+                    </div>
+                `;
+            } finally {
+                // Reset button
+                btn.disabled = false;
+                btn.textContent = '✨ Generate AI Tagline';
+            }
+        }
+
+        // Generate sample taglines (placeholder for AI generation)
+        function generateSampleTaglines(businessName, category, description) {
+            const templates = {
+                'Restaurant': [
+                    'Where flavor meets tradition',
+                    'Taste the difference',
+                    'Your neighborhood dining destination',
+                    'Authentic flavors, fresh ingredients',
+                    'Creating memorable dining experiences'
+                ],
+                'Services': [
+                    'Excellence in every service',
+                    'Your trusted partner',
+                    'Quality service, guaranteed results',
+                    'Professional solutions for your needs',
+                    'Exceeding expectations, every time'
+                ],
+                'Technology': [
+                    'Innovation that works',
+                    'Technology simplified',
+                    'Powering your digital future',
+                    'Smart solutions, real results',
+                    'Where technology meets excellence'
+                ],
+                'Healthcare': [
+                    'Your health, our priority',
+                    'Caring for you and your family',
+                    'Excellence in healthcare',
+                    'Compassionate care, professional service',
+                    'Your wellness journey starts here'
+                ],
+                'default': [
+                    'Quality you can trust',
+                    'Excellence in every detail',
+                    'Your success is our mission',
+                    'Professional service, personal touch',
+                    'Making the difference that matters'
+                ]
+            };
+
+            const categoryTemplates = templates[category] || templates['default'];
+            return categoryTemplates.slice(0, 3); // Return top 3 suggestions
+        }
+
+        // Display tagline options
+        function displayTaglineOptions(taglines) {
+            const suggestionsDiv = document.getElementById('taglineSuggestions');
+            let html = '<p style="font-weight: 600; margin-bottom: 10px;">Choose a tagline or use as inspiration:</p>';
+            
+            taglines.forEach(tagline => {
+                html += `<div class="tagline-option" onclick="selectTagline('${tagline}')">${tagline}</div>`;
+            });
+            
+            suggestionsDiv.innerHTML = html;
+        }
+
+        // Handle tagline selection
+        function selectTagline(tagline) {
+            document.getElementById('tagline').value = tagline;
+            document.getElementById('taglineSuggestions').classList.remove('show');
+            debugLog('Selected tagline: ' + tagline);
+        }
+
+        // Show result message (success or error)
+        function showResult(message, success, data = {}) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.className = "result " + (success ? "success" : "error");
+            resultDiv.innerHTML = `
+                <p>${message}</p>
+                ${data.businessId ? `<p><strong>Business ID:</strong> ${data.businessId}</p>` : ""}
+                ${data.websiteUrl ? `<p><a href="${data.websiteUrl}" target="_blank" class="website-link">🌐 View Your Website</a></p>` : ""}
+            `;
+            resultDiv.style.display = "block";
+            
+            // Reset loading state
+            document.getElementById("submitBtn").disabled = false;
+            document.getElementById("loading").classList.remove("show");
+        }
+
+        // Submit main form
+        async function submitForm(event) {
+            event.preventDefault();
+            debugLog("Form submission started");
+
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Convert FormData to object for processing
+            const formDataObj = Object.fromEntries(formData.entries());
+            debugLog("Form data collected: " + Object.keys(formDataObj).length + " fields");
+
+            // Handle checkboxes (platforms) - convert to comma-separated string
+            const platforms = Array.from(document.querySelectorAll('input[name="platforms"]:checked'))
+                                   .map(cb => cb.value);
+            formDataObj.platforms = platforms.join(",");
+
+            // Show loading state
+            document.getElementById("submitBtn").disabled = true;
+            document.getElementById("loading").classList.add("show");
+
+            try {
+                // Simulate form submission - replace with actual API call
+                debugLog("Submitting form data...");
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Simulate successful response
+                const mockResponse = {
+                    success: true,
+                    businessId: "THR_" + Date.now(),
+                    websiteUrl: `https://thrivoy.com/site/${formDataObj.businessName.toLowerCase().replace(/\s+/g, '-')}`
+                };
+
+                debugLog("Form submitted successfully");
+                showResult(
+                    "🎉 Your business website has been created successfully! You'll receive an email with your login details and social media posting schedule.",
+                    true,
+                    mockResponse
+                );
+
+            } catch (error) {
+                debugLog("Form submission error: " + error.message);
+                showResult(
+                    "❌ There was an error creating your website. Please try again or contact support.",
+                    false
+                );
+            }
+        }
+
+        // Listen for backend responses via postMessage
+        window.addEventListener("message", (event) => {
+            try {
+                let data = event.data;
+                debugLog("Received postMessage from: " + event.origin);
+                
+                if (typeof data === "string") {
+                    try { 
+                        data = JSON.parse(data); 
+                        debugLog("Parsed JSON response");
+                    } catch(e) { 
+                        debugLog("Failed to parse JSON: " + e.message);
+                        return; 
+                    }
+                }
+                
+                debugLog("Response data: " + JSON.stringify(data).substring(0, 200));
+
+                // Handle tagline generation responses
+                if (data.action === 'generateTagline') {
+                    if (data.success && data.taglines) {
+                        displayTaglineOptions(data.taglines);
+                        debugLog("Taglines received and displayed");
+                    } else {
+                        document.getElementById('taglineSuggestions').innerHTML = `
+                            <div style="text-align: center; color: #dc3545; padding: 15px;">
+                                ❌ Failed to generate taglines. Please try again.
+                            </div>
+                        `;
+                    }
+                }
+
+                // Handle main form submission responses
+                if (data.action === 'onboard') {
+                    if (data.success) {
+                        debugLog("Form submission successful");
+                        showResult(
+                            data.message || "🎉 Your business website has been created successfully!",
+                            true,
+                            data
+                        );
+                    } else {
+                        debugLog("Form submission failed: " + (data.message || "Unknown error"));
+                        showResult(
+                            data.message || "❌ There was an error creating your website. Please try again.",
+                            false
+                        );
+                    }
+                }
+
+            } catch (error) {
+                debugLog("Error processing postMessage: " + error.message);
+            }
+        });
+
+        // Initialize form event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('onboardForm');
+            form.addEventListener('submit', submitForm);
+            debugLog("Form event listeners initialized");
+
+            // Initialize debug panel (hidden by default)
+            toggleDebug(); // This will hide it initially since debugVisible starts as false
+        });
+
+        // Auto-fill WhatsApp number from phone field
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneField = document.getElementById('phone');
+            const whatsappField = document.getElementById('whatsappNumber');
+            
+            phoneField.addEventListener('blur', function() {
+                if (this.value && !whatsappField.value) {
+                    // Remove any non-digits and try to format for WhatsApp
+                    let phoneNumber = this.value.replace(/\D/g, '');
+                    
+                    // If it doesn't start with country code, assume India (+91)
+                    if (phoneNumber.length === 10 && !phoneNumber.startsWith('91')) {
+                        phoneNumber = '91' + phoneNumber;
+                    }
+                    
+                    whatsappField.value = phoneNumber;
+                    debugLog("Auto-filled WhatsApp number: " + phoneNumber);
+                }
+            });
+        });
+
+        // Form validation helpers
+        function validateForm() {
+            const requiredFields = ['businessName', 'ownerName', 'email', 'phone', 'category', 'location', 'description'];
+            let isValid = true;
+            let missingFields = [];
+
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    isValid = false;
+                    missingFields.push(field.previousElementSibling.textContent.replace(' *', ''));
+                    field.style.borderColor = '#dc3545';
+                } else {
+                    field.style.borderColor = '#e0e0e0';
+                }
+            });
+
+            // Email validation
+            const emailField = document.getElementById('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailField.value && !emailRegex.test(emailField.value)) {
+                isValid = false;
+                emailField.style.borderColor = '#dc3545';
+                if (!missingFields.includes('Email')) {
+                    missingFields.push('Email (invalid format)');
+                }
+            }
+
+            // Phone validation
+            const phoneField = document.getElementById('phone');
+            const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/;
+            if (phoneField.value && !phoneRegex.test(phoneField.value)) {
+                isValid = false;
+                phoneField.style.borderColor = '#dc3545';
+                if (!missingFields.includes('Phone')) {
+                    missingFields.push('Phone (invalid format)');
+                }
+            }
+
+            if (!isValid) {
+                debugLog("Form validation failed: " + missingFields.join(', '));
+                alert('Please correct the following fields:\n• ' + missingFields.join('\n• '));
+            }
+
+            return isValid;
+        }
+
+        // Update form submission to include validation
+        async function submitForm(event) {
+            event.preventDefault();
+            
+            // Validate form first
+            if (!validateForm()) {
+                return;
+            }
+
+            debugLog("Form submission started");
+
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Convert FormData to object for processing
+            const formDataObj = Object.fromEntries(formData.entries());
+            debugLog("Form data collected: " + Object.keys(formDataObj).length + " fields");
+
+            // Handle checkboxes (platforms) - convert to comma-separated string
+            const platforms = Array.from(document.querySelectorAll('input[name="platforms"]:checked'))
+                                   .map(cb => cb.value);
+            formDataObj.platforms = platforms.join(",");
+
+            // Show loading state
+            document.getElementById("submitBtn").disabled = true;
+            document.getElementById("loading").classList.add("show");
+
+            try {
+                // In a real implementation, you would submit to your backend API
+                // For demo purposes, we're simulating the submission
+                debugLog("Submitting form data...");
+                
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Simulate successful response
+                const mockResponse = {
+                    success: true,
+                    businessId: "THR_" + Date.now(),
+                    websiteUrl: `https://thrivoy.com/site/${formDataObj.businessName.toLowerCase().replace(/\s+/g, '-')}`,
+                    message: "Your business website has been created successfully! You'll receive an email with login details and your social media posting schedule."
+                };
+
+                debugLog("Form submitted successfully");
+                showResult(
+                    "🎉 " + mockResponse.message,
+                    true,
+                    mockResponse
+                );
+
+                // Scroll to result
+                document.getElementById("result").scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                debugLog("Form submission error: " + error.message);
+                showResult(
+                    "❌ There was an error creating your website. Please try again or contact support.",
+                    false
+                );
+            }
+        }
+
+        // Enhanced tagline generation with better samples
+        function generateSampleTaglines(businessName, category, description) {
+            const businessKeywords = description.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+            
+            const templates = {
+                'Restaurant': [
+                    'Where flavor meets tradition',
+                    'Taste the difference, feel at home',
+                    'Authentic cuisine, unforgettable experience',
+                    'Fresh ingredients, passionate cooking',
+                    'Your culinary journey starts here'
+                ],
+                'Services': [
+                    'Excellence in every service',
+                    'Your trusted service partner',
+                    'Professional solutions, personal care',
+                    'Quality service, guaranteed satisfaction',
+                    'Exceeding expectations, delivering results'
+                ],
+                'Technology': [
+                    'Innovation that transforms',
+                    'Technology simplified for you',
+                    'Powering your digital transformation',
+                    'Smart solutions, seamless experience',
+                    'Where innovation meets reliability'
+                ],
+                'Healthcare': [
+                    'Your health, our commitment',
+                    'Compassionate care, professional excellence',
+                    'Healthcare that puts you first',
+                    'Healing with heart and expertise',
+                    'Your wellness journey, our priority'
+                ],
+                'Retail': [
+                    'Quality products, exceptional service',
+                    'Your shopping destination',
+                    'Where quality meets affordability',
+                    'Curated collections, personal touch',
+                    'Shopping made simple and enjoyable'
+                ],
+                'Education': [
+                    'Empowering minds, shaping futures',
+                    'Learning that makes a difference',
+                    'Knowledge for tomorrow\'s leaders',
+                    'Where education meets inspiration',
+                    'Unlocking potential, creating success'
+                ],
+                'Real Estate': [
+                    'Your dream home awaits',
+                    'Properties that match your lifestyle',
+                    'Building communities, creating homes',
+                    'Real estate solutions you can trust',
+                    'Finding the perfect place to call home'
+                ],
+                'Fitness': [
+                    'Your fitness transformation starts here',
+                    'Stronger body, healthier you',
+                    'Fitness tailored to your goals',
+                    'Where wellness meets results',
+                    'Empowering your fitness journey'
+                ],
+                'Beauty': [
+                    'Beauty that radiates confidence',
+                    'Where beauty meets expertise',
+                    'Enhancing your natural beauty',
+                    'Professional care, beautiful results',
+                    'Your beauty journey, our passion'
+                ],
+                'default': [
+                    'Quality you can trust',
+                    'Excellence in every detail',
+                    'Your success is our mission',
+                    'Professional service, personal touch',
+                    'Making the difference that matters'
+                ]
+            };
+
+            let selectedTaglines = templates[category] || templates['default'];
+            
+            // Try to personalize one tagline with business name if it's short enough
+            if (businessName.length < 20) {
+                selectedTaglines = [...selectedTaglines];
+                selectedTaglines[0] = `${businessName} - where excellence begins`;
+            }
+
+            return selectedTaglines.slice(0, 4); // Return top 4 suggestions
+        }
+
+        // Add some visual feedback for form interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add focus/blur animations to form fields
+            const formFields = document.querySelectorAll('input, select, textarea');
+            
+            formFields.forEach(field => {
+                field.addEventListener('focus', function() {
+                    this.style.transform = 'translateY(-1px)';
+                    this.style.boxShadow = '0 5px 15px rgba(102, 126, 234, 0.2)';
+                });
+                
+                field.addEventListener('blur', function() {
+                    this.style.transform = 'translateY(0)';
+                    if (this.style.borderColor !== 'rgb(220, 53, 69)') { // Don't override error styling
+                        this.style.boxShadow = '';
+                    }
+                });
+            });
+
+            // Add hover effects to checkboxes
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                const label = cb.nextElementSibling;
+                cb.addEventListener('change', function() {
+                    if (this.checked) {
+                        label.style.color = '#667eea';
+                        label.style.fontWeight = '600';
+                    } else {
+                        label.style.color = '';
+                        label.style.fontWeight = '';
+                    }
+                });
+            });
+        });
+
+        debugLog("Thrivoy application initialized");
+    </script>
+</body>
+</html>
