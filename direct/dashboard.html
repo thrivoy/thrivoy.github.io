@@ -1,75 +1,392 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard - Thrivoy</title>
-  <script src="config.js"></script>
+  <meta charset="utf-8" />
+  <title>Thrivoy — Business Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="config.js"></script> <!-- must exist and define APPS_SCRIPT_URL -->
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h2 { text-align: center; }
-    table { border-collapse: collapse; margin: 20px auto; width: 80%; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #f0f0f0; }
-    .badge { padding: 4px 8px; border-radius: 6px; color: white; }
-    .active { background: green; }
-    .pending { background: orange; }
+    :root{
+      --accent:#2f80ed; --muted:#6b7280; --success:#16a34a; --warn:#f59e0b; --danger:#ef4444;
+      --card-bg:#ffffff; --page-bg:#f6f7fb; --radius:12px;
+    }
+    body{font-family:Inter,system-ui,Arial,Helvetica,sans-serif;background:var(--page-bg);margin:0;padding:20px;color:#111}
+    .container{max-width:1100px;margin:0 auto}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .biz-left{display:flex;gap:12px;align-items:center}
+    .avatar{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,#e9eefc,#f7f9ff);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)}
+    h1{margin:0;font-size:20px}
+    .subtitle{color:var(--muted);font-size:13px}
+    .badges{display:flex;gap:8px;align-items:center}
+    .badge{padding:6px 10px;border-radius:999px;font-size:12px;color:white}
+    .badge.published{background:var(--success)}.badge.draft{background:var(--warn)}.badge.paused{background:var(--danger)}
+    .actions{display:flex;gap:8px;align-items:center}
+    .btn{background:var(--accent);color:white;padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
+    .btn.secondary{background:#fff;border:1px solid #e6e9ef;color:#111}
+    .card{background:var(--card-bg);border-radius:var(--radius);padding:16px;box-shadow:0 6px 20px rgba(12,15,20,0.04);margin-bottom:16px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+    .stat{padding:12px;border-radius:10px;background:#fbfdff;text-align:center}
+    .stat .num{font-size:20px;font-weight:700}
+    .section-title{font-weight:700;margin:8px 0 12px}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:10px;border-bottom:1px solid #eef1f6;text-align:left;font-size:14px}
+    th{background:#fbfdff;font-weight:700}
+    .invoice-actions{display:flex;gap:8px;align-items:center}
+    .badge-inv{padding:6px 8px;border-radius:8px;color:#fff;font-weight:700;font-size:12px}
+    .inv-paid{background:var(--success)}.inv-pending{background:var(--warn)}.inv-overdue{background:var(--danger)}
+    .content-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+    .content-card{border-radius:10px;overflow:hidden;border:1px solid #eef1f6;background:#fff}
+    .content-media{height:140px;background:#f6f7fb;background-size:cover;background-position:center}
+    .content-body{padding:10px}
+    .small{font-size:13px;color:var(--muted)}
+    .toolbar{display:flex;gap:8px;align-items:center}
+    .toggle{display:flex;gap:8px;align-items:center}
+    @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:640px){header{flex-direction:column;align-items:flex-start} .grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <h2>📊 Business Dashboard</h2>
-  <div id="dashboard">Loading...</div>
+  <div class="container">
+    <header>
+      <div class="biz-left">
+        <div class="avatar" id="avatar">B</div>
+        <div>
+          <h1 id="bizName">Loading…</h1>
+          <div class="subtitle" id="bizOwner">—</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="badges" style="margin-bottom:8px">
+          <div id="publishBadge" class="badge published">Loading</div>
+          <div class="small" id="lastUpdated">—</div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="viewSiteBtn">View Website</button>
+          <button class="btn secondary" id="copyLinkBtn">Copy Site Link</button>
+          <button class="btn secondary" id="whatsAppBtn">WhatsApp</button>
+          <button class="btn secondary" id="emailBtn">Email</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong class="section-title">Overview</strong><div class="small">Key metrics and quick actions</div></div>
+        <div class="toolbar">
+          <div class="toggle small">Auto-refresh <input type="checkbox" id="autoRefresh" style="margin-left:8px"></div>
+          <button class="btn secondary" id="exportInvoicesBtn">Export Invoices CSV</button>
+        </div>
+      </div>
+
+      <div class="grid" id="statsGrid" style="margin-top:12px">
+        <div class="stat card">
+          <div class="small">Visitors</div>
+          <div class="num" id="statVisitors">—</div>
+        </div>
+        <div class="stat card">
+          <div class="small">Leads</div>
+          <div class="num" id="statLeads">—</div>
+        </div>
+        <div class="stat card">
+          <div class="small">Published Pages</div>
+          <div class="num" id="statPages">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong class="section-title">Invoices</strong>
+        <div class="small">Manage payments</div>
+      </div>
+
+      <div id="invoicesArea">Loading invoices…</div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong class="section-title">Content Library</strong>
+        <div class="small">Posts and social content</div>
+      </div>
+
+      <div id="contentArea">Loading content…</div>
+    </div>
+
+    <div style="text-align:center;margin-top:12px">
+      <button class="btn" id="refreshBtn">Refresh Now</button>
+      <button class="btn secondary" id="viewLogsBtn">Open Logs</button>
+    </div>
+  </div>
 
   <script>
-    function makeJSONPRequest(url, params, callback) {
-      const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-      params.callback = callbackName;
-      const queryString = Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
-      const script = document.createElement('script');
-      script.src = url + '?' + queryString;
-      window[callbackName] = function(data) {
-        callback(data);
-        document.head.removeChild(script);
-        delete window[callbackName];
-      };
-      document.head.appendChild(script);
+  // ---------- JSONP helper ----------
+  function makeJSONPRequest(url, params, cb, timeout = 15000) {
+    const callbackName = 'jsonp_cb_' + Math.floor(Math.random()*1e9);
+    params = Object.assign({}, params, { callback: callbackName });
+    const qs = Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
+    const script = document.createElement('script');
+    script.src = url + '?' + qs;
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      cleanup();
+      cb({ success: false, error: 'JSONP timeout' });
+    }, timeout);
+    function cleanup() {
+      try { script.remove(); } catch(e) {}
+      try { delete window[callbackName]; } catch(e) {}
+      clearTimeout(timer);
     }
+    window[callbackName] = function(data) {
+      if (timedOut) return;
+      cleanup();
+      cb(data);
+    };
+    script.onerror = function() {
+      if (timedOut) return;
+      cleanup();
+      cb({ success: false, error: 'JSONP load error' });
+    };
+    document.head.appendChild(script);
+  }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const businessId = urlParams.get("businessId");
+  // ---------- Helpers ----------
+  function safe(v, alt = '') { return (v===undefined || v===null) ? alt : v; }
+  function formatDate(ts) { if(!ts) return '—'; const d = new Date(ts); return d.toLocaleString(); }
+  function statusBadgeClass(status) {
+    if (!status) return 'inv-pending';
+    const s = String(status).toLowerCase();
+    if (s.includes('paid')) return 'inv-paid';
+    if (s.includes('pending')) return 'inv-pending';
+    if (s.includes('over') || s.includes('due')) return 'inv-overdue';
+    return 'inv-pending';
+  }
+  function logEvent(eventData) {
+    // Fire-and-forget logging via JSONP - do not block UI
+    try {
+      const payload = Object.assign({ action: 'log' }, eventData);
+      makeJSONPRequest(APPS_SCRIPT_URL, payload, function(){}, 8000);
+    } catch(e) { console.warn('logEvent failed', e.message); }
+  }
+  function downloadCSV(rows, filename = 'invoices.csv') {
+    if (!rows || !rows.length) return alert('No rows to export');
+    const esc = v => '"' + String(v===undefined||v===null ? '' : v).replace(/"/g,'""') + '"';
+    const keys = Object.keys(rows[0]);
+    let csv = keys.map(esc).join(',') + '\n';
+    rows.forEach(r => { csv += keys.map(k => esc(r[k])).join(',') + '\n'; });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+    a.remove(); URL.revokeObjectURL(url);
+  }
 
-    if (businessId) {
-      makeJSONPRequest(APPS_SCRIPT_URL, { action: "getDashboard", businessId }, function(response) {
-        if (response.success) {
-          let html = `<h3>Welcome, ${response.ownerName}</h3>
-                      <p>Business: <strong>${response.businessName}</strong></p>
-                      <h4>Invoices</h4>
-                      <table>
-                        <tr><th>ID</th><th>Amount</th><th>Status</th></tr>`;
-          (response.invoices || []).forEach(inv => {
-            const statusClass = inv.status === "Paid" ? "active" : "pending";
-            html += `<tr>
-                      <td>${inv.id}</td>
-                      <td>₹${inv.amount}</td>
-                      <td><span class="badge ${statusClass}">${inv.status}</span></td>
-                    </tr>`;
-          });
-          html += "</table>";
-          document.getElementById('dashboard').innerHTML = html;
+  // ---------- UI wiring ----------
+  const bizNameEl = document.getElementById('bizName');
+  const bizOwnerEl = document.getElementById('bizOwner');
+  const avatarEl = document.getElementById('avatar');
+  const publishBadgeEl = document.getElementById('publishBadge');
+  const lastUpdatedEl = document.getElementById('lastUpdated');
+  const statVisitorsEl = document.getElementById('statVisitors');
+  const statLeadsEl = document.getElementById('statLeads');
+  const statPagesEl = document.getElementById('statPages');
+  const invoicesArea = document.getElementById('invoicesArea');
+  const contentArea = document.getElementById('contentArea');
+  const viewSiteBtn = document.getElementById('viewSiteBtn');
+  const copyLinkBtn = document.getElementById('copyLinkBtn');
+  const whatsAppBtn = document.getElementById('whatsAppBtn');
+  const emailBtn = document.getElementById('emailBtn');
+  const refreshBtn = document.getElementById('refreshBtn');
+  const exportInvoicesBtn = document.getElementById('exportInvoicesBtn');
+  const viewLogsBtn = document.getElementById('viewLogsBtn');
+  const autoRefreshToggle = document.getElementById('autoRefresh');
 
-          // Log success
-          makeJSONPRequest(APPS_SCRIPT_URL, {
-            action: "log",
-            event: "dashboard_view",
-            businessId: businessId,
-            formType: "dashboard"
-          }, ()=>{});
-        } else {
-          document.getElementById('dashboard').innerHTML = "❌ Error: " + (response.error || "Unable to fetch dashboard");
-        }
-      });
+  let currentData = null;
+  let autoRefreshTimer = null;
+
+  function renderDashboard(resp) {
+    // response shape may vary: support resp.business or root-level fields
+    const business = resp.business || {};
+    const top = {
+      businessId: resp.businessId || business.businessId || resp.id || '',
+      businessName: resp.businessName || business.businessName || business.name || '',
+      ownerName: resp.ownerName || business.ownerName || business.owner || '',
+      email: resp.email || business.email || '',
+      phone: resp.phone || business.phone || '',
+      websiteUrl: resp.websiteUrl || resp.website || business.websiteUrl || '',
+      publishStatus: resp.publishStatus || business.publishStatus || (resp.published ? 'Published' : 'Draft'),
+      lastUpdated: resp.lastUpdated || business.lastUpdated || resp.updatedAt || ''
+    };
+
+    currentData = resp; // store for actions
+
+    // header
+    bizNameEl.textContent = safe(top.businessName, 'Untitled business');
+    bizOwnerEl.textContent = safe(top.ownerName, '') + (top.email ? ' · ' + top.email : '');
+    avatarEl.textContent = (top.businessName || 'B').slice(0,2).toUpperCase();
+    publishBadgeEl.textContent = safe(top.publishStatus, 'Unknown');
+    publishBadgeEl.className = 'badge ' + (String(top.publishStatus).toLowerCase().includes('publish') ? 'published' : (String(top.publishStatus).toLowerCase().includes('draft') ? 'draft' : 'paused'));
+    lastUpdatedEl.textContent = 'Last updated: ' + (top.lastUpdated ? formatDate(top.lastUpdated) : '—');
+
+    // stats
+    statVisitorsEl.textContent = safe(resp.stats && resp.stats.visitors, 0);
+    statLeadsEl.textContent = safe(resp.stats && resp.stats.leads, 0);
+    statPagesEl.textContent = safe(resp.stats && resp.stats.pages, resp.pagesCount || 1);
+
+    // actions: view site, copy link, whatsapp, email
+    const websiteUrl = top.websiteUrl;
+    viewSiteBtn.onclick = () => {
+      if (websiteUrl) { window.open(websiteUrl, '_blank'); }
+      else alert('No website URL available yet.');
+      logEvent({ event: 'click_view_site', businessId: top.businessId });
+    };
+    copyLinkBtn.onclick = async () => {
+      if (!websiteUrl) return alert('No website URL to copy.');
+      try {
+        await navigator.clipboard.writeText(websiteUrl);
+        alert('Site link copied to clipboard');
+        logEvent({ event: 'copy_site_link', businessId: top.businessId });
+      } catch (e) { alert('Copy failed: ' + e.message); }
+    };
+    whatsAppBtn.onclick = () => {
+      const phone = top.phone;
+      if (!phone) return alert('No phone number available.');
+      const wa = 'https://wa.me/' + encodeURIComponent(phone.replace(/[^0-9+]/g,'')) + '?text=' + encodeURIComponent('Hi, I would like to know about ' + top.businessName);
+      window.open(wa, '_blank');
+      logEvent({ event: 'click_whatsapp', businessId: top.businessId, phone: phone });
+    };
+    emailBtn.onclick = () => {
+      if (!top.email) return alert('No email available.');
+      window.location.href = 'mailto:' + encodeURIComponent(top.email) + '?subject=' + encodeURIComponent('About ' + top.businessName);
+      logEvent({ event: 'click_email', businessId: top.businessId, email: top.email });
+    };
+
+    // invoices
+    const invoices = resp.invoices || [];
+    if (!invoices.length) {
+      invoicesArea.innerHTML = '<div class="small">No invoices found.</div>';
     } else {
-      document.getElementById('dashboard').innerHTML = "❌ Missing businessId.";
+      let html = '<table><thead><tr><th>Invoice ID</th><th>Amount</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>';
+      invoices.forEach(inv => {
+        const status = inv.status || 'Pending';
+        const cls = statusBadgeClass(status);
+        const upi = inv.upiDeepLink || inv.upi || '';
+        html += `<tr>
+          <td>${inv.id || inv.invoiceId || ''}</td>
+          <td>₹${inv.amount != null ? inv.amount : ''}</td>
+          <td><span class="badge-inv ${cls}">${status}</span></td>
+          <td>${formatDate(inv.createdAt || inv.created || inv.timestamp)}</td>
+          <td>
+            <div class="invoice-actions">
+              ${upi ? `<button class="btn" onclick="payInvoice('${encodeURIComponent(upi)}','${encodeURIComponent(inv.id||inv.invoiceId||'')}')">Pay</button>` : `<button class="btn secondary" disabled>No UPI</button>`}
+              <button class="btn secondary" onclick="copyInvoice('${encodeURIComponent(JSON.stringify(inv))}')">Copy</button>
+            </div>
+          </td>
+        </tr>`;
+      });
+      html += '</tbody></table>';
+      invoicesArea.innerHTML = html;
     }
+
+    // content
+    const content = resp.content || [];
+    if (!content.length) {
+      contentArea.innerHTML = '<div class="small">No content found.</div>';
+    } else {
+      let html = '<div class="content-grid">';
+      content.forEach(item => {
+        const img = item.mediaUrl || item.image || '';
+        html += `<div class="content-card">
+          ${img ? `<div class="content-media" style="background-image:url('${img.replace(/'/g,"\\'")}')"></div>` : `<div class="content-media" style="display:flex;align-items:center;justify-content:center;color:var(--muted)">No image</div>`}
+          <div class="content-body">
+            <div style="font-weight:700">${item.title || item.caption || 'Untitled'}</div>
+            <div class="small">${(item.caption || item.summary || '').slice(0,140)}</div>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <button class="btn secondary" onclick='copyContent(${JSON.stringify(escape(item.title||item.caption||''))})'>Copy</button>
+              ${item.mediaUrl ? `<a class="btn" href="${item.mediaUrl}" target="_blank">Open</a>` : ''}
+            </div>
+          </div>
+        </div>`;
+      });
+      html += '</div>';
+      contentArea.innerHTML = html;
+    }
+
+    // enable export
+    exportInvoicesBtn.onclick = () => {
+      const rows = (invoices || []).map(inv => ({
+        invoiceId: inv.id || inv.invoiceId || '',
+        amount: inv.amount || '',
+        status: inv.status || '',
+        upi: inv.upiDeepLink || inv.upi || '',
+        createdAt: inv.createdAt || inv.created || ''
+      }));
+      if (!rows.length) return alert('No invoices to export');
+      downloadCSV(rows, (top.businessId || 'invoices') + '.csv');
+      logEvent({ event: 'export_invoices', businessId: top.businessId });
+    };
+
+    logEvent({ event: 'dashboard_view', businessId: top.businessId, owner: top.ownerName });
+  }
+
+  // ---------- actions triggered from HTML ----------
+  window.payInvoice = function(upiEncoded, invoiceIdEncoded) {
+    const upi = decodeURIComponent(upiEncoded||'');
+    const invoiceId = decodeURIComponent(invoiceIdEncoded||'');
+    if (!upi) return alert('Payment link not available for this invoice.');
+    // open UPI link - many browsers will open UPI apps if deep link correct
+    window.open(upi, '_blank');
+    logEvent({ event: 'click_pay', invoiceId: invoiceId, upi: upi });
+  };
+  window.copyInvoice = function(invEncoded) {
+    try {
+      const text = decodeURIComponent(invEncoded);
+      navigator.clipboard.writeText(text).then(()=> alert('Invoice copied to clipboard'));
+    } catch(e) { alert('Copy failed: ' + e.message); }
+  };
+  window.copyContent = function(escapedTitle) {
+    try {
+      const txt = decodeURIComponent(escapedTitle);
+      navigator.clipboard.writeText(txt).then(()=> alert('Content copied'));
+    } catch(e) { alert('Copy failed: ' + e.message); }
+  };
+
+  // ---------- load / refresh logic ----------
+  const params = new URLSearchParams(window.location.search);
+  const businessId = params.get('businessId');
+  function fetchAndRender() {
+    if (!businessId) {
+      document.getElementById('bizName').textContent = 'Missing businessId';
+      return;
+    }
+    invoicesArea.innerHTML = 'Loading invoices...';
+    contentArea.innerHTML = 'Loading content...';
+    makeJSONPRequest(APPS_SCRIPT_URL, { action: 'getDashboard', businessId: businessId }, function(resp) {
+      if (resp && resp.success) {
+        renderDashboard(resp);
+      } else {
+        invoicesArea.innerHTML = '<div class="small">Failed to load: ' + (resp && resp.error ? resp.error : 'Unknown') + '</div>';
+        contentArea.innerHTML = '';
+        document.getElementById('bizName').textContent = 'Failed to load';
+      }
+    }, 20000);
+  }
+
+  refreshBtn.addEventListener('click', fetchAndRender);
+  viewLogsBtn.addEventListener('click', () => { window.open('logs.html','_blank'); });
+
+  autoRefreshToggle.addEventListener('change', function() {
+    if (this.checked) {
+      autoRefreshTimer = setInterval(fetchAndRender, 30 * 1000);
+    } else {
+      clearInterval(autoRefreshTimer);
+    }
+  });
+
+  // initial load
+  fetchAndRender();
   </script>
 </body>
 </html>
