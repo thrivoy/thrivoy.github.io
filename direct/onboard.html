@@ -1,55 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Start Your Business Website - Thrivoy</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Thrivoy Onboarding</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
+    h1 { text-align: center; color: #333; }
+    form {
+      max-width: 500px; margin: 20px auto; padding: 20px;
+      background: #fff; border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    label { display: block; margin: 10px 0 5px; font-weight: bold; }
+    input, textarea {
+      width: 100%; padding: 10px; margin-bottom: 15px;
+      border: 1px solid #ccc; border-radius: 5px;
+      font-size: 14px;
+    }
+    button {
+      display: block; width: 100%; padding: 12px;
+      background: #28a745; color: #fff;
+      border: none; border-radius: 6px;
+      font-size: 16px; cursor: pointer;
+    }
+    button:disabled { background: #888; cursor: not-allowed; }
+    .notification {
+      margin: 20px auto; padding: 12px; border-radius: 6px;
+      max-width: 500px; text-align: center;
+      font-size: 14px;
+    }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+  </style>
 </head>
 <body>
-    <form id="onboard-form">
-        <input name="businessName" placeholder="Business Name" required>
-        <input name="ownerName" placeholder="Your Name" required>
-        <input name="email" type="email" placeholder="Email" required>
-        <input name="phone" placeholder="Phone" required>
-        <select name="category" required>
-            <option value="healthcare">Healthcare</option>
-            <option value="insurance">Insurance</option>
-            <option value="technology">Technology</option>
-            <option value="consulting">Consulting</option>
-        </select>
-        <input name="location" placeholder="City" required>
-        <textarea name="description" placeholder="Business Description"></textarea>
-        <button type="submit">Create My Website</button>
-    </form>
+  <h1>Onboard Your Business</h1>
 
-    <script>
-    document.getElementById('onboard-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(e.target);
-        const payload = Object.fromEntries(formData.entries());
-        payload.action = 'onboard';
-        
-        // Your Apps Script Web App URL
-        const apiUrl = 'https://script.google.com/macros/s/AKfycby3ZInculE5ONXfR_O6c4VYSyuJGGyipPP-8pmEXvZ3L6R2Yt80v-h30xlK6nPCmKM/exec';
-        
-        fetch(apiUrl, {
-            method: 'POST',
-            body: JSON.stringify(payload),
-            headers: {'Content-Type': 'application/json'}
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = `thankyou.html?businessId=${data.businessId}`;
-            } else {
-                alert('Error: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Something went wrong. Please try again.');
-        });
+  <form id="onboardForm">
+    <label>Business Name</label>
+    <input type="text" name="businessName" required>
+
+    <label>Owner Name</label>
+    <input type="text" name="ownerName" required>
+
+    <label>Email</label>
+    <input type="email" name="email" required>
+
+    <label>Phone</label>
+    <input type="tel" name="phone" required>
+
+    <label>Category</label>
+    <input type="text" name="category">
+
+    <label>Description</label>
+    <textarea name="description"></textarea>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="notification"></div>
+
+  <script>
+    // === JSONP Helper ===
+    function makeJSONPRequest(url, params, callback) {
+      const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+      params.callback = callbackName;
+
+      const queryString = Object.keys(params)
+        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key]))
+        .join('&');
+
+      const script = document.createElement('script');
+      script.src = url + '?' + queryString;
+
+      window[callbackName] = function(data) {
+        callback(data);
+        document.head.removeChild(script);
+        delete window[callbackName];
+      };
+
+      document.head.appendChild(script);
+    }
+
+    // === Form Handling ===
+    const form = document.getElementById('onboardForm');
+    const notify = document.getElementById('notification');
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-kB8K0IATyXb6AFi2M8HAVn6yuTDLOyi_n6vlBLN2Qz5Mj_8e0zmBeJC0CPH8xl3u/exec"; // <-- Replace
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = Object.fromEntries(new FormData(form).entries());
+      formData.action = "onboard";
+
+      notify.textContent = "Submitting...";
+      notify.className = "notification";
+
+      makeJSONPRequest(APPS_SCRIPT_URL, formData, function(response) {
+        if (response.success && response.businessId) {
+          notify.textContent = "✅ Onboarding successful! Redirecting...";
+          notify.className = "notification success";
+          setTimeout(() => {
+            window.location.href = "thankyou.html?businessId=" + encodeURIComponent(response.businessId);
+          }, 1500);
+        } else {
+          notify.textContent = "❌ Error: " + (response.error || "Unknown error");
+          notify.className = "notification error";
+        }
+      });
     });
-    </script>
+  </script>
 </body>
 </html>
