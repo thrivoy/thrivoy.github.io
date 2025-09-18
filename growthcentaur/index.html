@@ -1,888 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thrivoy - AI-Powered Business Websites & Social Media</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        header {
-            padding: 20px 0;
-            text-align: center;
-            color: white;
-        }
-
-        .hero {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 60px 40px;
-            margin: 40px 0;
-            text-align: center;
-            color: white;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-
-        .hero h1 {
-            font-size: 3.5em;
-            margin-bottom: 20px;
-            background: linear-gradient(45deg, #fff, #f1c40f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 1.3em;
-            margin-bottom: 30px;
-            opacity: 0.9;
-        }
-
-        .cta-button {
-            background: linear-gradient(45deg, #e74c3c, #f39c12);
-            color: white;
-            padding: 18px 40px;
-            font-size: 1.2em;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-        }
-
-        .onboard-form {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            margin: 40px 0;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            display: none;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 20px;
-        }
-
-        .form-row .form-group {
-            flex: 1;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            width: auto;
-            margin: 0;
-        }
-
-        .submit-btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 16px 40px;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .submit-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .loading.show {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .result {
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            display: none;
-        }
-
-        .result.success {
-            background: #d4edda;
-            color: #155724;
-            border: 2px solid #c3e6cb;
-            display: block;
-        }
-
-        .result.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 2px solid #f5c6cb;
-            display: block;
-        }
-
-        .website-link {
-            display: inline-block;
-            background: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-top: 10px;
-        }
-
-        .debug-log {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 300px;
-            max-height: 200px;
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 10px;
-            border-radius: 10px;
-            font-family: monospace;
-            font-size: 12px;
-            overflow-y: auto;
-            z-index: 1000;
-        }
-
-        .debug-controls {
-            position: fixed;
-            bottom: 230px;
-            right: 20px;
-            z-index: 1001;
-        }
-
-        .debug-btn {
-            background: #333;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-size: 11px;
-            cursor: pointer;
-            margin: 2px;
-        }
-
-        .tagline-generator {
-            position: relative;
-        }
-
-        .generate-tagline-btn {
-            background: linear-gradient(45deg, #28a745, #20c997);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            margin-left: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .generate-tagline-btn:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-        }
-
-        .generate-tagline-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .tagline-suggestions {
-            margin-top: 10px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-            display: none;
-        }
-
-        .tagline-suggestions.show {
-            display: block;
-        }
-
-        .tagline-option {
-            padding: 8px 12px;
-            margin: 5px 0;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .tagline-option:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .tagline-loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-
-        .tagline-spinner {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        .iframe-container {
-            display: none;
-            position: absolute;
-            top: -1000px;
-            left: -1000px;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5em;
-            }
-            
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-            
-            .debug-log, .debug-controls {
-                display: none;
-            }
-
-            .generate-tagline-btn {
-                margin-left: 0;
-                margin-top: 10px;
-                width: 100%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thrivoy - Launch Your Business</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:0; color:#333; }
+    .container { max-width: 900px; margin: auto; padding: 20px; }
+    .hero { background: white; padding: 30px; border-radius: 10px; margin-top: 30px; }
+    h1 { color: #764ba2; }
+    label { display:block; margin-top:15px; font-weight:bold; }
+    input, select, textarea { width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc; }
+    button { margin-top:20px; background:#764ba2; color:white; padding:12px; border:none; border-radius:8px; cursor:pointer; width:100%; }
+    .result { margin-top:20px; padding:15px; border-radius:8px; display:none; }
+    .result.success { background:#d4edda; color:#155724; display:block; }
+    .result.error { background:#f8d7da; color:#721c24; display:block; }
+    .loading { text-align:center; margin:20px 0; display:none; }
+    .tagline-box { background:#f1f1f1; padding:15px; border-radius:8px; margin-top:20px; }
+    .iframe-container { display:none; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h2>🚀 Thrivoy</h2>
-            <p>AI-Powered Business Websites & Social Media Management</p>
-        </header>
+  <div class="container">
+    <div class="hero">
+      <h1>🚀 Thrivoy</h1>
+      <p>AI-Powered Business Websites & Social Media</p>
 
-        <div class="hero">
-            <h1>Launch Your Business Online in Minutes</h1>
-            <p>Get a professional website + automated social media posts powered by AI</p>
-            <button class="cta-button" onclick="showOnboardingForm()">
-                🎯 Start Your Free Trial
-            </button>
+      <form id="onboardForm">
+        <!-- Core business info -->
+        <label for="businessName">Business Name *</label>
+        <input type="text" id="businessName" name="businessName" required>
+        <label for="ownerName">Owner Name *</label>
+        <input type="text" id="ownerName" name="ownerName" required>
+        <label for="email">Email *</label>
+        <input type="email" id="email" name="email" required>
+        <label for="phone">Phone *</label>
+        <input type="tel" id="phone" name="phone" required>
+        <label for="category">Business Category *</label>
+        <select id="category" name="category" required>
+          <option value="">Choose...</option>
+          <option value="healthcare">Healthcare</option>
+          <option value="insurance">Insurance</option>
+          <option value="technology">Technology</option>
+          <option value="education">Education</option>
+          <option value="consulting">Consulting</option>
+          <option value="services">Services</option>
+        </select>
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location">
+        <label for="description">Short Description</label>
+        <textarea id="description" name="description"></textarea>
+
+        <!-- Intelligence Questions -->
+        <label for="painPoints">Customer Pain Points</label>
+        <textarea id="painPoints" name="painPoints" placeholder="What problems does your business solve?"></textarea>
+        <label for="goals">Business Goals</label>
+        <textarea id="goals" name="goals" placeholder="What do you want to achieve with this website?"></textarea>
+        <label for="audience">Target Audience</label>
+        <textarea id="audience" name="audience" placeholder="Who is your ideal customer?"></textarea>
+        <label for="tone">Preferred Tone/Style</label>
+        <select id="tone" name="tone">
+          <option value="">Choose...</option>
+          <option value="professional">Professional</option>
+          <option value="casual">Casual</option>
+          <option value="friendly">Friendly</option>
+          <option value="luxury">Luxury</option>
+          <option value="innovative">Innovative</option>
+        </select>
+
+        <!-- AI Tagline Generator -->
+        <div class="tagline-box">
+          <h3>✨ AI Tagline Generator</h3>
+          <button type="button" id="generateTaglineBtn">Generate Tagline</button>
+          <div id="taglineSuggestions"></div>
         </div>
 
-        <form class="onboard-form" id="onboardForm">
-            <h2 style="text-align: center; margin-bottom: 30px; color: #333;">
-                🏢 Tell Us About Your Business
-            </h2>
+        <button type="submit">🎯 Create My Business Website</button>
+      </form>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="businessName">Business Name *</label>
-                    <input type="text" id="businessName" name="businessName" required>
-                </div>
-                <div class="form-group">
-                    <label for="ownerName">Owner Name *</label>
-                    <input type="text" id="ownerName" name="ownerName" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="email">Email *</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone *</label>
-                    <input type="tel" id="phone" name="phone" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="category">Business Category *</label>
-                    <select id="category" name="category" required>
-                        <option value="">Choose category...</option>
-                        <option value="healthcare">Healthcare</option>
-                        <option value="insurance">Insurance</option>
-                        <option value="technology">Technology</option>
-                        <option value="education">Education</option>
-                        <option value="consulting">Consulting</option>
-                        <option value="services">Services</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="location">Location *</label>
-                    <input type="text" id="location" name="location" placeholder="City, State" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="description">Business Description *</label>
-                <textarea id="description" name="description" placeholder="Briefly describe your business..." required></textarea>
-            </div>
-
-            <div class="form-group tagline-generator">
-                <label for="tagline">Tagline</label>
-                <div style="display: flex; align-items: center; flex-wrap: wrap;">
-                    <input type="text" id="tagline" name="tagline" placeholder="Your business motto or catchphrase" style="flex: 1; min-width: 200px;">
-                    <button type="button" class="generate-tagline-btn" onclick="generateTagline()" id="generateTaglineBtn">
-                        ✨ Generate AI Tagline
-                    </button>
-                </div>
-                <div class="tagline-suggestions" id="taglineSuggestions"></div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="brandPrimary">Primary Brand Color</label>
-                    <input type="color" id="brandPrimary" name="brandPrimary" value="#1166EE">
-                </div>
-                <div class="form-group">
-                    <label for="brandSecondary">Secondary Brand Color</label>
-                    <input type="color" id="brandSecondary" name="brandSecondary" value="#FF8800">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Social Media Platforms</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="platform_linkedin" name="platforms" value="linkedin" checked>
-                        <label for="platform_linkedin">LinkedIn</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="platform_facebook" name="platforms" value="facebook">
-                        <label for="platform_facebook">Facebook</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="platform_instagram" name="platforms" value="instagram">
-                        <label for="platform_instagram">Instagram</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="platform_whatsapp" name="platforms" value="whatsapp">
-                        <label for="platform_whatsapp">WhatsApp</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="frequency">Posting Frequency</label>
-                    <select id="frequency" name="frequency">
-                        <option value="daily">Daily</option>
-                        <option value="weekly" selected>Weekly</option>
-                        <option value="monthly">Monthly</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="tone">Content Tone</label>
-                    <select id="tone" name="tone">
-                        <option value="friendly" selected>Friendly</option>
-                        <option value="professional">Professional</option>
-                        <option value="casual">Casual</option>
-                        <option value="authoritative">Authoritative</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="whatsappNumber">WhatsApp Business Number</label>
-                <input type="tel" id="whatsappNumber" name="whatsappNumber" placeholder="Include country code (e.g., 917892159170)">
-            </div>
-
-            <div class="form-group">
-                <div class="checkbox-item">
-                    <input type="checkbox" id="showWhatsApp" name="showWhatsApp" value="true" checked>
-                    <label for="showWhatsApp">Show WhatsApp widget on website</label>
-                </div>
-            </div>
-
-            <h3 style="color: #667eea; margin: 40px 0 20px 0; text-align: center;">
-                🎯 Business Intelligence (Optional)
-            </h3>
-            <p style="text-align: center; color: #666; margin-bottom: 30px;">
-                Help us create more targeted content and compelling messaging for your website
-            </p>
-
-            <div class="form-group">
-                <label for="targetAudience">Who are your ideal customers?</label>
-                <input type="text" id="targetAudience" name="targetAudience" 
-                       placeholder="e.g., Small business owners, young professionals, families">
-                <small style="color: #666; font-size: 13px;">This helps create content that speaks directly to your customers</small>
-            </div>
-
-            <div class="form-group">
-                <label for="uniqueValue">What makes you different from competitors?</label>
-                <input type="text" id="uniqueValue" name="uniqueValue" 
-                       placeholder="e.g., 20+ years experience, same-day service, personalized approach">
-                <small style="color: #666; font-size: 13px;">Your unique selling points will be highlighted throughout your website</small>
-            </div>
-
-            <div class="form-group">
-                <label for="keyBenefits">What are the top 3 benefits customers get?</label>
-                <input type="text" id="keyBenefits" name="keyBenefits" 
-                       placeholder="e.g., Save time, Reduce costs, Peace of mind">
-                <small style="color: #666; font-size: 13px;">Separate multiple benefits with commas</small>
-            </div>
-
-            <div class="form-group">
-                <label for="problemSolved">What main problem do you solve for customers?</label>
-                <input type="text" id="problemSolved" name="problemSolved" 
-                       placeholder="e.g., Complex paperwork, Finding reliable insurance">
-                <small style="color: #666; font-size: 13px;">Understanding the problem helps create compelling messaging</small>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="yearsExperience">Years of experience?</label>
-                    <input type="text" id="yearsExperience" name="yearsExperience" placeholder="e.g., 5, 10, 15+">
-                </div>
-                <div class="form-group">
-                    <label for="serviceArea">Geographic area you serve?</label>
-                    <input type="text" id="serviceArea" name="serviceArea" 
-                           placeholder="e.g., All of Karnataka, Pan-India">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="certifications">Certifications, awards, or credentials?</label>
-                <input type="text" id="certifications" name="certifications" 
-                       placeholder="e.g., Licensed Agent, MBA, Industry Awards">
-            </div>
-
-            <div class="form-group">
-                <label for="successStories">Brief example of how you've helped a customer?</label>
-                <textarea id="successStories" name="successStories" 
-                          placeholder="e.g., Helped family save 30% on insurance premiums"
-                          style="min-height: 80px;"></textarea>
-                <small style="color: #666; font-size: 13px;">This can be used as a testimonial or case study on your website</small>
-            </div>
-
-            <input type="hidden" name="action" value="onboard">
-            <input type="hidden" name="plan" value="starter">
-            <input type="hidden" name="price" value="499">
-
-            <button type="submit" class="submit-btn" id="submitBtn">
-                🚀 Create My Business Website
-            </button>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Creating your website and setting up your business profile...</p>
-            </div>
-
-            <div class="result" id="result"></div>
-        </form>
+      <div class="loading" id="loading">⏳ Processing...</div>
+      <div class="result success" id="resultSuccess"></div>
+      <div class="result error" id="resultError"></div>
     </div>
+  </div>
 
-    <!-- Hidden iframe for Apps Script communication -->
-    <div class="iframe-container">
-        <iframe id="submissionIframe" name="submissionIframe"></iframe>
-    </div>
+  <!-- hidden iframe for Apps Script post responses -->
+  <div class="iframe-container"><iframe name="submissionIframe"></iframe></div>
 
-    <!-- Debug Panel -->
-    <div class="debug-controls">
-        <button class="debug-btn" onclick="toggleDebug()">Toggle Debug</button>
-        <button class="debug-btn" onclick="clearLog()">Clear Log</button>
-    </div>
-    <div class="debug-log" id="debugLog"></div>
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhVjQXzsl_pgYGBQkmp3GTIhEeEb25AAZfxj-0CwWnuDd_rRj7u2odPMuW7C4R6d3R/exec";
 
-    <script>
-        // 🔥 CRITICAL: Replace this URL with your actual Google Apps Script deployment URL
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTA75Tn8QWapxElNWbksuNDVDaYyeJiKuxRQ5AwzA1d-xusieurRaM4eU5v9tuXFk6hA/exec";
-        
-        let debugVisible = false;
-
-        // Debug functions
-        function toggleDebug() {
-            debugVisible = !debugVisible;
-            document.getElementById('debugLog').style.display = debugVisible ? 'block' : 'none';
+    // --- Helpers ---
+    function postToAppsScriptViaIframe(data) {
+      return new Promise((resolve, reject) => {
+        const form = document.createElement("form");
+        form.style.display = "none";
+        form.method = "POST";
+        form.action = APPS_SCRIPT_URL;
+        form.target = "submissionIframe";
+        for (let k in data) {
+          const input = document.createElement("input");
+          input.type = "hidden"; input.name = k; input.value = data[k];
+          form.appendChild(input);
         }
+        document.body.appendChild(form);
 
-        function clearLog() {
-            document.getElementById('debugLog').innerHTML = '';
+        const listener = (e) => {
+          if (!String(e.origin).includes("script.google")) return;
+          window.removeEventListener("message", listener);
+          form.remove();
+          resolve(e.data);
+        };
+        window.addEventListener("message", listener);
+        form.submit();
+      });
+    }
+
+    // --- AI Tagline Generator ---
+    document.getElementById("generateTaglineBtn").addEventListener("click", async () => {
+      const data = {
+        action: "generateTagline",
+        businessName: document.getElementById("businessName").value,
+        category: document.getElementById("category").value,
+        description: document.getElementById("description").value
+      };
+      document.getElementById("taglineSuggestions").innerText = "⏳ Generating...";
+      try {
+        const resp = await postToAppsScriptViaIframe(data);
+        if (resp && resp.success && resp.taglines) {
+          document.getElementById("taglineSuggestions").innerHTML =
+            "<ul>" + resp.taglines.map(t => "<li>" + t + "</li>").join("") + "</ul>";
+        } else {
+          document.getElementById("taglineSuggestions").innerText = "❌ Failed to generate taglines.";
         }
+      } catch (err) {
+        document.getElementById("taglineSuggestions").innerText = "❌ Error: " + err.message;
+      }
+    });
 
-        function debugLog(message) {
-            const debugEl = document.getElementById('debugLog');
-            const timestamp = new Date().toLocaleTimeString();
-            debugEl.innerHTML += `<div>[${timestamp}] ${message}</div>`;
-            debugEl.scrollTop = debugEl.scrollHeight;
-            console.log(`[Thrivoy Debug] ${message}`);
+    // --- Onboarding Form Submit ---
+    document.getElementById("onboardForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("resultSuccess").style.display = "none";
+      document.getElementById("resultError").style.display = "none";
+
+      const data = {
+        action: "onboard",
+        businessName: document.getElementById("businessName").value,
+        ownerName: document.getElementById("ownerName").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        category: document.getElementById("category").value,
+        location: document.getElementById("location").value,
+        description: document.getElementById("description").value,
+        painPoints: document.getElementById("painPoints").value,
+        goals: document.getElementById("goals").value,
+        audience: document.getElementById("audience").value,
+        tone: document.getElementById("tone").value
+      };
+
+      try {
+        const resp = await postToAppsScriptViaIframe(data);
+        document.getElementById("loading").style.display = "none";
+        if (resp && resp.success) {
+          document.getElementById("resultSuccess").innerText = "✅ Success! Redirecting...";
+          document.getElementById("resultSuccess").style.display = "block";
+          const bizId = resp.businessId || (resp.business && resp.business.businessId);
+          if (bizId) {
+            setTimeout(() => {
+              window.location.href =
+                "https://thrivoydirect.github.io/site/thankyou.html?businessId=" + encodeURIComponent(bizId);
+            }, 2000);
+          }
+        } else {
+          document.getElementById("resultError").innerText =
+            "❌ Submission failed: " + (resp.error || "Unknown error");
+          document.getElementById("resultError").style.display = "block";
         }
-
-        // Show onboarding form when CTA button is clicked
-        function showOnboardingForm() {
-            document.querySelector(".hero").style.display = "none";
-            document.getElementById("onboardForm").style.display = "block";
-            debugLog("Onboarding form displayed");
-        }
-
-        // Generate AI tagline function (calls real backend)
-        async function generateTagline() {
-            const businessName = document.getElementById('businessName').value.trim();
-            const category = document.getElementById('category').value;
-            const description = document.getElementById('description').value.trim();
-            const uniqueValue = document.getElementById('uniqueValue').value.trim();
-            
-            if (!businessName || !category) {
-                alert('Please fill in Business Name and Category first to generate a tagline.');
-                return;
-            }
-
-            const btn = document.getElementById('generateTaglineBtn');
-            const suggestionsDiv = document.getElementById('taglineSuggestions');
-            
-            // Show loading state
-            btn.disabled = true;
-            btn.textContent = '⏳ Generating...';
-            suggestionsDiv.innerHTML = `
-                <div class="tagline-loading">
-                    <div class="tagline-spinner"></div>
-                    <p>Creating AI-powered taglines for your business...</p>
-                </div>
-            `;
-            suggestionsDiv.classList.add('show');
-            
-            debugLog('Generating tagline for: ' + businessName + ' (' + category + ')');
-
-            try {
-                const taglineData = {
-                    action: 'generateTagline',
-                    businessName: businessName,
-                    category: category,
-                    description: description,
-                    uniqueValue: uniqueValue
-                };
-
-                // Submit to Apps Script via iframe
-                await submitToAppsScript(taglineData, 'tagline');
-                
-            } catch (error) {
-                debugLog('Tagline generation error: ' + error.message);
-                suggestionsDiv.innerHTML = `
-                    <div style="text-align: center; color: #dc3545; padding: 15px;">
-                        ❌ Failed to generate taglines. Please try again.
-                    </div>
-                `;
-            } finally {
-                // Reset button
-                btn.disabled = false;
-                btn.textContent = '✨ Generate AI Tagline';
-            }
-        }
-
-        // Display tagline options
-        function displayTaglineOptions(taglines) {
-            const suggestionsDiv = document.getElementById('taglineSuggestions');
-            let html = '<p style="font-weight: 600; margin-bottom: 10px;">Choose a tagline or use as inspiration:</p>';
-            
-            taglines.forEach(tagline => {
-                html += `<div class="tagline-option" onclick="selectTagline('${tagline.replace(/'/g, '\\\'')}')">${tagline}</div>`;
-            });
-            
-            suggestionsDiv.innerHTML = html;
-        }
-
-        // Handle tagline selection
-        function selectTagline(tagline) {
-            document.getElementById('tagline').value = tagline;
-            document.getElementById('taglineSuggestions').classList.remove('show');
-            debugLog('Selected tagline: ' + tagline);
-        }
-
-        // Submit data to Apps Script via iframe
-        async function submitToAppsScript(data, context = 'main') {
-            return new Promise((resolve, reject) => {
-                if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE") {
-                    reject(new Error('Apps Script URL not configured. Please update APPS_SCRIPT_URL in the code.'));
-                    return;
-                }
-
-                debugLog(`Submitting to Apps Script (${context}): ${JSON.stringify(data).substring(0, 100)}...`);
-
-                // Create a unique callback name
-                const callbackName = 'callback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                
-                // Set up response handler
-                const timeout = setTimeout(() => {
-                    cleanup();
-                    reject(new Error('Request timeout after 30 seconds'));
-                }, 30000);
-
-                function cleanup() {
-                    clearTimeout(timeout);
-                    if (window[callbackName]) {
-                        delete window[callbackName];
-                    }
-                    if (script && script.parentNode) {
-                        script.parentNode.removeChild(script);
-                    }
-                }
-
-                // Set up global callback function
-                window[callbackName] = function(response) {
-                    cleanup();
-                    debugLog(`Response received (${context}): ${JSON.stringify(response).substring(0, 200)}...`);
-                    resolve(response);
-                };
-
-                // Create script element for JSONP
-                const script = document.createElement('script');
-                const params = new URLSearchParams(data);
-                params.append('callback', callbackName);
-                script.src = APPS_SCRIPT_URL + '?' + params.toString();
-                
-                script.onerror = function() {
-                    cleanup();
-                    reject(new Error('Network error or Apps Script unavailable'));
-                };
-
-                document.head.appendChild(script);
-            });
-        }
-
-        // Show result message (success or error)
-        function showResult(message, success, data = {}) {
-            const resultDiv = document.getElementById("result");
-            resultDiv.className = "result " + (success ? "success" : "error");
-            
-            let html = `<p>${message}</p>`;
-            
-            if (data.businessId) {
-                html += `<p><strong>Business ID:</strong> ${data.businessId}</p>`;
-            }
-            
-            if (data.websiteUrl) {
-                html += `<p><a href="${data.websiteUrl}" target="_blank" class="website-link">🌐 View Your Website</a></p>`;
-            }
-            
-            if (data.invoice && data.invoice.upiDeepLink) {
-                html += `
-                    <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px;">
-                        <h4>💳 Payment Information</h4>
-                        <p><strong>Amount:</strong> ₹${data.invoice.amount}</p>
-                        <p><strong>Invoice ID:</strong> ${data.invoice.invoiceId}</p>
-                        <a href="${data.invoice.upiDeepLink}" target="_blank" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; display: inline-block; margin-top: 10px;">
-                            💳 Pay Now via UPI
-                        </a>
-                    </div>
-                `;
-            }
-            
-            resultDiv.innerHTML = html;
-            resultDiv.style.display = "block";
-            
-            // Reset loading state
-            document.getElementById("submitBtn").disabled = false;
-            document.getElementById("loading").classList.remove("show");
-            
-            // Scroll to result
-            resultDiv.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Validate form before submission
-        function validateForm() {
-            const requiredFields = ['businessName', 'ownerName', 'email', 'phone', 'category', 'location', 'description'];
-            let isValid = true;
-            let missingFields = [];
-
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (!field.value.trim()) {
-                    isValid = false;
-                    missingFields.push(field.previousElementSibling.textContent.replace(' *', ''));
-                    field.style.borderColor = '#dc3545';
-                } else {
-                    field.style.borderColor = '#e0e0e0';
-                }
-            });
-
-            // Email validation
-            const emailField = document.getElementById('email');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (emailField.value && !emailRegex.test(emailField.value)) {
-                isValid = false;
-                emailField.style.borderColor = '#dc3545';
-                if (!missingFields.includes('Email')) {
-                    missingFields.push('Email (invalid format)');
-                }
-            }
-
-            // Phone validation
-            const phoneField = document.getElementById('phone');
-            const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/;
-            if (phoneField.value && !phoneRegex.test(phoneField.value)) {
-                isValid = false;
-                phoneField.style.borderColor = '#dc3545';
-                if (!missingFields.includes('Phone')) {
-                    missingFields.push('Phone (invalid format)');
-                }
-            }
-
-            if (!isValid) {
-                debugLog("Form validation failed: " + missingFields.join(', '));                
-                alert("Please correct the following fields:\n- " + missingFields.join("\n- "));
-            }
-
-            return isValid;
-        }
-
-        // Handle form submission
-        document.getElementById("onboardForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
-
-            if (!validateForm()) {
-                return;
-            }
-
-            const form = e.target;
-            const submitBtn = document.getElementById("submitBtn");
-            const loadingDiv = document.getElementById("loading");
-            const resultDiv = document.getElementById("result");
-
-            // Show loading state
-            submitBtn.disabled = true;
-            loadingDiv.classList.add("show");
-            resultDiv.style.display = "none";
-
-            // Gather form data
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => {
-                if (data[key]) {
-                    if (!Array.isArray(data[key])) {
-                        data[key] = [data[key]];
-                    }
-                    data[key].push(value);
-                } else {
-                    data[key] = value;
-                }
-            });
-
-            debugLog("Submitting form data...");
-
-            try {
-                const response = await submitToAppsScript(data, 'form');
-                if (response.success) {
-                    showResult("✅ Website successfully created!", true, response.data || {});
-                } else {
-                    showResult("❌ Submission failed: " + (response.message || "Unknown error"), false);
-                }
-            } catch (error) {
-                debugLog("Form submission error: " + error.message);
-                showResult("❌ Submission error: " + error.message, false);
-            }
-        });
-
-        // Initialize
-        debugLog("Script loaded. Ready.");
-    </script>
+      } catch (err) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("resultError").innerText = "❌ Error: " + err.message;
+        document.getElementById("resultError").style.display = "block";
+      }
+    });
+  </script>
 </body>
 </html>
