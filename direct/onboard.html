@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Start Your Business Website - Thrivoy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <form id="onboard-form">
+        <input name="businessName" placeholder="Business Name" required>
+        <input name="ownerName" placeholder="Your Name" required>
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="phone" placeholder="Phone" required>
+        <select name="category" required>
+            <option value="healthcare">Healthcare</option>
+            <option value="insurance">Insurance</option>
+            <option value="technology">Technology</option>
+            <option value="consulting">Consulting</option>
+        </select>
+        <input name="location" placeholder="City" required>
+        <textarea name="description" placeholder="Business Description"></textarea>
+        <button type="submit">Create My Website</button>
+    </form>
+
+    <script>
+    document.getElementById('onboard-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const payload = Object.fromEntries(formData.entries());
+        payload.action = 'onboard';
+        
+        // Your Apps Script Web App URL
+        const apiUrl = 'https://script.google.com/macros/s/AKfycby3ZInculE5ONXfR_O6c4VYSyuJGGyipPP-8pmEXvZ3L6R2Yt80v-h30xlK6nPCmKM/exec';
+        
+        fetch(apiUrl, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `thankyou.html?businessId=${data.businessId}`;
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Something went wrong. Please try again.');
+        });
+    });
+    </script>
+</body>
+</html>
