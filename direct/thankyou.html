@@ -3,83 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <title>Thank You - Thrivoy</title>
+  <script src="config.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; text-align: center; }
-    h1 { color: #28a745; }
-    .card {
-      display: inline-block;
-      padding: 20px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      max-width: 500px;
-    }
-    .info { margin: 10px 0; font-size: 16px; color: #333; }
-    .error { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 6px; }
-    .success { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; }
-    a.button {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #007bff;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 6px;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; margin: 40px; }
+    .card { border: 2px solid #c3e6cb; padding: 20px; border-radius: 10px; background: #d4edda; display: inline-block; }
   </style>
 </head>
 <body>
-  <h1>Thank You!</h1>
-  <div id="content" class="card">Loading your business info...</div>
+  <h2>🎉 Thank You for Onboarding!</h2>
+  <div class="card" id="thankYouCard">Loading details...</div>
 
   <script>
-    // === JSONP Helper ===
     function makeJSONPRequest(url, params, callback) {
       const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
       params.callback = callbackName;
-
-      const queryString = Object.keys(params)
-        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key]))
-        .join('&');
-
+      const queryString = Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
       const script = document.createElement('script');
       script.src = url + '?' + queryString;
-
       window[callbackName] = function(data) {
         callback(data);
         document.head.removeChild(script);
         delete window[callbackName];
       };
-
       document.head.appendChild(script);
     }
 
-    // === Extract URL Param ===
-    function getParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const businessId = urlParams.get("businessId");
 
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-kB8K0IATyXb6AFi2M8HAVn6yuTDLOyi_n6vlBLN2Qz5Mj_8e0zmBeJC0CPH8xl3u/exec"; // <-- Replace
-    const bizId = getParam("businessId");
-    const contentDiv = document.getElementById("content");
-
-    if (!bizId) {
-      contentDiv.innerHTML = "<div class='error'>❌ Missing business ID</div>";
-    } else {
-      makeJSONPRequest(APPS_SCRIPT_URL, { action: "getThankYou", businessId: bizId }, function(response) {
+    if (businessId) {
+      makeJSONPRequest(APPS_SCRIPT_URL, { action: "getThankYou", businessId }, function(response) {
         if (response.success) {
-          contentDiv.innerHTML = `
-            <div class="success">✅ Business onboarded successfully!</div>
-            <div class="info"><strong>Business ID:</strong> ${response.businessId || bizId}</div>
-            <div class="info"><strong>Business Name:</strong> ${response.businessName || "N/A"}</div>
-            <div class="info"><strong>Owner:</strong> ${response.ownerName || "N/A"}</div>
-            <a class="button" href="dashboard.html?businessId=${encodeURIComponent(bizId)}">Go to Dashboard</a>
-          `;
+          document.getElementById('thankYouCard').innerHTML =
+            `<h3>Welcome, ${response.ownerName}!</h3>
+             <p>Your business <strong>${response.businessName}</strong> is onboarded.</p>
+             <p><a href="dashboard.html?businessId=${businessId}">Go to Dashboard</a></p>`;
+
+          // Log success
+          makeJSONPRequest(APPS_SCRIPT_URL, {
+            action: "log",
+            event: "thankyou_view",
+            businessId: businessId,
+            formType: "thankyou"
+          }, ()=>{});
         } else {
-          contentDiv.innerHTML = "<div class='error'>❌ Error: " + (response.error || "Unknown error") + "</div>";
+          document.getElementById('thankYouCard').innerHTML = "❌ Error: " + (response.error || "Unable to fetch details");
         }
       });
+    } else {
+      document.getElementById('thankYouCard').innerHTML = "❌ Missing businessId.";
     }
   </script>
 </body>
