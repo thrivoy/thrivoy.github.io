@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Thrivoy</title>
+</head>
+<body>
+    <div id="dashboard">
+        <h1>Your Business Dashboard</h1>
+        <div id="business-overview"></div>
+        <div id="subscription-status"></div>
+        <div id="website-link"></div>
+    </div>
+
+    <script>
+    // Get businessId from URL or login system
+    const businessId = new URLSearchParams(window.location.search).get('businessId');
+    
+    if (businessId) {
+        fetch(`https://script.google.com/macros/s/AKfycby3ZInculE5ONXfR_O6c4VYSyuJGGyipPP-8pmEXvZ3L6R2Yt80v-h30xlK6nPCmKM/exec?action=getDashboard&businessId=${businessId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Populate dashboard with business data
+                document.getElementById('business-overview').innerHTML = `
+                    <h2>${data.business.businessName}</h2>
+                    <p>Owner: ${data.business.ownerName}</p>
+                `;
+                
+                document.getElementById('website-link').innerHTML = `
+                    <a href="${data.websiteUrl}" target="_blank">Visit Your Website</a>
+                `;
+            }
+        });
+    }
+    </script>
+</body>
+</html>
