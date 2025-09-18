@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thrivoy Backend Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; text-align: center; }
+    h1 { color: #333; }
+    #result {
+      margin: 20px auto; padding: 15px; border-radius: 8px;
+      max-width: 500px; font-size: 16px;
+    }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+  <h1>Thrivoy JSONP Test</h1>
+  <p>Click the button below to test your Apps Script backend.</p>
+  <button onclick="runTest()">Run Test</button>
+
+  <div id="result">Awaiting test...</div>
+
+  <script>
+    // === JSONP Helper ===
+    function makeJSONPRequest(url, params, callback) {
+      const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+      params.callback = callbackName;
+
+      const queryString = Object.keys(params)
+        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key]))
+        .join('&');
+
+      const script = document.createElement('script');
+      script.src = url + '?' + queryString;
+
+      window[callbackName] = function(data) {
+        callback(data);
+        document.head.removeChild(script);
+        delete window[callbackName];
+      };
+
+      document.head.appendChild(script);
+    }
+
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-kB8K0IATyXb6AFi2M8HAVn6yuTDLOyi_n6vlBLN2Qz5Mj_8e0zmBeJC0CPH8xl3u/exec"; // <-- Replace
+
+    function runTest() {
+      document.getElementById("result").textContent = "⏳ Testing...";
+
+      makeJSONPRequest(APPS_SCRIPT_URL, { action: "test" }, function(response) {
+        const resultDiv = document.getElementById("result");
+        if (response.success) {
+          resultDiv.className = "success";
+          resultDiv.innerHTML = `
+            ✅ JSONP test successful!<br>
+            Message: ${response.message}<br>
+            Timestamp: ${response.timestamp}<br>
+            Method: ${response.method}
+          `;
+        } else {
+          resultDiv.className = "error";
+          resultDiv.innerHTML = "❌ Test failed: " + (response.error || "Unknown error");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
