@@ -1,166 +1,106 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thrivoy - Launch Your Business</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Thrivoy — Onboard</title>
   <style>
-    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:0; color:#333; }
-    .container { max-width: 900px; margin: auto; padding: 20px; }
-    .hero { background: white; padding: 30px; border-radius: 10px; margin-top: 30px; }
-    h1 { color: #764ba2; }
-    label { display:block; margin-top:15px; font-weight:bold; }
-    input, select, textarea { width:100%; padding:10px; margin-top:5px; border-radius:5px; border:1px solid #ccc; }
-    button { margin-top:20px; background:#764ba2; color:white; padding:12px; border:none; border-radius:8px; cursor:pointer; width:100%; }
-    .result { margin-top:20px; padding:15px; border-radius:8px; display:none; }
-    .result.success { background:#d4edda; color:#155724; display:block; }
-    .result.error { background:#f8d7da; color:#721c24; display:block; }
-    .loading { text-align:center; margin:20px 0; display:none; }
-    .tagline-box { background:#f1f1f1; padding:15px; border-radius:8px; margin-top:20px; }
+    body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f7f8fb}
+    .container{max-width:900px;margin:30px auto;padding:24px;background:#fff;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+    h1{margin-top:0;color:#333}
+    label{display:block;margin-top:14px;font-weight:bold}
+    input,select,textarea{width:100%;padding:10px;margin-top:4px;border:1px solid #ccc;border-radius:6px}
+    textarea{min-height:70px}
+    button{margin-top:18px;padding:12px;background:#2f80ed;color:#fff;border:0;border-radius:6px;cursor:pointer;font-weight:bold;width:100%}
+    .loading{display:none;margin-top:10px;color:#666}
+    .result{margin-top:16px;padding:12px;border-radius:8px;display:none}
+    .result.success{background:#e9f7ef;color:#0b7a4e}
+    .result.error{background:#fff0f0;color:#8a1f1f}
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="hero">
-      <h1>🚀 Thrivoy</h1>
-      <p>AI-Powered Business Websites & Social Media</p>
+    <h1>🚀 Thrivoy Onboarding</h1>
+    <form id="onboardForm">
+      <label>Business Name *</label>
+      <input id="businessName" name="businessName" required />
+      <label>Owner Name *</label>
+      <input id="ownerName" name="ownerName" required />
+      <label>Email *</label>
+      <input type="email" id="email" name="email" required />
+      <label>Phone *</label>
+      <input type="tel" id="phone" name="phone" required />
+      <label>Category *</label>
+      <select id="category" name="category" required>
+        <option value="">Choose…</option>
+        <option>Services</option><option>Consulting</option>
+        <option>Technology</option><option>Healthcare</option>
+        <option>Education</option><option>Insurance</option>
+      </select>
+      <label>Location *</label>
+      <input id="location" name="location" required />
+      <label>Description *</label>
+      <textarea id="description" name="description" required></textarea>
 
-      <form id="onboardForm">
-        <!-- Core business info -->
-        <label for="businessName">Business Name *</label>
-        <input type="text" id="businessName" name="businessName" required>
-        <label for="ownerName">Owner Name *</label>
-        <input type="text" id="ownerName" name="ownerName" required>
-        <label for="email">Email *</label>
-        <input type="email" id="email" name="email" required>
-        <label for="phone">Phone *</label>
-        <input type="tel" id="phone" name="phone" required>
-        <label for="category">Business Category *</label>
-        <select id="category" name="category" required>
-          <option value="">Choose...</option>
-          <option value="healthcare">Healthcare</option>
-          <option value="insurance">Insurance</option>
-          <option value="technology">Technology</option>
-          <option value="education">Education</option>
-          <option value="consulting">Consulting</option>
-          <option value="services">Services</option>
-        </select>
-        <label for="location">Location</label>
-        <input type="text" id="location" name="location">
-        <label for="description">Short Description</label>
-        <textarea id="description" name="description"></textarea>
+      <h3>Intelligence Questions</h3>
+      <label>Target Audience</label>
+      <input id="audience" name="audience" />
+      <label>Unique Value</label>
+      <input id="uniqueValue" name="uniqueValue" />
+      <label>Key Benefits</label>
+      <input id="benefits" name="benefits" />
+      <label>Problem Solved</label>
+      <input id="problemSolved" name="problemSolved" />
+      <label>Success Story</label>
+      <textarea id="successStory" name="successStory"></textarea>
 
-        <!-- Intelligence Questions -->
-        <label for="painPoints">Customer Pain Points</label>
-        <textarea id="painPoints" name="painPoints"></textarea>
-        <label for="goals">Business Goals</label>
-        <textarea id="goals" name="goals"></textarea>
-        <label for="audience">Target Audience</label>
-        <textarea id="audience" name="audience"></textarea>
-        <label for="tone">Preferred Tone/Style</label>
-        <select id="tone" name="tone">
-          <option value="">Choose...</option>
-          <option value="professional">Professional</option>
-          <option value="casual">Casual</option>
-          <option value="friendly">Friendly</option>
-          <option value="luxury">Luxury</option>
-          <option value="innovative">Innovative</option>
-        </select>
-
-        <!-- AI Tagline Generator -->
-        <div class="tagline-box">
-          <h3>✨ AI Tagline Generator</h3>
-          <button type="button" id="generateTaglineBtn">Generate Tagline</button>
-          <div id="taglineSuggestions"></div>
-        </div>
-
-        <button type="submit">🎯 Create My Business Website</button>
-      </form>
-
-      <div class="loading" id="loading">⏳ Processing...</div>
-      <div class="result success" id="resultSuccess"></div>
-      <div class="result error" id="resultError"></div>
-    </div>
+      <button type="submit" id="submitBtn">🎯 Create My Business Website</button>
+    </form>
+    <div id="loading" class="loading">⏳ Submitting...</div>
+    <div id="result" class="result"></div>
   </div>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbznSdyf_IBX5zFxtrr9VGvHYZJBmIc86EG8Lik9Pw82Vxy2bb5JqdO11T0Lb_mB4n9H/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfKDe7l0mCabFqCeGE5d3gNw_Hyjy8GlbgpGxpkGoZvFBnl9iWFFLD8lnMOydbxaaE/exec";
 
-    async function postToAppsScript(data) {
-      const resp = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(data).toString()
-      });
-      return await resp.json();
-    }
-
-    // Tagline Generator
-    document.getElementById("generateTaglineBtn").addEventListener("click", async () => {
-      const data = {
-        action: "generateTagline",
-        businessName: document.getElementById("businessName").value,
-        category: document.getElementById("category").value,
-        description: document.getElementById("description").value
-      };
-      document.getElementById("taglineSuggestions").innerText = "⏳ Generating...";
-      try {
-        const resp = await postToAppsScript(data);
-        if (resp && resp.success && resp.taglines) {
-          document.getElementById("taglineSuggestions").innerHTML =
-            "<ul>" + resp.taglines.map(t => "<li>" + t + "</li>").join("") + "</ul>";
-        } else {
-          document.getElementById("taglineSuggestions").innerText = "❌ Failed to generate taglines.";
-        }
-      } catch (err) {
-        document.getElementById("taglineSuggestions").innerText = "❌ Error: " + err.message;
-      }
-    });
-
-    // Form Submission
     document.getElementById("onboardForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      document.getElementById("loading").style.display = "block";
-      document.getElementById("resultSuccess").style.display = "none";
-      document.getElementById("resultError").style.display = "none";
+      const loading = document.getElementById("loading");
+      const result = document.getElementById("result");
+      result.style.display="none";
+      loading.style.display="block";
 
-      const data = {
-        action: "onboard",
-        businessName: document.getElementById("businessName").value,
-        ownerName: document.getElementById("ownerName").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
-        category: document.getElementById("category").value,
-        location: document.getElementById("location").value,
-        description: document.getElementById("description").value,
-        painPoints: document.getElementById("painPoints").value,
-        goals: document.getElementById("goals").value,
-        audience: document.getElementById("audience").value,
-        tone: document.getElementById("tone").value
-      };
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      data.action = "onboard";
 
       try {
-        const resp = await postToAppsScript(data);
-        document.getElementById("loading").style.display = "none";
-        if (resp && resp.success) {
-          document.getElementById("resultSuccess").innerText = "✅ Success! Redirecting...";
-          document.getElementById("resultSuccess").style.display = "block";
-          const bizId = resp.businessId || (resp.business && resp.business.businessId);
-          if (bizId) {
-            setTimeout(() => {
-              window.location.href =
-                "https://thrivoydirect.github.io/site/thankyou.html?businessId=" + encodeURIComponent(bizId);
-            }, 2000);
-          }
+        const resp = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(data).toString()
+        });
+        const json = await resp.json();
+        loading.style.display="none";
+        if (json.success) {
+          result.className="result success";
+          result.style.display="block";
+          result.innerHTML = `✅ Success! Business ID: ${json.businessId || ""}`;
+          setTimeout(()=> {
+            window.location.href =
+              "https://thrivoydirect.github.io/site/thankyou.html?businessId=" +
+              encodeURIComponent(json.businessId);
+          }, 2000);
         } else {
-          document.getElementById("resultError").innerText =
-            "❌ Submission failed: " + (resp.error || "Unknown error");
-          document.getElementById("resultError").style.display = "block";
+          result.className="result error";
+          result.style.display="block";
+          result.innerText = "❌ " + (json.error||"Unknown error");
         }
-      } catch (err) {
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("resultError").innerText = "❌ Error: " + err.message;
-        document.getElementById("resultError").style.display = "block";
+      } catch(err) {
+        loading.style.display="none";
+        result.className="result error";
+        result.style.display="block";
+        result.innerText = "❌ Network error: " + err.message;
       }
     });
   </script>
