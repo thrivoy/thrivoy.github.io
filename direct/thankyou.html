@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to Thrivoy!</title>
+</head>
+<body>
+    <div id="thank-you-content">
+        <h1>Your Website is Ready!</h1>
+        <div id="business-info"></div>
+        <div id="payment-section"></div>
+    </div>
+
+    <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const businessId = urlParams.get('businessId');
+    
+    if (businessId) {
+        fetch(`https://script.google.com/macros/s/AKfycby3ZInculE5ONXfR_O6c4VYSyuJGGyipPP-8pmEXvZ3L6R2Yt80v-h30xlK6nPCmKM/exec?action=getThankYou&businessId=${businessId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('business-info').innerHTML = `
+                    <h2>${data.business.businessName}</h2>
+                    <p><a href="${data.websiteUrl}" target="_blank">View Your Website</a></p>
+                `;
+                
+                if (data.invoice) {
+                    document.getElementById('payment-section').innerHTML = `
+                        <h3>Complete Your Subscription (₹${data.invoice.amount})</h3>
+                        <a href="${data.invoice.upiDeepLink}" class="pay-button">Pay Now via UPI</a>
+                    `;
+                }
+            }
+        });
+    }
+    </script>
+</body>
+</html>
