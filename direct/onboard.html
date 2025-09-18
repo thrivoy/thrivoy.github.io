@@ -3,73 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <title>Thrivoy Onboarding</title>
+  <script src="config.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
-    h1 { text-align: center; color: #333; }
-    form {
-      max-width: 500px; margin: 20px auto; padding: 20px;
-      background: #fff; border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-    label { display: block; margin: 10px 0 5px; font-weight: bold; }
-    input, textarea {
-      width: 100%; padding: 10px; margin-bottom: 15px;
-      border: 1px solid #ccc; border-radius: 5px;
-      font-size: 14px;
-    }
-    button {
-      display: block; width: 100%; padding: 12px;
-      background: #28a745; color: #fff;
-      border: none; border-radius: 6px;
-      font-size: 16px; cursor: pointer;
-    }
-    button:disabled { background: #888; cursor: not-allowed; }
-    .notification {
-      margin: 20px auto; padding: 12px; border-radius: 6px;
-      max-width: 500px; text-align: center;
-      font-size: 14px;
-    }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    form { max-width: 400px; margin: auto; }
+    label { display: block; margin-top: 10px; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 4px; }
+    button { margin-top: 15px; padding: 10px; width: 100%; }
+    .notification { margin: 15px 0; padding: 10px; border-radius: 5px; }
     .success { background: #d4edda; color: #155724; }
     .error { background: #f8d7da; color: #721c24; }
   </style>
 </head>
 <body>
-  <h1>Onboard Your Business</h1>
-
-  <form id="onboardForm">
-    <label>Business Name</label>
-    <input type="text" name="businessName" required>
-
-    <label>Owner Name</label>
-    <input type="text" name="ownerName" required>
-
-    <label>Email</label>
-    <input type="email" name="email" required>
-
-    <label>Phone</label>
-    <input type="tel" name="phone" required>
-
-    <label>Category</label>
-    <input type="text" name="category">
-
-    <label>Description</label>
-    <textarea name="description"></textarea>
-
+  <h2>Onboard Your Business</h2>
+  <form id="onboardForm" data-type="onboarding">
+    <label>Business Name <input type="text" name="businessName" required></label>
+    <label>Owner Name <input type="text" name="ownerName" required></label>
+    <label>Email <input type="email" name="email" required></label>
+    <label>Phone <input type="text" name="phone" required></label>
+    <label>Description <textarea name="description"></textarea></label>
     <button type="submit">Submit</button>
   </form>
 
   <div id="notification"></div>
 
   <script>
-    // === JSONP Helper ===
+    // JSONP helper
     function makeJSONPRequest(url, params, callback) {
       const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
       params.callback = callbackName;
-
-      const queryString = Object.keys(params)
-        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key]))
-        .join('&');
-
+      const queryString = Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
       const script = document.createElement('script');
       script.src = url + '?' + queryString;
 
@@ -82,30 +46,43 @@
       document.head.appendChild(script);
     }
 
-    // === Form Handling ===
-    const form = document.getElementById('onboardForm');
-    const notify = document.getElementById('notification');
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-kB8K0IATyXb6AFi2M8HAVn6yuTDLOyi_n6vlBLN2Qz5Mj_8e0zmBeJC0CPH8xl3u/exec"; // <-- Replace
+    function validateForm(data) {
+      if (!data.businessName.trim()) { alert("Business name required"); return false; }
+      if (!data.ownerName.trim()) { alert("Owner name required"); return false; }
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) { alert("Valid email required"); return false; }
+      if (!data.phone || data.phone.length < 8) { alert("Valid phone required"); return false; }
+      return true;
+    }
 
+    const form = document.getElementById('onboardForm');
     form.addEventListener('submit', function(e) {
       e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (!validateForm(data)) return;
 
-      const formData = Object.fromEntries(new FormData(form).entries());
-      formData.action = "onboard";
+      data.action = "onboard";
+      makeJSONPRequest(APPS_SCRIPT_URL, data, function(response) {
+        if (response.success) {
+          // Log success
+          makeJSONPRequest(APPS_SCRIPT_URL, {
+            action: "log",
+            event: "onboard_success",
+            businessId: response.businessId,
+            formType: "onboarding"
+          }, ()=>{});
 
-      notify.textContent = "Submitting...";
-      notify.className = "notification";
-
-      makeJSONPRequest(APPS_SCRIPT_URL, formData, function(response) {
-        if (response.success && response.businessId) {
-          notify.textContent = "✅ Onboarding successful! Redirecting...";
-          notify.className = "notification success";
-          setTimeout(() => {
-            window.location.href = "thankyou.html?businessId=" + encodeURIComponent(response.businessId);
-          }, 1500);
+          window.location.href = "thankyou.html?businessId=" + encodeURIComponent(response.businessId);
         } else {
-          notify.textContent = "❌ Error: " + (response.error || "Unknown error");
-          notify.className = "notification error";
+          document.getElementById('notification').innerHTML =
+            '<div class="notification error">❌ ' + (response.error || "Onboarding failed") + '</div>';
+
+          // Log failure
+          makeJSONPRequest(APPS_SCRIPT_URL, {
+            action: "log",
+            event: "onboard_error",
+            error: response.error || "Unknown",
+            formType: "onboarding"
+          }, ()=>{});
         }
       });
     });
