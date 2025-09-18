@@ -1,37 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard - Thrivoy</title>
+  <meta charset="UTF-8">
+  <title>Business Dashboard - Thrivoy</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
+    h1 { text-align: center; color: #007bff; }
+    .card {
+      max-width: 600px; margin: 20px auto; padding: 20px;
+      background: #fff; border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .info { margin: 10px 0; font-size: 16px; }
+    .error { background: #f8d7da; color: #721c24; padding: 12px; border-radius: 6px; text-align: center; }
+    .success { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; text-align: center; }
+    .section-title { margin-top: 20px; font-weight: bold; color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f1f1f1; }
+  </style>
 </head>
 <body>
-    <div id="dashboard">
-        <h1>Your Business Dashboard</h1>
-        <div id="business-overview"></div>
-        <div id="subscription-status"></div>
-        <div id="website-link"></div>
-    </div>
+  <h1>Your Business Dashboard</h1>
+  <div id="dashboard" class="card">Loading your data...</div>
 
-    <script>
-    // Get businessId from URL or login system
-    const businessId = new URLSearchParams(window.location.search).get('businessId');
-    
-    if (businessId) {
-        fetch(`https://script.google.com/macros/s/AKfycby3ZInculE5ONXfR_O6c4VYSyuJGGyipPP-8pmEXvZ3L6R2Yt80v-h30xlK6nPCmKM/exec?action=getDashboard&businessId=${businessId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Populate dashboard with business data
-                document.getElementById('business-overview').innerHTML = `
-                    <h2>${data.business.businessName}</h2>
-                    <p>Owner: ${data.business.ownerName}</p>
-                `;
-                
-                document.getElementById('website-link').innerHTML = `
-                    <a href="${data.websiteUrl}" target="_blank">Visit Your Website</a>
-                `;
-            }
-        });
+  <script>
+    // === JSONP Helper ===
+    function makeJSONPRequest(url, params, callback) {
+      const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+      params.callback = callbackName;
+
+      const queryString = Object.keys(params)
+        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key]))
+        .join('&');
+
+      const script = document.createElement('script');
+      script.src = url + '?' + queryString;
+
+      window[callbackName] = function(data) {
+        callback(data);
+        document.head.removeChild(script);
+        delete window[callbackName];
+      };
+
+      document.head.appendChild(script);
     }
-    </script>
+
+    // === Extract URL Param ===
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-kB8K0IATyXb6AFi2M8HAVn6yuTDLOyi_n6vlBLN2Qz5Mj_8e0zmBeJC0CPH8xl3u/exec"; // <-- Replace
+    const bizId = getParam("businessId");
+    const dashboardDiv = document.getElementById("dashboard");
+
+    if (!bizId) {
+      dashboardDiv.innerHTML = "<div class='error'>❌ Missing business ID</div>";
+    } else {
+      makeJSONPRequest(APPS_SCRIPT_URL, { action: "getDashboard", businessId: bizId }, function(response) {
+        if (response.success) {
+          let html = `
+            <div class="success">✅ Dashboard loaded successfully!</div>
+            <div class="info"><strong>Business ID:</strong> ${response.businessId || bizId}</div>
+            <div class="info"><strong>Business Name:</strong> ${response.businessName || "N/A"}</div>
+            <div class="info"><strong>Owner:</strong> ${response.ownerName || "N/A"}</div>
+            <div class="info"><strong>Email:</strong> ${response.email || "N/A"}</div>
+            <div class="info"><strong>Phone:</strong> ${response.phone || "N/A"}</div>
+          `;
+
+          // Optional: show invoices, stats, etc. if returned
+          if (response.invoices && response.invoices.length > 0) {
+            html += `<div class="section-title">Invoices</div><table><tr><th>ID</th><th>Amount</th><th>Status</th></tr>`;
+            response.invoices.forEach(inv => {
+              html += `<tr><td>${inv.id}</td><td>${inv.amount}</td><td>${inv.status}</td></tr>`;
+            });
+            html += `</table>`;
+          }
+
+          dashboardDiv.innerHTML = html;
+        } else {
+          dashboardDiv.innerHTML = "<div class='error'>❌ Error: " + (response.error || "Unknown error") + "</div>";
+        }
+      });
+    }
+  </script>
 </body>
 </html>
