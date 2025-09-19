@@ -17,6 +17,18 @@
       color: #fff;
       padding: 1rem;
       text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { margin: 0; font-size: 1.2rem; }
+    header a {
+      background: #fff;
+      color: #4a90e2;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.9rem;
     }
     main {
       max-width: 900px;
@@ -26,12 +38,8 @@
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    h1, h2 {
-      margin-top: 0;
-    }
-    section {
-      margin-bottom: 2rem;
-    }
+    h1, h2 { margin-top: 0; }
+    section { margin-bottom: 2rem; }
     button {
       padding: 0.6rem 1rem;
       border: none;
@@ -40,18 +48,14 @@
       color: #fff;
       cursor: pointer;
       font-size: 1rem;
+      margin-top: 0.5rem;
     }
     button:disabled {
       background: #aaa;
       cursor: not-allowed;
     }
-    ul, ol {
-      margin: 0;
-      padding-left: 1.2rem;
-    }
-    li {
-      margin: 0.25rem 0;
-    }
+    ul, ol { margin: 0; padding-left: 1.2rem; }
+    li { margin: 0.25rem 0; }
     .card {
       padding: 1rem;
       border: 1px solid #eee;
@@ -59,29 +63,44 @@
       background: #fafafa;
       margin-bottom: 1rem;
     }
-    input {
+    input[type="text"] {
       padding: 0.5rem;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 1rem;
       width: 100%;
     }
+    .remember {
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .remember input { margin-right: 0.4rem; }
   </style>
 </head>
 <body>
   <header>
     <h1>Thrivoy Business Dashboard</h1>
+    <a href="onboard.html">➕ New Business</a>
   </header>
+
   <main>
-    <section>
+    <section id="finder">
       <h2>Find Your Dashboard</h2>
       <input type="text" id="bizIdInput" placeholder="Enter your Business ID (e.g., BIZ-12345)">
+      <div class="remember">
+        <input type="checkbox" id="rememberMe">
+        <label for="rememberMe">Remember me on this device</label>
+      </div>
       <button id="loadBtn">Load Dashboard</button>
     </section>
 
     <section id="bizInfo" style="display:none;">
       <h2>Business Info</h2>
       <div class="card" id="bizDetails"></div>
+      <button id="switchBtn">🔄 Switch Business</button>
     </section>
 
     <section id="taglines" style="display:none;">
@@ -100,9 +119,9 @@
   <script>
     // JSONP helper
     function makeJSONPRequest(url, params, callback) {
-      const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
+      const cbName = 'jsonp_cb_' + Math.round(100000 * Math.random());
       params = params || {};
-      params.callback = callbackName;
+      params.callback = cbName;
 
       const query = Object.keys(params)
         .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
@@ -111,10 +130,10 @@
       const script = document.createElement('script');
       script.src = url + '?' + query;
 
-      window[callbackName] = function(data) {
+      window[cbName] = function(data) {
         callback(data);
         document.head.removeChild(script);
-        delete window[callbackName];
+        delete window[cbName];
       };
 
       document.head.appendChild(script);
@@ -122,8 +141,10 @@
 
     const loadBtn = document.getElementById('loadBtn');
     const bizIdInput = document.getElementById('bizIdInput');
+    const rememberMe = document.getElementById('rememberMe');
     const bizInfoSec = document.getElementById('bizInfo');
     const bizDetails = document.getElementById('bizDetails');
+    const switchBtn = document.getElementById('switchBtn');
     const taglineSec = document.getElementById('taglines');
     const taglineList = document.getElementById('taglineList');
     const regenTaglines = document.getElementById('regenTaglines');
@@ -134,13 +155,7 @@
     let currentBiz = null;
 
     // Load dashboard
-    loadBtn.addEventListener('click', function() {
-      const bizId = bizIdInput.value.trim();
-      if (!bizId) {
-        alert('Please enter your Business ID.');
-        return;
-      }
-
+    function loadDashboard(bizId, remember) {
       makeJSONPRequest(APPS_SCRIPT_URL, { action: 'getDashboard', businessId: bizId }, function(res) {
         console.log('Dashboard:', res);
 
@@ -150,11 +165,26 @@
         }
 
         currentBiz = res;
+        // Save bizId in localStorage only if rememberMe is checked
+        if (remember) {
+          localStorage.setItem('thrivoyBizId', bizId);
+        }
         renderDashboard(res);
       });
+    }
+
+    loadBtn.addEventListener('click', function() {
+      const bizId = bizIdInput.value.trim();
+      if (!bizId) {
+        alert('Please enter your Business ID.');
+        return;
+      }
+      loadDashboard(bizId, rememberMe.checked);
     });
 
     function renderDashboard(data) {
+      document.getElementById('finder').style.display = 'none';
+
       // Business Info
       bizInfoSec.style.display = 'block';
       bizDetails.innerHTML = `
@@ -192,6 +222,17 @@
         contentPlan.innerHTML = '<li>No content plan yet.</li>';
       }
     }
+
+    // Switch Business
+    switchBtn.addEventListener('click', function() {
+      currentBiz = null;
+      bizIdInput.value = '';
+      localStorage.removeItem('thrivoyBizId');
+      document.getElementById('finder').style.display = 'block';
+      bizInfoSec.style.display = 'none';
+      taglineSec.style.display = 'none';
+      contentSec.style.display = 'none';
+    });
 
     // Regenerate taglines
     regenTaglines.addEventListener('click', function() {
@@ -250,6 +291,20 @@
         }
       });
     });
+
+    // 🔑 Auto-load logic
+    const params = new URLSearchParams(window.location.search);
+    const autoBizId = params.get('businessId');
+    const storedBizId = localStorage.getItem('thrivoyBizId');
+
+    if (autoBizId) {
+      bizIdInput.value = autoBizId;
+      loadDashboard(autoBizId, true); // If from thankyou, always remember
+    } else if (storedBizId) {
+      bizIdInput.value = storedBizId;
+      rememberMe.checked = true;
+      loadDashboard(storedBizId, true);
+    }
   </script>
 </body>
 </html>
