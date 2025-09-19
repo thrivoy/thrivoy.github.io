@@ -3,39 +3,131 @@
 <head>
   <meta charset="UTF-8">
   <title>Thrivoy Onboarding</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="config.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    form { max-width: 400px; margin: auto; }
-    label { display: block; margin-top: 10px; }
-    input, textarea { width: 100%; padding: 8px; margin-top: 4px; }
-    button { margin-top: 15px; padding: 10px; width: 100%; }
-    .notification { margin: 15px 0; padding: 10px; border-radius: 5px; }
-    .success { background: #d4edda; color: #155724; }
-    .error { background: #f8d7da; color: #721c24; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background: #f5f7fa;
+      color: #333;
+    }
+    header {
+      background: #4a90e2;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      margin-top: 0;
+    }
+    form {
+      display: grid;
+      gap: 1rem;
+    }
+    label {
+      font-weight: bold;
+    }
+    input, textarea, select, button {
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      width: 100%;
+    }
+    button {
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    .output {
+      margin-top: 2rem;
+      padding: 1rem;
+      border: 1px solid #eee;
+      background: #fafafa;
+      border-radius: 6px;
+    }
+    .tagline-list li {
+      margin: 0.25rem 0;
+    }
   </style>
 </head>
 <body>
-  <h2>Onboard Your Business</h2>
-  <form id="onboardForm" data-type="onboarding">
-    <label>Business Name <input type="text" name="businessName" required></label>
-    <label>Owner Name <input type="text" name="ownerName" required></label>
-    <label>Email <input type="email" name="email" required></label>
-    <label>Phone <input type="text" name="phone" required></label>
-    <label>Description <textarea name="description"></textarea></label>
-    <button type="submit">Submit</button>
-  </form>
+  <header>
+    <h1>Thrivoy Business Onboarding</h1>
+  </header>
+  <main>
+    <h2>Tell us about your business</h2>
+    <form id="onboardForm">
+      <div>
+        <label for="businessName">Business Name</label>
+        <input type="text" id="businessName" name="businessName" required>
+      </div>
+      <div>
+        <label for="ownerName">Owner Name</label>
+        <input type="text" id="ownerName" name="ownerName" required>
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div>
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone">
+      </div>
+      <div>
+        <label for="category">Industry/Category</label>
+        <input type="text" id="category" name="category" placeholder="e.g. bakery, salon, consultancy">
+      </div>
+      <div>
+        <label for="descr">Business Description</label>
+        <textarea id="descr" name="descr" rows="3"></textarea>
+      </div>
+      <div>
+        <label for="targetCustomer">Target Customer</label>
+        <input type="text" id="targetCustomer" name="targetCustomer" placeholder="e.g. busy professionals, families">
+      </div>
+      <div>
+        <label for="usp">Unique Selling Point (USP)</label>
+        <input type="text" id="usp" name="usp" placeholder="What makes you stand out?">
+      </div>
+      <button type="submit">Submit</button>
+    </form>
 
-  <div id="notification"></div>
+    <div id="results" class="output" style="display:none;">
+      <h3>AI-Generated Taglines</h3>
+      <ul id="taglineList" class="tagline-list"></ul>
+      <h3>7-Day Content Plan</h3>
+      <ol id="contentPlan"></ol>
+    </div>
+  </main>
 
   <script>
     // JSONP helper
     function makeJSONPRequest(url, params, callback) {
-      const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+      const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
+      params = params || {};
       params.callback = callbackName;
-      const queryString = Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
+
+      const query = Object.keys(params)
+        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+        .join('&');
+
       const script = document.createElement('script');
-      script.src = url + '?' + queryString;
+      script.src = url + '?' + query;
 
       window[callbackName] = function(data) {
         callback(data);
@@ -46,44 +138,80 @@
       document.head.appendChild(script);
     }
 
-    function validateForm(data) {
-      if (!data.businessName.trim()) { alert("Business name required"); return false; }
-      if (!data.ownerName.trim()) { alert("Owner name required"); return false; }
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)) { alert("Valid email required"); return false; }
-      if (!data.phone || data.phone.length < 8) { alert("Valid phone required"); return false; }
-      return true;
-    }
-
     const form = document.getElementById('onboardForm');
+    const resultsBox = document.getElementById('results');
+    const taglineList = document.getElementById('taglineList');
+    const contentPlan = document.getElementById('contentPlan');
+
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-      const data = Object.fromEntries(new FormData(form).entries());
-      if (!validateForm(data)) return;
 
-      data.action = "onboard";
-      makeJSONPRequest(APPS_SCRIPT_URL, data, function(response) {
-        if (response.success) {
-          // Log success
-          makeJSONPRequest(APPS_SCRIPT_URL, {
-            action: "log",
-            event: "onboard_success",
-            businessId: response.businessId,
-            formType: "onboarding"
-          }, ()=>{});
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      data.action = 'onboard';
 
-          window.location.href = "thankyou.html?businessId=" + encodeURIComponent(response.businessId);
-        } else {
-          document.getElementById('notification').innerHTML =
-            '<div class="notification error">❌ ' + (response.error || "Onboarding failed") + '</div>';
+      // Disable submit button
+      const btn = form.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
 
-          // Log failure
-          makeJSONPRequest(APPS_SCRIPT_URL, {
-            action: "log",
-            event: "onboard_error",
-            error: response.error || "Unknown",
-            formType: "onboarding"
-          }, ()=>{});
+      // Step 1: Onboard business
+      makeJSONPRequest(APPS_SCRIPT_URL, data, function(res) {
+        console.log('Onboard response:', res);
+
+        if (!res.success) {
+          alert('❌ Onboarding failed: ' + (res.error || 'Unknown error'));
+          btn.disabled = false;
+          btn.textContent = 'Submit';
+          return;
         }
+
+        const bizId = res.businessId || 'unknown';
+
+        // Step 2: Generate taglines
+        makeJSONPRequest(APPS_SCRIPT_URL, {
+          action: 'generateTagline',
+          businessName: data.businessName,
+          service: data.descr,
+          targetCustomer: data.targetCustomer,
+          usp: data.usp
+        }, function(tagRes) {
+          taglineList.innerHTML = '';
+          if (tagRes.success && tagRes.taglines) {
+            tagRes.taglines.forEach(t => {
+              const li = document.createElement('li');
+              li.textContent = t;
+              taglineList.appendChild(li);
+            });
+          } else {
+            taglineList.innerHTML = '<li>❌ Could not generate taglines.</li>';
+          }
+        });
+
+        // Step 3: Generate content plan
+        makeJSONPRequest(APPS_SCRIPT_URL, {
+          action: 'generateContentPlan',
+          businessName: data.businessName,
+          service: data.descr,
+          targetCustomer: data.targetCustomer,
+          usp: data.usp
+        }, function(planRes) {
+          contentPlan.innerHTML = '';
+          if (planRes.success && planRes.plan) {
+            planRes.plan.forEach(p => {
+              const li = document.createElement('li');
+              li.textContent = (p.platform ? '[' + p.platform + '] ' : '') + (p.title || '') + ': ' + (p.text || '');
+              contentPlan.appendChild(li);
+            });
+          } else {
+            contentPlan.innerHTML = '<li>❌ Could not generate content plan.</li>';
+          }
+        });
+
+        // Show results
+        resultsBox.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Submit';
       });
     });
   </script>
