@@ -1,310 +1,140 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <title>Thrivoy Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <script src="config.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      background: #f5f7fa;
-      color: #333;
-    }
-    header {
-      background: #4a90e2;
-      color: #fff;
-      padding: 1rem;
-      text-align: center;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header h1 { margin: 0; font-size: 1.2rem; }
-    header a {
-      background: #fff;
-      color: #4a90e2;
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
-    main {
-      max-width: 900px;
-      margin: 2rem auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    h1, h2 { margin-top: 0; }
-    section { margin-bottom: 2rem; }
-    button {
-      padding: 0.6rem 1rem;
-      border: none;
-      border-radius: 6px;
-      background: #4a90e2;
-      color: #fff;
-      cursor: pointer;
-      font-size: 1rem;
-      margin-top: 0.5rem;
-    }
-    button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
-    }
-    ul, ol { margin: 0; padding-left: 1.2rem; }
-    li { margin: 0.25rem 0; }
-    .card {
-      padding: 1rem;
-      border: 1px solid #eee;
-      border-radius: 6px;
-      background: #fafafa;
-      margin-bottom: 1rem;
-    }
-    input[type="text"] {
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
-      width: 100%;
-    }
-    .remember {
-      margin-top: 0.5rem;
-      display: flex;
-      align-items: center;
-      font-size: 0.9rem;
-      color: #555;
-    }
-    .remember input { margin-right: 0.4rem; }
+    body{font-family:Arial,Helvetica,sans-serif;background:#f7fafc;padding:18px}
+    .wrap{max-width:980px;margin:18px auto}
+    .card{background:#fff;padding:18px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.05);margin-bottom:14px}
+    .muted{color:#6b7280}
+    .tagline{font-size:20px;color:#0b74de;margin:6px 0}
+    .hero{font-size:16px;margin:6px 0;color:#111827}
+    .content-plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:12px}
+    .plan-item{background:#f8fafc;padding:10px;border-radius:6px}
+    button{background:#0b74de;color:#fff;padding:8px;border-radius:6px;border:0;cursor:pointer}
+    .controls{display:flex;gap:10px;align-items:center}
   </style>
 </head>
 <body>
-  <header>
-    <h1>Thrivoy Business Dashboard</h1>
-    <a href="onboard.html">➕ New Business</a>
-  </header>
-
-  <main>
-    <section id="finder">
-      <h2>Find Your Dashboard</h2>
-      <input type="text" id="bizIdInput" placeholder="Enter your Business ID (e.g., BIZ-12345)">
-      <div class="remember">
-        <input type="checkbox" id="rememberMe">
-        <label for="rememberMe">Remember me on this device</label>
+  <div class="wrap">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 id="bizName">Loading business...</h2>
+          <div id="bizIdDisplay" class="muted"></div>
+        </div>
+        <div class="controls">
+          <button id="refreshBtn">Refresh</button>
+          <button id="forgetBtn" style="background:#ef4444">Forget Business</button>
+        </div>
       </div>
-      <button id="loadBtn">Load Dashboard</button>
-    </section>
 
-    <section id="bizInfo" style="display:none;">
-      <h2>Business Info</h2>
-      <div class="card" id="bizDetails"></div>
-      <button id="switchBtn">🔄 Switch Business</button>
-    </section>
+      <div id="contentArea" style="margin-top:14px">
+        <div class="muted">Fetching AI content...</div>
+      </div>
+    </div>
 
-    <section id="taglines" style="display:none;">
-      <h2>Taglines</h2>
-      <ul id="taglineList"></ul>
-      <button id="regenTaglines">Regenerate Taglines</button>
-    </section>
-
-    <section id="contentPlanSec" style="display:none;">
-      <h2>7-Day Content Plan</h2>
-      <ol id="contentPlan"></ol>
-      <button id="regenPlan">Regenerate Content Plan</button>
-    </section>
-  </main>
+    <div id="planCard" class="card">
+      <h3>7-day Content Plan</h3>
+      <div id="plan" class="content-plan"></div>
+    </div>
+  </div>
 
   <script>
-    // JSONP helper
-    function makeJSONPRequest(url, params, callback) {
-      const cbName = 'jsonp_cb_' + Math.round(100000 * Math.random());
-      params = params || {};
-      params.callback = cbName;
-
-      const query = Object.keys(params)
-        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-        .join('&');
-
+    // JSONP helper (same as onboard)
+    function makeJSONPRequest(url, params, callbackName, onComplete, timeoutMs=12000) {
+      const cb = callbackName || ('cb_' + Date.now() + '_' + Math.random().toString(36).slice(2,8));
+      params = Object.assign({}, params, { callback: cb });
+      const query = Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
       const script = document.createElement('script');
-      script.src = url + '?' + query;
-
-      window[cbName] = function(data) {
-        callback(data);
-        document.head.removeChild(script);
-        delete window[cbName];
-      };
-
+      script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + query;
+      script.async = true;
+      let timer = setTimeout(()=>{ cleanup(); onComplete({ success:false, error:'timeout' }); }, timeoutMs);
+      window[cb] = function(data){ clearTimeout(timer); cleanup(); onComplete(data); };
+      script.onerror = function(){ clearTimeout(timer); cleanup(); onComplete({ success:false, error:'load error' }); };
+      function cleanup(){ try{ document.head.removeChild(script); }catch(e){} try{ delete window[cb]; }catch(e){} }
       document.head.appendChild(script);
     }
 
-    const loadBtn = document.getElementById('loadBtn');
-    const bizIdInput = document.getElementById('bizIdInput');
-    const rememberMe = document.getElementById('rememberMe');
-    const bizInfoSec = document.getElementById('bizInfo');
-    const bizDetails = document.getElementById('bizDetails');
-    const switchBtn = document.getElementById('switchBtn');
-    const taglineSec = document.getElementById('taglines');
-    const taglineList = document.getElementById('taglineList');
-    const regenTaglines = document.getElementById('regenTaglines');
-    const contentSec = document.getElementById('contentPlanSec');
-    const contentPlan = document.getElementById('contentPlan');
-    const regenPlan = document.getElementById('regenPlan');
+    (function(){
+      const params = new URLSearchParams(location.search);
+      let bizId = params.get('businessId') || '';
+      // fallback to localStorage
+      try { if (!bizId) bizId = localStorage.getItem('thrivoyBizId') || ''; } catch(e) {}
 
-    let currentBiz = null;
+      const bizNameEl = document.getElementById('bizName');
+      const bizIdEl = document.getElementById('bizIdDisplay');
+      const contentArea = document.getElementById('contentArea');
+      const planEl = document.getElementById('plan');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const forgetBtn = document.getElementById('forgetBtn');
 
-    // Load dashboard
-    function loadDashboard(bizId, remember) {
-      makeJSONPRequest(APPS_SCRIPT_URL, { action: 'getDashboard', businessId: bizId }, function(res) {
-        console.log('Dashboard:', res);
+      function showError(msg) { contentArea.innerHTML = '<div class="muted" style="color:#b91c1c">'+msg+'</div>'; }
 
-        if (!res.success) {
-          alert('❌ Could not load dashboard: ' + (res.error || 'Unknown error'));
-          return;
-        }
-
-        currentBiz = res;
-        // Save bizId in localStorage only if rememberMe is checked
-        if (remember) {
-          localStorage.setItem('thrivoyBizId', bizId);
-        }
-        renderDashboard(res);
-      });
-    }
-
-    loadBtn.addEventListener('click', function() {
-      const bizId = bizIdInput.value.trim();
       if (!bizId) {
-        alert('Please enter your Business ID.');
+        bizNameEl.textContent = 'No Business selected';
+        bizIdEl.textContent = '';
+        contentArea.innerHTML = '<div class="muted">Please enter your Business ID or use the onboarding flow.</div>';
         return;
       }
-      loadDashboard(bizId, rememberMe.checked);
-    });
 
-    function renderDashboard(data) {
-      document.getElementById('finder').style.display = 'none';
+      bizIdEl.textContent = 'Business ID: ' + bizId;
 
-      // Business Info
-      bizInfoSec.style.display = 'block';
-      bizDetails.innerHTML = `
-        <strong>Name:</strong> ${data.businessName || ''}<br>
-        <strong>Owner:</strong> ${data.ownerName || ''}<br>
-        <strong>Email:</strong> ${data.email || ''}<br>
-        <strong>Phone:</strong> ${data.phone || ''}<br>
-        <strong>Category:</strong> ${data.category || ''}<br>
-        <strong>Description:</strong> ${data.descr || ''}
-      `;
+      function loadDashboard(){
+        contentArea.innerHTML = '<div class="muted">Loading content & taglines...</div>';
+        // 1) fetch ThankYou / business object to get saved fields
+        makeJSONPRequest(APPS_SCRIPT_URL, { action: 'getThankYou', businessId: bizId }, null, function(resp){
+          if (!resp || !resp.success) {
+            showError('Failed to load business data: ' + (resp && resp.error || 'unknown'));
+            return;
+          }
+          const biz = resp.business || {};
+          bizNameEl.textContent = biz.businessName || biz.businessname || 'Your Business';
+          // show tagline/hero if available
+          const tagline = biz.tagline || biz.Tagline || resp.tagline || '';
+          const hero = biz.hero || biz.heroMessage || resp.heroMessage || '';
+          const html = `
+            ${tagline ? '<div class="tagline">'+tagline+'</div>' : ''}
+            ${hero ? '<div class="hero">'+hero+'</div>' : ''}
+            <p class="muted">Category: ${biz.category || biz.Category || '-'} | Location: ${biz.location || biz.Location || '-'}</p>
+          `;
+          contentArea.innerHTML = html;
+        }, 12000);
 
-      // Taglines
-      taglineSec.style.display = 'block';
-      taglineList.innerHTML = '';
-      if (data.taglines && data.taglines.length > 0) {
-        data.taglines.forEach(t => {
-          const li = document.createElement('li');
-          li.textContent = t;
-          taglineList.appendChild(li);
-        });
-      } else {
-        taglineList.innerHTML = '<li>No taglines yet.</li>';
+        // 2) request a 7-day content plan (uses generateContentPlan endpoint)
+        makeJSONPRequest(APPS_SCRIPT_URL, { action: 'generateContentPlan', businessName: '', businessId: bizId }, null, function(resp){
+          planEl.innerHTML = '';
+          if (!resp || !resp.success) {
+            planEl.innerHTML = '<div class="muted">Unable to create content plan: ' + (resp && resp.error || 'unknown') + '</div>';
+            return;
+          }
+          const plan = resp.plan || [];
+          if (plan.length === 0) {
+            planEl.innerHTML = '<div class="muted">No plan items returned</div>';
+            return;
+          }
+          plan.forEach(function(item){
+            const card = document.createElement('div');
+            card.className = 'plan-item';
+            card.innerHTML = '<strong>Day '+item.day+'</strong><div style="margin-top:6px;font-weight:600">'+ (item.title || '') + '</div><div style="margin-top:6px">'+ (item.text || '') + '</div><div style="margin-top:8px;color:#6b7280">'+(item.hashtags || '')+'</div>';
+            planEl.appendChild(card);
+          });
+        }, 14000);
       }
 
-      // Content plan
-      contentSec.style.display = 'block';
-      contentPlan.innerHTML = '';
-      if (data.contentPlan && data.contentPlan.length > 0) {
-        data.contentPlan.forEach(p => {
-          const li = document.createElement('li');
-          li.textContent = (p.platform ? '[' + p.platform + '] ' : '') + (p.title || '') + ': ' + (p.text || '');
-          contentPlan.appendChild(li);
-        });
-      } else {
-        contentPlan.innerHTML = '<li>No content plan yet.</li>';
-      }
-    }
-
-    // Switch Business
-    switchBtn.addEventListener('click', function() {
-      currentBiz = null;
-      bizIdInput.value = '';
-      localStorage.removeItem('thrivoyBizId');
-      document.getElementById('finder').style.display = 'block';
-      bizInfoSec.style.display = 'none';
-      taglineSec.style.display = 'none';
-      contentSec.style.display = 'none';
-    });
-
-    // Regenerate taglines
-    regenTaglines.addEventListener('click', function() {
-      if (!currentBiz) return;
-      regenTaglines.disabled = true;
-      regenTaglines.textContent = 'Regenerating...';
-
-      makeJSONPRequest(APPS_SCRIPT_URL, {
-        action: 'generateTagline',
-        businessName: currentBiz.businessName,
-        service: currentBiz.descr,
-        targetCustomer: currentBiz.targetCustomer,
-        usp: currentBiz.usp
-      }, function(res) {
-        regenTaglines.disabled = false;
-        regenTaglines.textContent = 'Regenerate Taglines';
-
-        taglineList.innerHTML = '';
-        if (res.success && res.taglines) {
-          res.taglines.forEach(t => {
-            const li = document.createElement('li');
-            li.textContent = t;
-            taglineList.appendChild(li);
-          });
-        } else {
-          taglineList.innerHTML = '<li>❌ Could not regenerate taglines.</li>';
-        }
+      refreshBtn.addEventListener('click', loadDashboard);
+      forgetBtn.addEventListener('click', function(){
+        try { localStorage.removeItem('thrivoyBizId'); } catch(e){}
+        alert('Business ID forgotten. You will need to re-enter Business ID to access dashboard.');
+        location.href = 'onboard.html';
       });
-    });
 
-    // Regenerate content plan
-    regenPlan.addEventListener('click', function() {
-      if (!currentBiz) return;
-      regenPlan.disabled = true;
-      regenPlan.textContent = 'Regenerating...';
-
-      makeJSONPRequest(APPS_SCRIPT_URL, {
-        action: 'generateContentPlan',
-        businessName: currentBiz.businessName,
-        service: currentBiz.descr,
-        targetCustomer: currentBiz.targetCustomer,
-        usp: currentBiz.usp
-      }, function(res) {
-        regenPlan.disabled = false;
-        regenPlan.textContent = 'Regenerate Content Plan';
-
-        contentPlan.innerHTML = '';
-        if (res.success && res.plan) {
-          res.plan.forEach(p => {
-            const li = document.createElement('li');
-            li.textContent = (p.platform ? '[' + p.platform + '] ' : '') + (p.title || '') + ': ' + (p.text || '');
-            contentPlan.appendChild(li);
-          });
-        } else {
-          contentPlan.innerHTML = '<li>❌ Could not regenerate content plan.</li>';
-        }
-      });
-    });
-
-    // 🔑 Auto-load logic
-    const params = new URLSearchParams(window.location.search);
-    const autoBizId = params.get('businessId');
-    const storedBizId = localStorage.getItem('thrivoyBizId');
-
-    if (autoBizId) {
-      bizIdInput.value = autoBizId;
-      loadDashboard(autoBizId, true); // If from thankyou, always remember
-    } else if (storedBizId) {
-      bizIdInput.value = storedBizId;
-      rememberMe.checked = true;
-      loadDashboard(storedBizId, true);
-    }
+      // initial load
+      loadDashboard();
+    })();
   </script>
 </body>
 </html>
