@@ -9,69 +9,82 @@
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 2rem;
-      background: #f9fafc;
+      background: #f5f7fa;
       color: #333;
     }
-    .card {
+    .container {
       background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       max-width: 600px;
       margin: 2rem auto;
     }
-    h1 {
-      color: #4a90e2;
-    }
-    .bizId {
-      font-size: 1.2rem;
+    h1 { color: #4a90e2; }
+    p { margin: 1rem 0; }
+    .biz-id {
       font-weight: bold;
-      color: #2c3e50;
-      margin: 1rem 0;
-    }
-    .redirect {
-      margin-top: 1.5rem;
-      font-size: 1rem;
-      color: #555;
+      color: #4a90e2;
+      font-size: 1.2rem;
     }
     a.button {
       display: inline-block;
-      margin-top: 1rem;
-      padding: 0.7rem 1.2rem;
+      padding: 0.6rem 1.2rem;
       background: #4a90e2;
       color: #fff;
-      text-decoration: none;
       border-radius: 6px;
+      text-decoration: none;
+      margin-top: 1rem;
     }
+    .remember {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .remember input { margin-right: 0.4rem; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>🎉 Thank You for Joining Thrivoy!</h1>
-    <p>Your business has been successfully onboarded.</p>
-    
-    <p class="bizId">Business ID: <span id="bizId">Loading...</span></p>
-    
-    <p class="redirect">You’ll be redirected to your dashboard shortly...</p>
-    <a id="dashLink" href="dashboard.html" class="button">Go to Dashboard Now</a>
+  <div class="container">
+    <h1>🎉 Thank You!</h1>
+    <p>Your business has been onboarded successfully.</p>
+    <p>Your Business ID is:</p>
+    <p class="biz-id" id="bizIdDisplay">Loading...</p>
+
+    <div class="remember">
+      <input type="checkbox" id="rememberMe">
+      <label for="rememberMe">Remember this Business ID for dashboard</label>
+    </div>
+
+    <a id="dashboardLink" class="button" href="dashboard.html">Go to Dashboard</a>
   </div>
 
   <script>
-    // Get businessId from URL
+    // Extract businessId from URL
     const params = new URLSearchParams(window.location.search);
-    const bizId = params.get("businessId") || "UNKNOWN";
+    const bizId = params.get('businessId');
 
-    // Display on page
-    document.getElementById("bizId").textContent = bizId;
+    const bizIdDisplay = document.getElementById('bizIdDisplay');
+    const dashboardLink = document.getElementById('dashboardLink');
+    const rememberMe = document.getElementById('rememberMe');
 
-    // Update dashboard link
-    const dashUrl = "dashboard.html?businessId=" + encodeURIComponent(bizId);
-    document.getElementById("dashLink").href = dashUrl;
+    if (bizId) {
+      bizIdDisplay.textContent = bizId;
+      dashboardLink.href = `dashboard.html?businessId=${bizId}`;
 
-    // Auto-redirect after 5s
-    setTimeout(() => {
-      window.location.href = dashUrl;
-    }, 5000);
+      // If Remember Me checked → save ID in localStorage
+      rememberMe.addEventListener('change', function() {
+        if (this.checked) {
+          localStorage.setItem('thrivoyBizId', bizId);
+        } else {
+          localStorage.removeItem('thrivoyBizId');
+        }
+      });
+    } else {
+      bizIdDisplay.textContent = "❌ Not found";
+    }
   </script>
 </body>
 </html>
