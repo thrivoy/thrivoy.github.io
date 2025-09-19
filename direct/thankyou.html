@@ -3,56 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <title>Thank You - Thrivoy</title>
-  <script src="config.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 40px; }
-    .card { border: 2px solid #c3e6cb; padding: 20px; border-radius: 10px; background: #d4edda; display: inline-block; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2rem;
+      background: #f9fafc;
+      color: #333;
+    }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 2rem;
+      max-width: 600px;
+      margin: 2rem auto;
+    }
+    h1 {
+      color: #4a90e2;
+    }
+    .bizId {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #2c3e50;
+      margin: 1rem 0;
+    }
+    .redirect {
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      color: #555;
+    }
+    a.button {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.7rem 1.2rem;
+      background: #4a90e2;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
-  <h2>🎉 Thank You for Onboarding!</h2>
-  <div class="card" id="thankYouCard">Loading details...</div>
+  <div class="card">
+    <h1>🎉 Thank You for Joining Thrivoy!</h1>
+    <p>Your business has been successfully onboarded.</p>
+    
+    <p class="bizId">Business ID: <span id="bizId">Loading...</span></p>
+    
+    <p class="redirect">You’ll be redirected to your dashboard shortly...</p>
+    <a id="dashLink" href="dashboard.html" class="button">Go to Dashboard Now</a>
+  </div>
 
   <script>
-    function makeJSONPRequest(url, params, callback) {
-      const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-      params.callback = callbackName;
-      const queryString = Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
-      const script = document.createElement('script');
-      script.src = url + '?' + queryString;
-      window[callbackName] = function(data) {
-        callback(data);
-        document.head.removeChild(script);
-        delete window[callbackName];
-      };
-      document.head.appendChild(script);
-    }
+    // Get businessId from URL
+    const params = new URLSearchParams(window.location.search);
+    const bizId = params.get("businessId") || "UNKNOWN";
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const businessId = urlParams.get("businessId");
+    // Display on page
+    document.getElementById("bizId").textContent = bizId;
 
-    if (businessId) {
-      makeJSONPRequest(APPS_SCRIPT_URL, { action: "getThankYou", businessId }, function(response) {
-        if (response.success) {
-          document.getElementById('thankYouCard').innerHTML =
-            `<h3>Welcome, ${response.ownerName}!</h3>
-             <p>Your business <strong>${response.businessName}</strong> is onboarded.</p>
-             <p><a href="dashboard.html?businessId=${businessId}">Go to Dashboard</a></p>`;
+    // Update dashboard link
+    const dashUrl = "dashboard.html?businessId=" + encodeURIComponent(bizId);
+    document.getElementById("dashLink").href = dashUrl;
 
-          // Log success
-          makeJSONPRequest(APPS_SCRIPT_URL, {
-            action: "log",
-            event: "thankyou_view",
-            businessId: businessId,
-            formType: "thankyou"
-          }, ()=>{});
-        } else {
-          document.getElementById('thankYouCard').innerHTML = "❌ Error: " + (response.error || "Unable to fetch details");
-        }
-      });
-    } else {
-      document.getElementById('thankYouCard').innerHTML = "❌ Missing businessId.";
-    }
+    // Auto-redirect after 5s
+    setTimeout(() => {
+      window.location.href = dashUrl;
+    }, 5000);
   </script>
 </body>
 </html>
