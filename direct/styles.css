@@ -1,0 +1,119 @@
+/* styles.css — Thrivoy shared styling */
+
+/* Reset-ish */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Global */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f9;
+  color: #111827;
+  line-height: 1.4;
+  padding: 20px;
+}
+
+/* Container cards */
+.card {
+  background: #fff;
+  padding: 22px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  margin: 20px auto;
+  max-width: 760px;
+}
+
+/* Headings */
+h1, h2, h3 {
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+h1 {
+  font-size: 1.8rem;
+}
+h2 {
+  font-size: 1.4rem;
+}
+h3 {
+  font-size: 1.2rem;
+}
+
+/* Form elements */
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 600;
+}
+input[type=text],
+input[type=email],
+textarea,
+select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+textarea {
+  resize: vertical;
+}
+
+/* Buttons */
+button,
+a.button {
+  background: #0b74de;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+button:hover,
+a.button:hover {
+  background: #0959aa;
+}
+
+/* Muted text */
+.muted {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Status messages */
+.status {
+  margin-top: 10px;
+}
+.status.error {
+  color: #b91c1c;
+}
+.status.success {
+  color: #065f46;
+}
+
+/* Dashboard specific */
+.tagline {
+  font-size: 20px;
+  color: #0b74de;
+  margin: 6px 0;
+}
+.hero {
+  font-size: 16px;
+  margin: 6px 0;
+  color: #111827;
+}
+.content-plan {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.plan-item {
+  background: #f8fafc;
+  padding: 10px;
+  border-radius: 6px;
+}
