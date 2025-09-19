@@ -1,139 +1,199 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <title>Thrivoy Onboarding</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="config.js"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css"> <!-- optional -->
+  <script src="config.js"></script> <!-- must exist and define APPS_SCRIPT_URL -->
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fa;
-      padding: 2rem;
-    }
-    .card {
-      background: #fff;
-      padding: 2rem;
-      max-width: 600px;
-      margin: 2rem auto;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #4a90e2;
-      margin-top: 0;
-    }
-    label {
-      display: block;
-      margin: 0.5rem 0 0.2rem;
-    }
-    input, textarea, select {
-      width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-bottom: 1rem;
-    }
-    button {
-      padding: 0.7rem 1.2rem;
-      border: none;
-      background: #4a90e2;
-      color: #fff;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
-    }
-    .status {
-      margin-top: 1rem;
-      font-weight: bold;
-      color: #333;
-    }
+    body{font-family:Arial,Helvetica,sans-serif;background:#f4f6f9;padding:20px}
+    .card{max-width:760px;margin:20px auto;background:#fff;padding:22px;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,0.06)}
+    h1{margin:0 0 12px;color:#1e293b}
+    label{display:block;margin-top:10px;font-weight:600}
+    input[type=text], input[type=email], textarea, select {width:100%;padding:8px;margin-top:6px;border:1px solid #d1d5db;border-radius:6px}
+    .inline{display:flex;gap:10px}
+    .muted{color:#6b7280;font-size:13px}
+    button{background:#0b74de;color:#fff;padding:10px 16px;border-radius:6px;border:0;cursor:pointer;margin-top:14px}
+    .status{margin-top:10px}
+    .error{color:#b91c1c}
+    .success{color:#065f46}
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Onboard Your Business</h1>
-    <form id="onboardForm">
-      <label for="businessName">Business Name</label>
-      <input type="text" id="businessName" name="businessName" required>
+    <h1>Onboard your business</h1>
+    <p class="muted">Fill the fields below — the AI will use the intelligence answers to generate compelling website + content.</p>
 
-      <label for="ownerName">Owner Name</label>
-      <input type="text" id="ownerName" name="ownerName" required>
+    <form id="onboardForm" data-type="onboarding">
+      <label>Business Name
+        <input name="businessName" required />
+      </label>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
+      <label>Owner Name
+        <input name="ownerName" />
+      </label>
 
-      <label for="phone">Phone</label>
-      <input type="text" id="phone" name="phone" required>
+      <label>Email
+        <input type="email" name="email" required />
+      </label>
 
-      <label for="category">Category</label>
-      <select id="category" name="category" required>
-        <option value="services">Services</option>
-        <option value="products">Products</option>
-        <option value="consulting">Consulting</option>
-        <option value="education">Education</option>
-      </select>
+      <label>Phone
+        <input name="phone" />
+      </label>
 
-      <label for="descr">Description</label>
-      <textarea id="descr" name="descr" rows="4" required></textarea>
+      <label>Category / Industry
+        <select name="category">
+          <option value="services">Services</option>
+          <option value="technology">Technology</option>
+          <option value="healthcare">Healthcare</option>
+          <option value="education">Education</option>
+          <option value="consulting">Consulting</option>
+          <option value="insurance">Insurance</option>
+        </select>
+      </label>
 
-      <button type="submit" id="submitBtn">Submit</button>
-      <p class="status" id="status"></p>
+      <label>Location (City, State)
+        <input name="location" placeholder="e.g., Bangalore, India" />
+      </label>
+
+      <hr style="margin:14px 0"/>
+
+      <h3>Intelligence questions (these matter — Gemini uses them)</h3>
+
+      <label>Short description (what you do)
+        <textarea name="description" rows="3" placeholder="What does your business do?"></textarea>
+      </label>
+
+      <label>Target audience
+        <input name="targetAudience" placeholder="Who are your customers?" />
+      </label>
+
+      <label>Unique value / USP
+        <input name="uniqueValue" placeholder="What makes you different?" />
+      </label>
+
+      <label>Key benefits (comma separated)
+        <input name="keyBenefits" placeholder="What benefits do customers get? e.g., faster delivery, lower cost" />
+      </label>
+
+      <label>Problem you solve
+        <input name="problemSolved" placeholder="Which customer problem do you solve?" />
+      </label>
+
+      <label>Tone (professional, friendly, bold...)
+        <input name="tone" placeholder="e.g., friendly" />
+      </label>
+
+      <div style="margin-top:12px">
+        <button id="submitBtn" type="submit">Create my website</button>
+        <span class="status" id="statusText"></span>
+      </div>
     </form>
   </div>
 
   <script>
-    // JSONP helper
-    function makeJSONPRequest(url, params, callback) {
-      const cbName = 'jsonp_cb_' + Math.floor(Math.random() * 100000);
-      params.callback = cbName;
+    // Basic JSONP helper
+    function makeJSONPRequest(url, params, callbackName, onComplete, timeoutMs=15000) {
+      // build unique callback parameter name if not provided
+      const cb = callbackName || ('cb_' + Date.now() + '_' + Math.random().toString(36).slice(2,8));
+      params = Object.assign({}, params, { callback: cb });
 
-      const query = Object.keys(params)
-        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-        .join('&');
-
+      const query = Object.keys(params).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k])).join('&');
       const script = document.createElement('script');
-      script.src = url + '?' + query;
+      script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + query;
+      script.async = true;
+      let timer = setTimeout(() => {
+        cleanup();
+        onComplete({ success: false, error: 'JSONP timeout' });
+      }, timeoutMs);
 
-      window[cbName] = function(data) {
-        callback(data);
-        document.head.removeChild(script);
-        delete window[cbName];
+      window[cb] = function(data){
+        clearTimeout(timer);
+        cleanup();
+        onComplete(data);
       };
+
+      script.onerror = function(){
+        clearTimeout(timer);
+        cleanup();
+        onComplete({ success: false, error: 'JSONP script load failed' });
+      };
+
+      function cleanup(){
+        try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e){}
+        try { delete window[cb]; } catch(e){}
+      }
 
       document.head.appendChild(script);
     }
 
-    const form = document.getElementById('onboardForm');
-    const statusEl = document.getElementById('status');
-    const submitBtn = document.getElementById('submitBtn');
+    (function(){
+      const form = document.getElementById('onboardForm');
+      const status = document.getElementById('statusText');
+      const submitBtn = document.getElementById('submitBtn');
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
+      function setStatus(txt, cls) {
+        status.textContent = txt || '';
+        status.className = 'status ' + (cls || '');
+      }
 
-      submitBtn.disabled = true;
-      statusEl.textContent = 'Submitting...';
+      form.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        setStatus('Preparing submission...', '');
+        submitBtn.disabled = true;
 
-      const formData = Object.fromEntries(new FormData(form).entries());
+        const fd = new FormData(form);
+        const data = {};
+        for (const [k,v] of fd.entries()) {
+          data[k] = v;
+        }
+        // add action
+        data.action = 'onboard';
 
-      makeJSONPRequest(APPS_SCRIPT_URL, {
-        action: 'onboard',
-        ...formData
-      }, function(res) {
-        if (res.success && res.businessId) {
-          statusEl.textContent = '✅ Onboarding successful! Redirecting...';
-          // Redirect to thankyou.html with businessId
-          const url = 'thankyou.html?businessId=' + encodeURIComponent(res.businessId);
-          setTimeout(() => window.location.href = url, 2000);
-        } else {
-          statusEl.textContent = '❌ Error: ' + (res.error || 'Onboarding failed');
+        // Validate minimal fields
+        if (!data.businessName || !data.email) {
+          setStatus('Business name and email are required', 'error');
+          submitBtn.disabled = false;
+          return;
+        }
+
+        setStatus('Submitting (JSONP) — this bypasses CORS...', '');
+
+        // Use JSONP GET — backend supports onboard via GET with JSONP
+        try {
+          makeJSONPRequest(APPS_SCRIPT_URL, data, null, function(resp){
+            if (!resp) {
+              setStatus('No response from server', 'error');
+              submitBtn.disabled = false;
+              return;
+            }
+            if (resp.success) {
+              setStatus('Success! Redirecting...', 'success');
+
+              // Redirect to thank you with businessId, pass remember=true by default
+              const biz = resp.businessId || resp.businessID || resp.id || resp.id0 || resp.id1 || resp.business_id || resp.biz || '';
+              if (biz) {
+                // redirect with remember flag set so thankyou auto-saves
+                window.location.href = 'thankyou.html?businessId=' + encodeURIComponent(biz) + '&remember=true';
+                return;
+              } else {
+                // if server didn't return id, show message
+                setStatus('Onboarded but no businessId returned. Please check dashboard later.', 'error');
+                submitBtn.disabled = false;
+                return;
+              }
+            } else {
+              setStatus('Submission failed: ' + (resp.error || resp.message || 'unknown'), 'error');
+              submitBtn.disabled = false;
+            }
+          }, 20000);
+        } catch (err) {
+          setStatus('Submission error: ' + err.message, 'error');
           submitBtn.disabled = false;
         }
       });
-    });
+    })();
   </script>
 </body>
 </html>
