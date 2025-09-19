@@ -1,90 +1,61 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Thank You - Thrivoy</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <title>Thank You — Thrivoy</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 2rem;
-      background: #f5f7fa;
-      color: #333;
-    }
-    .container {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      max-width: 600px;
-      margin: 2rem auto;
-    }
-    h1 { color: #4a90e2; }
-    p { margin: 1rem 0; }
-    .biz-id {
-      font-weight: bold;
-      color: #4a90e2;
-      font-size: 1.2rem;
-    }
-    a.button {
-      display: inline-block;
-      padding: 0.6rem 1.2rem;
-      background: #4a90e2;
-      color: #fff;
-      border-radius: 6px;
-      text-decoration: none;
-      margin-top: 1rem;
-    }
-    .remember {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .remember input { margin-right: 0.4rem; }
+    body{font-family:Arial,Helvetica,sans-serif;background:#f4f6f9;padding:20px}
+    .card{max-width:720px;margin:30px auto;background:#fff;padding:22px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.06);text-align:center}
+    .biz{font-weight:700;color:#0b74de;margin:12px 0;font-size:1.2rem}
+    a.button{display:inline-block;margin-top:12px;background:#0b74de;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none}
+    .remember{margin-top:12px}
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🎉 Thank You!</h1>
-    <p>Your business has been onboarded successfully.</p>
-    <p>Your Business ID is:</p>
-    <p class="biz-id" id="bizIdDisplay">Loading...</p>
+  <div class="card">
+    <h1>🎉 Thank you — you're onboarded!</h1>
+    <p>We created your site and started the onboarding tasks.</p>
+
+    <p>Your Business ID:</p>
+    <div class="biz" id="bizId">Loading...</div>
 
     <div class="remember">
-      <input type="checkbox" id="rememberMe">
-      <label for="rememberMe">Remember this Business ID for dashboard</label>
+      <label><input type="checkbox" id="remember"> Remember this Business ID for dashboard</label>
     </div>
 
-    <a id="dashboardLink" class="button" href="dashboard.html">Go to Dashboard</a>
+    <div style="margin-top:14px">
+      <a id="goDash" class="button" href="dashboard.html">Open Dashboard</a>
+    </div>
   </div>
 
   <script>
-    // Extract businessId from URL
-    const params = new URLSearchParams(window.location.search);
-    const bizId = params.get('businessId');
+    (function(){
+      const params = new URLSearchParams(window.location.search);
+      const biz = params.get('businessId') || '';
+      const rememberFlag = params.get('remember') || '';
+      const bizEl = document.getElementById('bizId');
+      const rememberEl = document.getElementById('remember');
+      const goDash = document.getElementById('goDash');
 
-    const bizIdDisplay = document.getElementById('bizIdDisplay');
-    const dashboardLink = document.getElementById('dashboardLink');
-    const rememberMe = document.getElementById('rememberMe');
-
-    if (bizId) {
-      bizIdDisplay.textContent = bizId;
-      dashboardLink.href = `dashboard.html?businessId=${bizId}`;
-
-      // If Remember Me checked → save ID in localStorage
-      rememberMe.addEventListener('change', function() {
-        if (this.checked) {
-          localStorage.setItem('thrivoyBizId', bizId);
-        } else {
-          localStorage.removeItem('thrivoyBizId');
+      if (biz) {
+        bizEl.textContent = biz;
+        goDash.href = 'dashboard.html?businessId=' + encodeURIComponent(biz);
+        if (rememberFlag === 'true') {
+          rememberEl.checked = true;
+          try { localStorage.setItem('thrivoyBizId', biz); } catch(e){}
         }
-      });
-    } else {
-      bizIdDisplay.textContent = "❌ Not found";
-    }
+
+        rememberEl.addEventListener('change', function(){
+          try {
+            if (this.checked) localStorage.setItem('thrivoyBizId', biz);
+            else localStorage.removeItem('thrivoyBizId');
+          } catch(e){}
+        });
+      } else {
+        bizEl.textContent = 'Not available';
+      }
+    })();
   </script>
 </body>
 </html>
